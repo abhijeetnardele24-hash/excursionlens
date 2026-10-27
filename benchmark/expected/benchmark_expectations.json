@@ -1,0 +1,110 @@
+{
+  "CASE-01-DOOR-OPEN": {
+    "filename": "01_door_left_open.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 40.0,
+    "min_temperature": 4.2,
+    "max_temperature": 11.3,
+    "observation_count": 4,
+    "anomalies_count": 2
+  },
+  "CASE-02-TRANSFER-DELAY": {
+    "filename": "02_transfer_delay.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 60.0,
+    "min_temperature": 4.5,
+    "max_temperature": 9.2,
+    "observation_count": 4,
+    "anomalies_count": 2
+  },
+  "CASE-03-REEFER-POWER-LOSS": {
+    "filename": "03_reefer_power_loss.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 60.0,
+    "min_temperature": 4.0,
+    "max_temperature": 15.9,
+    "observation_count": 2,
+    "anomalies_count": 0
+  },
+  "CASE-04-EQUIPMENT-DRIFT": {
+    "filename": "04_equipment_drift.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 100.0,
+    "min_temperature": 4.0,
+    "max_temperature": 9.6,
+    "observation_count": 2,
+    "anomalies_count": 0
+  },
+  "CASE-05-LOGGER-SPIKE": {
+    "filename": "05_isolated_logger_spike.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 5.0,
+    "min_temperature": 4.2,
+    "max_temperature": 14.8,
+    "observation_count": 4,
+    "anomalies_count": 2
+  },
+  "CASE-06-LOGGER-PLACEMENT": {
+    "filename": "06_logger_placement_diff.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 30.0,
+    "min_temperature": 4.5,
+    "max_temperature": 8.8,
+    "observation_count": 4,
+    "anomalies_count": 2
+  },
+  "CASE-07-TIMEZONE-MISMATCH": {
+    "filename": "07_clock_timezone_mismatch.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 35.0,
+    "min_temperature": 4.1,
+    "max_temperature": 9.4,
+    "observation_count": 4,
+    "anomalies_count": 2
+  },
+  "CASE-08-TELEMETRY-GAP": {
+    "filename": "08_missing_reading_gap.json",
+    "has_excursion": false,
+    "total_excursion_duration_minutes": 0.0,
+    "min_temperature": 4.5,
+    "max_temperature": 4.5,
+    "observation_count": 2,
+    "anomalies_count": 1
+  },
+  "CASE-09-DUAL-CAUSE": {
+    "filename": "09_dual_cause_event.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 65.0,
+    "min_temperature": 4.3,
+    "max_temperature": 11.5,
+    "observation_count": 7,
+    "anomalies_count": 4
+  },
+  "CASE-10-COMPLIANT": {
+    "filename": "10_no_true_excursion.json",
+    "has_excursion": false,
+    "total_excursion_duration_minutes": 0.0,
+    "min_temperature": 4.0,
+    "max_temperature": 4.9,
+    "observation_count": 1,
+    "anomalies_count": 0
+  },
+  "CASE-11-AMBIGUOUS": {
+    "filename": "11_ambiguous_evidence.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 30.0,
+    "min_temperature": 4.4,
+    "max_temperature": 9.8,
+    "observation_count": 4,
+    "anomalies_count": 2
+  },
+  "CASE-12-INJECTION": {
+    "filename": "12_adversarial_prompt_injection.json",
+    "has_excursion": true,
+    "total_excursion_duration_minutes": 45.0,
+    "min_temperature": 4.2,
+    "max_temperature": 12.5,
+    "observation_count": 4,
+    "anomalies_count": 2
+  }
+}

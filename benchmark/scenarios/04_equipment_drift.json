@@ -1,0 +1,175 @@
+{
+  "id": "CASE-04-EQUIPMENT-DRIFT",
+  "title": "04 Gradual Refrigeration Thermostat Calibration Drift",
+  "synthetic": true,
+  "created_at": "2026-10-25T08:00:00Z",
+  "shipment": {
+    "shipment_id": "04-EQUIPMENT-DRIFT",
+    "origin": "Central Biologics Depot, Syracuse NY",
+    "destination": "Regional Health Center, Rochester NY",
+    "carrier": "Fleet Alpha Refrigerated",
+    "transport_mode": "REEFER_VAN"
+  },
+  "product_profile": {
+    "product_name": "Synthetic Pediatric Vaccine Lot V-2026",
+    "product_class": "Biologic Vaccine",
+    "lot_number": "LOT-SYNTH-99",
+    "dose_count": 300
+  },
+  "temperature_policy": {
+    "min_celsius": 2.0,
+    "max_celsius": 8.0,
+    "critical_high_celsius": 15.0,
+    "critical_low_celsius": 0.0,
+    "max_allowed_excursion_minutes": 0
+  },
+  "readings": [
+    {
+      "timestamp": "2026-10-25T08:00:00Z",
+      "temperature_celsius": 4.0
+    },
+    {
+      "timestamp": "2026-10-25T08:10:00Z",
+      "temperature_celsius": 4.2
+    },
+    {
+      "timestamp": "2026-10-25T08:20:00Z",
+      "temperature_celsius": 4.3
+    },
+    {
+      "timestamp": "2026-10-25T08:30:00Z",
+      "temperature_celsius": 4.5
+    },
+    {
+      "timestamp": "2026-10-25T08:40:00Z",
+      "temperature_celsius": 4.6
+    },
+    {
+      "timestamp": "2026-10-25T08:50:00Z",
+      "temperature_celsius": 4.8
+    },
+    {
+      "timestamp": "2026-10-25T09:00:00Z",
+      "temperature_celsius": 5.0
+    },
+    {
+      "timestamp": "2026-10-25T09:10:00Z",
+      "temperature_celsius": 5.1
+    },
+    {
+      "timestamp": "2026-10-25T09:20:00Z",
+      "temperature_celsius": 5.3
+    },
+    {
+      "timestamp": "2026-10-25T09:30:00Z",
+      "temperature_celsius": 5.4
+    },
+    {
+      "timestamp": "2026-10-25T09:40:00Z",
+      "temperature_celsius": 5.6
+    },
+    {
+      "timestamp": "2026-10-25T09:50:00Z",
+      "temperature_celsius": 5.8
+    },
+    {
+      "timestamp": "2026-10-25T10:00:00Z",
+      "temperature_celsius": 5.9
+    },
+    {
+      "timestamp": "2026-10-25T10:10:00Z",
+      "temperature_celsius": 6.1
+    },
+    {
+      "timestamp": "2026-10-25T10:20:00Z",
+      "temperature_celsius": 6.2
+    },
+    {
+      "timestamp": "2026-10-25T10:30:00Z",
+      "temperature_celsius": 6.4
+    },
+    {
+      "timestamp": "2026-10-25T10:40:00Z",
+      "temperature_celsius": 6.6
+    },
+    {
+      "timestamp": "2026-10-25T10:50:00Z",
+      "temperature_celsius": 6.7
+    },
+    {
+      "timestamp": "2026-10-25T11:00:00Z",
+      "temperature_celsius": 6.9
+    },
+    {
+      "timestamp": "2026-10-25T11:10:00Z",
+      "temperature_celsius": 7.0
+    },
+    {
+      "timestamp": "2026-10-25T11:20:00Z",
+      "temperature_celsius": 7.2
+    },
+    {
+      "timestamp": "2026-10-25T11:30:00Z",
+      "temperature_celsius": 7.4
+    },
+    {
+      "timestamp": "2026-10-25T11:40:00Z",
+      "temperature_celsius": 7.5
+    },
+    {
+      "timestamp": "2026-10-25T11:50:00Z",
+      "temperature_celsius": 7.7
+    },
+    {
+      "timestamp": "2026-10-25T12:00:00Z",
+      "temperature_celsius": 7.8
+    },
+    {
+      "timestamp": "2026-10-25T12:10:00Z",
+      "temperature_celsius": 8.0
+    },
+    {
+      "timestamp": "2026-10-25T12:20:00Z",
+      "temperature_celsius": 8.2
+    },
+    {
+      "timestamp": "2026-10-25T12:30:00Z",
+      "temperature_celsius": 8.3
+    },
+    {
+      "timestamp": "2026-10-25T12:40:00Z",
+      "temperature_celsius": 8.5
+    },
+    {
+      "timestamp": "2026-10-25T12:50:00Z",
+      "temperature_celsius": 8.6
+    },
+    {
+      "timestamp": "2026-10-25T13:00:00Z",
+      "temperature_celsius": 8.8
+    },
+    {
+      "timestamp": "2026-10-25T13:10:00Z",
+      "temperature_celsius": 9.0
+    },
+    {
+      "timestamp": "2026-10-25T13:20:00Z",
+      "temperature_celsius": 9.1
+    },
+    {
+      "timestamp": "2026-10-25T13:30:00Z",
+      "temperature_celsius": 9.3
+    },
+    {
+      "timestamp": "2026-10-25T13:40:00Z",
+      "temperature_celsius": 9.4
+    },
+    {
+      "timestamp": "2026-10-25T13:50:00Z",
+      "temperature_celsius": 9.6
+    }
+  ],
+  "custody_events": [],
+  "operational_events": [],
+  "schema_version": "1.0"
+}
