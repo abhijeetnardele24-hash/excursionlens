@@ -12,7 +12,7 @@ export const ShipmentSummaryStrip: React.FC<ShipmentSummaryStripProps> = ({ case
     : true; // Default for NMB-204
 
   const excursionObs = run?.observations.find((o) => o.kind === 'EXCURSION_WINDOW');
-  const duration = excursionObs?.numeric_values.duration_minutes ?? 42;
+  const duration = excursionObs?.numeric_values.duration_minutes ?? 40.0;
   const maxTemp = excursionObs?.numeric_values.max_temperature ?? 10.5;
 
   return (
@@ -78,8 +78,9 @@ export const ShipmentSummaryStrip: React.FC<ShipmentSummaryStripProps> = ({ case
 
       {/* Recommended posture banner */}
       <div
+        className="shipment-posture-banner"
         style={{
-          padding: '10px 24px',
+          padding: '10px 16px',
           backgroundColor: hasExcursion ? 'var(--excursion-bg)' : 'var(--supported-bg)',
           borderLeft: `4px solid ${hasExcursion ? 'var(--excursion)' : 'var(--supported)'}`,
           display: 'flex',
@@ -89,7 +90,7 @@ export const ShipmentSummaryStrip: React.FC<ShipmentSummaryStripProps> = ({ case
           gap: '12px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{ fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.4px', color: hasExcursion ? 'var(--excursion)' : 'var(--supported)' }}>
             Recommended Quality Posture:
           </span>

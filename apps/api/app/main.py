@@ -3,19 +3,22 @@ apps/api/app/main.py — ExcursionLens Production FastAPI Application
 
 Serves:
 - REST API for Case Ingestion, Deterministic Excursion Analysis, and Agent Orchestration
-- Server-Sent Events (SSE) for Real-Time Stage Transition Streaming
+- Server-Sent Events (SSE) for Real-Time Stage Transition Streaming (Single-Execution Architecture)
 - Static Frontend SPA serving for production single-container deployment
 - Health and Metadata endpoints (/api/health, /api/meta)
+- Hardened with rate limiting, payload bounds, security headers, and safe CORS
 """
 
 import asyncio
 import json
 import os
 import subprocess
+import time
+from collections import defaultdict
 from contextlib import asynccontextmanager
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -27,14 +30,16 @@ from .domain.detector import DeterministicExcursionEngine
 from .domain.models import (
     CaseAnalysisResult,
     CounterfactualRequest,
-    InvestigationRun,
     ShipmentCase,
 )
 from .reports.generator import generate_printable_html_report
 
-# In-memory case and run repository
+# In-memory case repository
 CASES_STORE: dict[str, ShipmentCase] = {}
-RUNS_STORE: dict[str, InvestigationRun] = {}
+
+# In-memory sliding-window rate limiter
+RATE_LIMIT_RECORDS: dict[str, list[float]] = defaultdict(list)
+
 
 def get_git_commit_sha() -> str:
     try:
@@ -42,13 +47,14 @@ def get_git_commit_sha() -> str:
             ["git", "rev-parse", "HEAD"],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
         if res.returncode == 0:
             return res.stdout.strip()
     except Exception:
         pass
     return "unknown"
+
 
 def load_default_fixtures():
     nmb_path = os.path.join("packages", "fixtures", "nmb_204.json")
@@ -57,27 +63,67 @@ def load_default_fixtures():
             data = json.load(f)
             case = ShipmentCase.model_validate(data)
             CASES_STORE[case.id] = case
-            print(f"📦 Loaded default fixture case: {case.id} ({case.shipment.shipment_id})")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_default_fixtures()
     yield
 
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="Evidence-first Cold-Chain Temperature Excursion Investigation Agent",
-    lifespan=lifespan
+    description="Evidence-first Cold-Chain Temperature Excursion Investigation Decision-Support System",
+    lifespan=lifespan,
 )
 
+# CORS Allowlist
+allow_all = "*" in settings.cors_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"] if allow_all else settings.cors_origins,
+    allow_credentials=not allow_all,
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def security_and_rate_limit_middleware(request: Request, call_next):
+    # 1. Payload size check
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > settings.max_request_size_bytes:
+        return Response(content="Request payload exceeds maximum allowed size.", status_code=413)
+
+    # 2. Sliding window rate limiting (applied only to API endpoints)
+    if request.url.path.startswith("/api") and not request.url.path.endswith("/events"):
+        client_ip = request.client.host if request.client else "unknown"
+        now = time.time()
+        cutoff = now - 60.0
+
+        # Clean old requests
+        timestamps = [t for t in RATE_LIMIT_RECORDS[client_ip] if t > cutoff]
+        timestamps.append(now)
+        RATE_LIMIT_RECORDS[client_ip] = timestamps
+
+        if len(timestamps) > settings.rate_limit_per_minute:
+            return Response(content="Rate limit exceeded. Please wait before retrying.", status_code=429)
+
+    response = await call_next(request)
+
+    # 3. Security headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; font-src 'self' data:; "
+        "img-src 'self' data:; connect-src 'self' ws: wss:;"
+    )
+    return response
+
 
 orchestrator = InvestigationOrchestrator()
 counterfactual_engine = CounterfactualEngine()
@@ -94,7 +140,7 @@ def health():
         "status": "ok",
         "app": settings.app_name,
         "version": settings.app_version,
-        "mode": settings.app_mode
+        "mode": settings.app_mode,
     }
 
 
@@ -112,9 +158,10 @@ def meta():
             "selected_deep_model": settings.nvidia_deep_model_id,
         },
         "safety_disclaimer": (
-            "Investigation support only. Not a product disposition, medical decision, "
-            "legal conclusion, or regulatory determination."
-        )
+            "Investigation-support output generated from synthetic or user-supplied evidence. "
+            "It does not determine product safety, potency, regulatory compliance or disposition. "
+            "Follow organizational SOPs and obtain review from an authorized quality professional."
+        ),
     }
 
 
@@ -138,12 +185,12 @@ def validate_case(payload: dict[str, Any]):
             "case_id": case.id,
             "readings_count": len(case.readings),
             "custody_events_count": len(case.custody_events),
-            "operational_events_count": len(case.operational_events)
+            "operational_events_count": len(case.operational_events),
         }
     except Exception as e:
         return {
             "valid": False,
-            "errors": [str(e)]
+            "errors": [str(e)],
         }
 
 
@@ -169,65 +216,86 @@ def analyze_case_deterministic(case_id: str) -> CaseAnalysisResult:
 
 
 # ==============================================================================
-# Investigation Endpoints & Real-Time SSE
+# Single-Execution Investigation Endpoints & Real-Time SSE
 # ==============================================================================
 
 @app.post("/api/cases/{case_id}/investigations")
-async def start_investigation(case_id: str):
+async def start_investigation(case_id: str, background_tasks: BackgroundTasks):
+    """
+    Creates exactly ONE investigation run bound to the specified case.
+    Returns run_id immediately and executes in the background.
+    """
     if case_id not in CASES_STORE:
         raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
     case = CASES_STORE[case_id]
 
-    import uuid
-    run_id = f"RUN-{uuid.uuid4().hex[:8]}"
-
-    # Execute all stages and store the final run
-    final_run: InvestigationRun | None = None
-    async for event in orchestrator.run_investigation(case, run_id=run_id):
-        if "completed_run" in event.get("data", {}):
-            final_run = InvestigationRun.model_validate(event["data"]["completed_run"])
-        elif "run" in event:
-            final_run = InvestigationRun.model_validate(event["run"])
-
-    if final_run:
-        RUNS_STORE[run_id] = final_run
-
-    return {"status": "started", "run_id": run_id, "run": final_run}
+    run_id = orchestrator.init_run(case)
+    background_tasks.add_task(orchestrator.execute_run_background, run_id, case)
+    return {
+        "status": "started",
+        "run_id": run_id,
+        "case_id": case.id,
+    }
 
 
 @app.get("/api/investigations/{run_id}/events")
 async def stream_investigation_events(run_id: str):
-    """Server-Sent Events (SSE) streaming live investigation progress."""
-    # Find matching case
-    case = CASES_STORE.get("CASE-NMB-204")
-    if not case:
-        raise HTTPException(status_code=404, detail="Case not available for streaming.")
+    """
+    Server-Sent Events (SSE) that observes the existing background run.
+    Replays buffered past events and streams live transitions without starting a second execution.
+    """
+    if run_id not in orchestrator.runs:
+        raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
 
     async def event_generator():
-        async for event in orchestrator.run_investigation(case, run_id=run_id):
-            if "completed_run" in event.get("data", {}):
-                RUNS_STORE[run_id] = InvestigationRun.model_validate(event["data"]["completed_run"])
-            elif "run" in event:
-                RUNS_STORE[run_id] = InvestigationRun.model_validate(event["run"])
-            yield f"data: {json.dumps(event)}\n\n"
-            await asyncio.sleep(0.3)  # brief pause for visual comprehension
+        try:
+            async for event in orchestrator.subscribe(run_id):
+                yield f"data: {json.dumps(event)}\n\n"
+        except asyncio.CancelledError:
+            pass
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.get("/api/investigations/{run_id}")
 def get_investigation(run_id: str):
-    if run_id in RUNS_STORE:
-        return RUNS_STORE[run_id]
-    raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
+    run = orchestrator.get_run(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
+    return run
+
+
+@app.post("/api/investigations/{run_id}/cancel")
+def cancel_investigation(run_id: str):
+    success = orchestrator.cancel_investigation(run_id)
+    return {"status": "cancelled" if success else "not_running", "run_id": run_id}
+
+
+@app.delete("/api/investigations/{run_id}")
+def delete_investigation(run_id: str):
+    orchestrator.cancel_investigation(run_id)
+    orchestrator.runs.pop(run_id, None)
+    orchestrator.cases.pop(run_id, None)
+    orchestrator.event_buffers.pop(run_id, None)
+    orchestrator.listeners.pop(run_id, None)
+    orchestrator.tasks.pop(run_id, None)
+    return {"status": "deleted", "run_id": run_id}
 
 
 @app.post("/api/investigations/{run_id}/counterfactuals")
 def run_counterfactual(run_id: str, request: CounterfactualRequest):
-    if run_id not in RUNS_STORE:
+    run = orchestrator.get_run(run_id)
+    if not run:
         raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
-    run = RUNS_STORE[run_id]
-    case = CASES_STORE.get(run.case_id)
+    case = orchestrator.cases.get(run_id) or CASES_STORE.get(run.case_id)
     if not case:
         raise HTTPException(status_code=404, detail=f"Case '{run.case_id}' not found.")
 
@@ -238,10 +306,10 @@ def run_counterfactual(run_id: str, request: CounterfactualRequest):
 
 @app.get("/api/investigations/{run_id}/report")
 def get_html_report(run_id: str):
-    if run_id not in RUNS_STORE:
+    run = orchestrator.get_run(run_id)
+    if not run:
         raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
-    run = RUNS_STORE[run_id]
-    case = CASES_STORE.get(run.case_id)
+    case = orchestrator.cases.get(run_id) or CASES_STORE.get(run.case_id)
     if not case:
         raise HTTPException(status_code=404, detail=f"Case '{run.case_id}' not found.")
 
@@ -251,9 +319,10 @@ def get_html_report(run_id: str):
 
 @app.get("/api/investigations/{run_id}/report.json")
 def get_json_report(run_id: str):
-    if run_id not in RUNS_STORE:
+    run = orchestrator.get_run(run_id)
+    if not run:
         raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
-    return RUNS_STORE[run_id]
+    return run
 
 
 # Mount frontend static distribution if built

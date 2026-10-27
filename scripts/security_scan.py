@@ -27,7 +27,9 @@ SUSPICIOUS_PATTERNS = [
 
 EXEMPT_SUBSTRINGS = [
     "your_nebius_token_factory_key_here",
+    "your-nebius-token-factory-key",
     "your_tavily_api_key_here",
+    "your-tavily-api-key",
     "your_actual_api_key_here",
     "your_qloo_api_key_here",
     "your_key_here",

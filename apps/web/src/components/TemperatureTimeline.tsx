@@ -56,23 +56,36 @@ export const TemperatureTimeline: React.FC<TemperatureTimelineProps> = ({
   // Active hover reading
   const activeReading = hoverIndex !== null ? readings[hoverIndex] : null;
 
+  // Calculate excursion duration from out-of-range readings
+  const outOfRangeCount = readings.filter(
+    (r) => r.temperature_celsius < minAllowed || r.temperature_celsius > maxAllowed
+  ).length;
+  const excursionMinutes = outOfRangeCount > 0 ? outOfRangeCount * 5 : 0;
+
   return (
-    <div className="card" style={{ position: 'relative' }}>
+    <div className="card" style={{ position: 'relative', maxWidth: '100%', overflow: 'hidden' }}>
       <div className="card-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <h2 className="card-title">Temperature Telemetry &amp; Event Alignment</h2>
-          <span className="badge badge-excursion" title="Continuous excursion interval">
-            42 min Out-of-Range Window
-          </span>
+          {excursionMinutes > 0 ? (
+            <span className="badge badge-excursion" title="Continuous excursion interval">
+              {excursionMinutes} min Out-of-Range Window
+            </span>
+          ) : (
+            <span className="badge badge-supported" title="Temperature within policy">
+              Within Normal Range
+            </span>
+          )}
           <span className="badge badge-neutral" title="Associated logged events">
             {custodyEvents.length} Custody &bull; {operationalEvents.length} Ops Events Aligned
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
           <button
+            id="telemetry-table-toggle"
             className="btn-secondary"
             onClick={() => setShowTable(!showTable)}
-            style={{ fontSize: '11px', padding: '4px 10px' }}
+            style={{ fontSize: '12px', padding: '6px 12px', minHeight: '34px' }}
             aria-expanded={showTable}
             aria-controls="telemetry-table"
           >

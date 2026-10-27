@@ -133,7 +133,7 @@ export interface InvestigationRun {
   state: string;
   created_at: string;
   completed_at?: string;
-  provider_mode: 'LIVE_TOKEN_FACTORY' | 'DEMO_FIXTURE' | 'ERROR';
+  provider_mode: 'LIVE_TOKEN_FACTORY' | 'DEMO_FIXTURE_FALLBACK' | 'DEMO_FIXTURE' | 'NOT_CONFIGURED' | 'FAILED' | 'ERROR';
   requested_model: string;
   served_model?: string;
   observations: Observation[];

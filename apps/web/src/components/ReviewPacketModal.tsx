@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { InvestigationRun, ShipmentCase } from '../types';
 
 interface ReviewPacketModalProps {
@@ -14,6 +14,57 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
   run,
   caseData,
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Save previous active element for focus restoration
+    previouslyFocusedElement.current = document.activeElement as HTMLElement;
+
+    // Body scroll lock
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Focus first focusable item in modal
+    const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable && focusable.length > 0) {
+      focusable[0].focus();
+    }
+
+    // Escape listener and focus trap
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && focusable && focusable.length > 0) {
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElement.current) {
+        previouslyFocusedElement.current.focus();
+      }
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen || !run) {
     return null;
   }
@@ -33,8 +84,9 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="review-packet-modal-title">
       <div
+        ref={modalRef}
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{ padding: '28px', maxWidth: '850px' }}
@@ -42,7 +94,7 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
             <span className="badge badge-accent">Quality Incident Packet</span>
-            <h2 style={{ fontSize: '20px', fontWeight: 800, marginTop: '4px' }}>
+            <h2 id="review-packet-modal-title" style={{ fontSize: '20px', fontWeight: 800, marginTop: '4px' }}>
               ExcursionLens Quality Review Packet
             </h2>
             <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
@@ -55,9 +107,14 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
               Download JSON
             </button>
             <button className="btn-primary" onClick={handlePrint}>
-              Open Print / PDF View &nearr;
+              Open Print / PDF View ↗
             </button>
-            <button className="btn-secondary" onClick={onClose} style={{ padding: '6px 10px' }}>
+            <button
+              className="btn-secondary"
+              onClick={onClose}
+              aria-label="Close review packet modal"
+              style={{ padding: '6px 10px' }}
+            >
               ✕
             </button>
           </div>
@@ -75,7 +132,7 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
             marginBottom: '20px',
           }}
         >
-          <strong>Mandatory Quality Boundary:</strong> {run.disclaimer}
+          <strong>Decision-Support Boundary:</strong> {run.disclaimer}
         </div>
 
         {/* Summary metrics */}
@@ -95,9 +152,9 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
           </div>
 
           <div style={{ backgroundColor: 'var(--surface-raised)', padding: '10px', border: '1px solid var(--rules-subtle)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase' }}>Sponsor Verification</div>
-            <strong style={{ fontSize: '13px', color: 'var(--supported)' }}>
-              NVIDIA Nemotron &amp; Tavily
+            <div style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase' }}>Provider Mode</div>
+            <strong style={{ fontSize: '13px', color: run.provider_mode === 'LIVE_TOKEN_FACTORY' ? 'var(--supported)' : 'var(--muted)' }}>
+              {run.provider_mode === 'LIVE_TOKEN_FACTORY' ? 'LIVE VERIFIED' : 'FIXTURE DEMO'}
             </strong>
           </div>
         </div>
@@ -135,7 +192,7 @@ export const ReviewPacketModal: React.FC<ReviewPacketModalProps> = ({
 
         <div style={{ textAlign: 'right' }}>
           <button className="btn-primary" onClick={handlePrint} style={{ width: '100%', padding: '12px' }}>
-            Open Complete Formatted Audit Packet (Print/PDF) &nearr;
+            Open Formatted Incident Packet (Print/PDF) ↗
           </button>
         </div>
       </div>

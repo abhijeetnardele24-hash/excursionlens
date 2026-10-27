@@ -10,10 +10,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - NEBIUS_API_KEY=${NEBIUS_API_KEY:-}
+      - NEBIUS_TOKEN_FACTORY_KEY=${NEBIUS_TOKEN_FACTORY_KEY:-${NEBIUS_API_KEY:-}}
       - TAVILY_API_KEY=${TAVILY_API_KEY:-}
-      - NEBIUS_BASE_URL=${NEBIUS_BASE_URL:-https://api.tokenfactory.nebius.com/v1}
-      - DEFAULT_MODEL=${DEFAULT_MODEL:-nvidia/llama-3.1-nemotron-70b-instruct}
+      - NEBIUS_TOKEN_FACTORY_BASE_URL=${NEBIUS_TOKEN_FACTORY_BASE_URL:-https://api.tokenfactory.nebius.com/v1/}
+      - NVIDIA_DEEP_MODEL_ID=${NVIDIA_DEEP_MODEL_ID:-nvidia/llama-3.1-nemotron-70b-instruct}
+      - APP_MODE=${APP_MODE:-live}
       - ENVIRONMENT=production
     restart: unless-stopped
     healthcheck:

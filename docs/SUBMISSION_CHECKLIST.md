@@ -31,13 +31,13 @@
 
 ## 3. Product Features & Judge-Visible Path
 - [x] Canonical NMB-204 case fixture loaded and displayed.
-- [x] 100% deterministic excursion detector (42-min window, peak 10.5°C, AUC 38.6 degree-minutes).
+- [x] 100% deterministic excursion detector (40.0-min window, peak 10.5°C, AUC 50.5 degree-minutes).
 - [x] Multimodal custody and operational event rail aligned along UTC axis.
 - [x] Authoritative live web research via Tavily targeting CDC, FDA, WHO, and GS1.
 - [x] NVIDIA Nemotron-70B hypothesis generation through Nebius Token Factory.
 - [x] Adversarial skeptic critique pass cross-referencing vehicle alternator voltage.
 - [x] Counterfactual preventive control simulation workbench.
-- [x] Printable 21 CFR Part 11 compliant Quality Review Packet with cryptographic hashes.
+- [x] Printable Quality Review Packet with cryptographic SHA-256 evidence digests.
 - [x] Strict Anti-Auto-Release Invariant enforced (`QUARANTINE_PENDING_QUALIFIED_REVIEW`).
 
 ---

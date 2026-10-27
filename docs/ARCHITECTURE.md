@@ -46,7 +46,7 @@ ExcursionLens is an evidence-first operational agent for investigating cold-chai
 
 ## 1. Architectural Philosophy: Deterministic Core + Bounded AI
 
-Cold-chain compliance (governed by 21 CFR Part 11 and WHO Good Distribution Practice) strictly forbids ungrounded generative speculation in release decisions. ExcursionLens implements a hybrid architecture:
+Cold-chain operations in life-sciences distribution strictly forbid ungrounded generative speculation in release decisions. ExcursionLens implements a hybrid architecture:
 
 1. **Deterministic Sensory Layer (Python / NumPy / Pydantic):**
    - Telemetry parsing, time-delta calculations, gap detection, sensor drift, AUC (area under the curve above threshold), and threshold breach timings are 100% deterministic code.
@@ -103,7 +103,7 @@ The investigation executes through eight discrete, traceable stages streamed ove
 5. `NEMOTRON_HYPOTHESES`: Synthesizes 3 competing hypotheses (e.g. ambient heat infiltration, power loss, probe detachment) using NVIDIA Nemotron via Nebius Token Factory.
 6. `ADVERSARIAL_SKEPTIC`: Evaluates counter-evidence (e.g., verifying vehicle bus voltage directly refutes auxiliary power failure).
 7. `VALIDATE_CITATIONS`: Validates all factual citations against known observation and source IDs.
-8. `QUALITY_REVIEW_PACKET`: Compiles the human review packet, counterfactual simulation options, and immutable audit trail.
+8. `QUALITY_REVIEW_PACKET`: Compiles the human review packet, sensitivity replay options, and structured review export.
 
 ---
 

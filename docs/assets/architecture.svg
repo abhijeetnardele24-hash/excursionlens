@@ -58,7 +58,7 @@
         <tspan x="12" y="74">medical decision, or</tspan>
         <tspan x="12" y="90">regulatory release."</tspan>
       </text>
-      <text x="12" y="118" fill="#B5482D" font-size="10" font-weight="700">MANDATORY QUARANTINE</text>
+      <text x="12" y="118" fill="#B5482D" font-size="10" font-weight="700">QUARANTINE POSTURE</text>
       <text x="12" y="134" fill="#A2ADA6" font-size="9">Auto-release strictly forbidden</text>
     </g>
   </g>
@@ -76,9 +76,9 @@
     <g transform="translate(15, 55)">
       <rect width="200" height="95" rx="5" fill="#141D1B" stroke="#275E4B"/>
       <text x="12" y="22" fill="#275E4B" font-size="10" font-weight="700">EXCURSION DETECTOR</text>
-      <text x="12" y="40" fill="#EAE7DE" font-size="11">Duration: 42.0 minutes</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="11">Duration: 40.0 minutes</text>
       <text x="12" y="56" fill="#EAE7DE" font-size="11">Peak Temp: 10.5°C</text>
-      <text x="12" y="72" fill="#EAE7DE" font-size="11">Degree-Minutes: 44.8°C·min</text>
+      <text x="12" y="72" fill="#EAE7DE" font-size="11">Degree-Minutes: 50.5°C·min</text>
       <text x="12" y="86" fill="#A2ADA6" font-size="9">OBS-EXCURSION-01 Generated</text>
     </g>
 
@@ -143,13 +143,13 @@
       <rect width="186" height="70" rx="5" fill="#141D1B" stroke="#365E7D"/>
       <text x="10" y="20" fill="#365E7D" font-size="9.5" font-weight="700">COUNTERFACTUAL REPLAY</text>
       <text x="10" y="38" fill="#EAE7DE" font-size="10">Simulates 5-Min Door Close</text>
-      <text x="10" y="54" fill="#275E4B" font-size="10" font-weight="700">Excursion Drops: 42m &rarr; 0m</text>
+      <text x="10" y="54" fill="#275E4B" font-size="10" font-weight="700">Excursion Drops: 40m &rarr; 0m</text>
     </g>
 
     <g transform="translate(12, 400)">
       <rect width="186" height="75" rx="5" fill="#275E4B"/>
-      <text x="10" y="22" fill="#F3F0E8" font-size="10" font-weight="800">PROVIDER RECEIPT</text>
-      <text x="10" y="40" fill="#F3F0E8" font-size="10">Token Factory Latency: 340ms</text>
+      <text x="10" y="22" fill="#F3F0E8" font-size="10" font-weight="800">PROVIDER RECEIPTS</text>
+      <text x="10" y="40" fill="#F3F0E8" font-size="10">Fail-Closed Verification</text>
       <text x="10" y="56" fill="#F3F0E8" font-size="10">SHA-256 Response Digest</text>
       <text x="10" y="68" fill="#EAE7DE" font-size="8">Zero private reasoning leaked</text>
     </g>
@@ -185,10 +185,10 @@
 
     <g transform="translate(10, 270)">
       <rect width="125" height="95" rx="5" fill="#141D1B" stroke="#2D403B"/>
-      <text x="8" y="20" fill="#365E7D" font-size="8.5" font-weight="700">AUDIT EXPORTS</text>
+      <text x="8" y="20" fill="#365E7D" font-size="8.5" font-weight="700">REVIEW EXPORTS</text>
       <text x="8" y="38" fill="#EAE7DE" font-size="9">Printable HTML Packet</text>
       <text x="8" y="54" fill="#EAE7DE" font-size="9">Structured JSON</text>
-      <text x="8" y="70" fill="#A2ADA6" font-size="8">Immutable evidence trail</text>
+      <text x="8" y="70" fill="#A2ADA6" font-size="8">Structured evidence trail</text>
       <text x="8" y="82" fill="#A2ADA6" font-size="8">Sign-off fields included</text>
     </g>
 

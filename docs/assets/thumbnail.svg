@@ -47,7 +47,7 @@
         <text x="170" y="65" fill="#B5482D" font-size="11" font-weight="800">10.5°C</text>
 
         <rect x="0" y="210" width="300" height="40" rx="6" fill="#FBEBE8"/>
-        <text x="14" y="235" fill="#B5482D" font-size="12" font-weight="800">42 MIN CUMULATIVE BREACH</text>
+        <text x="14" y="235" fill="#B5482D" font-size="12" font-weight="800">40 MIN CUMULATIVE BREACH</text>
       </g>
     </g>
 
@@ -111,7 +111,7 @@
         <!-- Document Preview -->
         <g transform="translate(0, 90)">
           <rect width="290" height="110" rx="6" fill="#141D1B" stroke="#253531"/>
-          <text x="14" y="26" fill="#F3F0E8" font-size="12" font-weight="700">Audit-Ready Review Packet</text>
+          <text x="14" y="26" fill="#F3F0E8" font-size="12" font-weight="700">Quality Review Packet</text>
           <text x="14" y="46" fill="#A2ADA6" font-size="11">&bull; Printable Formatted HTML</text>
           <text x="14" y="64" fill="#A2ADA6" font-size="11">&bull; Machine-Verifiable JSON</text>
           <text x="14" y="82" fill="#A2ADA6" font-size="11">&bull; Formal Pharmacist Sign-Off Block</text>

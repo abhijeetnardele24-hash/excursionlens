@@ -88,7 +88,7 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
             </h3>
             <div style={{ fontSize: '12px', color: 'var(--accent)', marginBottom: '12px' }}>
               <a href={src.url} target="_blank" rel="noopener noreferrer">
-                {src.url} &nearr;
+                {src.url} ↗
               </a>
             </div>
 

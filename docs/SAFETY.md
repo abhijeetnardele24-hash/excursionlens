@@ -39,8 +39,10 @@ ExcursionLens ingests external data from IoT loggers, custody manifests, and liv
 
 ---
 
-## 4. Audit Trail & 21 CFR Part 11 Alignment
+## 4. Operational Review Trail & Decision-Support Boundary
 
-For pharmaceutical compliance, decisions must be reconstructible:
-- **Immutable Audit Export:** Every investigation run produces a cryptographically referenced JSON audit trail (`export-audit.json`) containing timestamps, raw sensor data hashes, query digests, model IDs, and skeptic critique passes.
-- **Formal Review Packet:** Generates a printable, standardized review packet (`review-packet.html`) formatted for Good Manufacturing Practice (GMP) quality files.
+> **Important Boundary Notice:** ExcursionLens outputs are investigation-support evidence generated from synthetic or user-supplied telemetry. They do not determine product safety, potency, regulatory compliance or disposition. Follow organizational SOPs and obtain review from an authorized quality professional.
+
+For quality documentation and investigation reconstruction:
+- **Structured Review Export:** Every investigation run produces a cryptographically referenced JSON record containing timestamps, raw sensor data SHA-256 hashes, query digests, model IDs, receipts, and skeptic critique passes.
+- **Formal Review Packet:** Generates a printable, standardized review packet (`review-packet.html`) with formal quality sign-off blocks, strict HTML escaping, and complete citation trees for authorized quality personnel.

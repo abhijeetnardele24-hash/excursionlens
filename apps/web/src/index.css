@@ -18,7 +18,7 @@
   --excursion-bg: #FBEBE8;
   --supported: #275E4B;
   --supported-bg: #EAF2EE;
-  --unknown: #9A6A1F;
+  --unknown: #7C5414;
   --unknown-bg: #F9F3E6;
   --accent: #365E7D;
   --accent-bg: #EDF3F8;
@@ -161,6 +161,7 @@ button:disabled {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
+
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -168,6 +169,47 @@ button:disabled {
   margin-bottom: 12px;
   border-bottom: 1px solid var(--rules-subtle);
   padding-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+  .app-header button {
+    flex: 1 1 120px !important;
+  }
+  main {
+    padding: 10px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  .card {
+    padding: 12px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .card-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #telemetry-table-toggle {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 6px !important;
+    box-sizing: border-box !important;
+  }
 }
 
 .card-title {

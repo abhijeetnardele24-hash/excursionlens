@@ -11,9 +11,14 @@ import json
 import os
 import sys
 import time
+from pathlib import Path
 
-from apps.api.app.domain.detector import DeterministicExcursionEngine
-from apps.api.app.domain.models import ShipmentCase
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from apps.api.app.domain.detector import DeterministicExcursionEngine  # noqa: E402
+from apps.api.app.domain.models import ShipmentCase  # noqa: E402
 
 
 def run_benchmark() -> int:

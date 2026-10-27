@@ -68,8 +68,17 @@ export const App: React.FC = () => {
     setToolEvents([]);
 
     try {
-      // Use SSE streaming endpoint for real-time progress
-      const runId = `RUN-${Math.random().toString(36).substring(2, 9)}`;
+      // 1. Initialize single-execution run bound to current case
+      const startRes = await fetch(`/api/cases/${caseData.id}/investigations`, {
+        method: 'POST',
+      });
+      if (!startRes.ok) {
+        throw new Error(`Failed to start investigation: ${startRes.statusText}`);
+      }
+      const startData = await startRes.json();
+      const runId = startData.run_id;
+
+      // 2. Connect to SSE stream to observe execution
       const eventSource = new EventSource(`/api/investigations/${runId}/events`);
 
       eventSource.onmessage = (event) => {
@@ -84,7 +93,7 @@ export const App: React.FC = () => {
               {
                 timestamp: new Date().toISOString(),
                 tool_name: payload.stage,
-                status: 'SUCCESS',
+                status: payload.stage === 'FAILED_TRUTHFULLY' ? 'FAILED' : 'SUCCESS',
                 summary: payload.message,
               },
             ]);
@@ -108,14 +117,16 @@ export const App: React.FC = () => {
 
       eventSource.onerror = async () => {
         eventSource.close();
-        // Fallback to standard POST endpoint if SSE drops
+        // Check final status via GET in case SSE closed at completion
         try {
-          const res = await fetch(`/api/cases/${caseData.id}/investigations`, { method: 'POST' });
+          const res = await fetch(`/api/investigations/${runId}`);
           if (res.ok) {
             const data = await res.json();
-            setRun(data.run);
-            setCurrentStage(data.run.state);
+            setRun(data);
+            setCurrentStage(data.state);
           }
+        } catch {
+          // ignore
         } finally {
           setIsInvestigating(false);
         }

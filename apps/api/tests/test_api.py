@@ -2,6 +2,8 @@
 apps/api/tests/test_api.py — Integration Tests for FastAPI Application Endpoints
 """
 
+import time
+
 import pytest
 from apps.api.app.main import app, load_default_fixtures
 from fastapi.testclient import TestClient
@@ -45,27 +47,49 @@ def test_deterministic_analyze_endpoint():
     assert res.status_code == 200
     data = res.json()
     assert data["has_excursion"] is True
-    assert 35.0 <= data["total_excursion_duration_minutes"] <= 45.0
+    assert data["total_excursion_duration_minutes"] == 40.0
     assert data["max_recorded_temperature"] == 10.5
     assert len(data["observations"]) >= 2
 
 
-def test_full_investigation_workflow_and_reports():
-    # 1. Start investigation
+def test_single_execution_workflow_and_sse():
+    # 1. Start investigation returns immediately
     res = client.post("/api/cases/CASE-NMB-204/investigations")
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "started"
     run_id = data["run_id"]
-    run = data["run"]
+    assert run_id.startswith("RUN-")
 
-    assert run["state"] == "HUMAN_REVIEW_READY"
-    assert run["review_posture"] == "QUARANTINE_PENDING_QUALIFIED_REVIEW"
-    assert len(run["hypotheses"]) >= 2
-    assert len(run["critiques"]) >= 1
-    assert run["validation_result"]["passed"] is True
+    # 2. Wait for background execution to reach terminal state
+    deadline = time.time() + 10.0
+    run_data = None
+    while time.time() < deadline:
+        get_res = client.get(f"/api/investigations/{run_id}")
+        assert get_res.status_code == 200
+        run_data = get_res.json()
+        if run_data["state"] in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
+            break
+        time.sleep(0.1)
 
-    # 2. Test Counterfactual endpoint
+    assert run_data is not None
+    assert run_data["state"] == "HUMAN_REVIEW_READY"
+    assert run_data["review_posture"] == "QUARANTINE_PENDING_QUALIFIED_REVIEW"
+    assert len(run_data["hypotheses"]) >= 2
+    assert len(run_data["critiques"]) >= 1
+    assert run_data["validation_result"]["passed"] is True
+
+    # 3. Connect to SSE stream: should replay past events idempotently
+    sse_res = client.get(f"/api/investigations/{run_id}/events")
+    assert sse_res.status_code == 200
+    assert "text/event-stream" in sse_res.headers["content-type"]
+    assert "stage_update" in sse_res.text
+
+    # 4. Unknown run ID fails with 404
+    bad_res = client.get("/api/investigations/RUN-NONEXISTENT/events")
+    assert bad_res.status_code == 404
+
+    # 5. Counterfactual sensitivity replay
     cf_payload = {
         "intervention_type": "EXPEDITE_DOOR_CLOSING",
         "parameters": {"simulated_door_open_minutes": 5}
@@ -74,20 +98,35 @@ def test_full_investigation_workflow_and_reports():
     assert cf_res.status_code == 200
     cf_data = cf_res.json()
     assert cf_data["simulated_excursion_duration_minutes"] == 0.0
-    assert "prevents thermal breakthrough" in cf_data["result_summary"]
+    assert "Synthetic sensitivity replay" in cf_data["result_summary"]
 
-    # 3. Test HTML Report endpoint
+    # 6. HTML Report endpoint with escaping
     html_res = client.get(f"/api/investigations/{run_id}/report")
     assert html_res.status_code == 200
     assert "text/html" in html_res.headers["content-type"]
     assert "ExcursionLens Investigation Report" in html_res.text
-    assert "Mandatory Quality Boundary" in html_res.text
+    assert "Decision-Support Boundary:" in html_res.text
     assert "Qualified Human Disposition Sign-Off" in html_res.text
 
-    # 4. Test JSON Report endpoint
+    # 7. JSON Report endpoint
     json_res = client.get(f"/api/investigations/{run_id}/report.json")
     assert json_res.status_code == 200
     report_data = json_res.json()
     assert report_data["id"] == run_id
     assert report_data["state"] == "HUMAN_REVIEW_READY"
-    assert "disclaimer" in report_data
+
+
+def test_security_headers_and_payload_limits():
+    res = client.get("/api/health")
+    assert res.headers["x-content-type-options"] == "nosniff"
+    assert res.headers["x-frame-options"] == "DENY"
+    assert "default-src 'self'" in res.headers["content-security-policy"]
+
+    # Test payload size limit
+    oversized = "a" * (2 * 1024 * 1024 + 100)
+    big_res = client.post(
+        "/api/cases/validate",
+        data=oversized,
+        headers={"content-type": "application/json", "content-length": str(len(oversized))}
+    )
+    assert big_res.status_code == 413

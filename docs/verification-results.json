@@ -1,31 +1,31 @@
 {
-  "timestamp": "2026-10-27T19:18:09Z",
+  "timestamp": "2026-10-27T20:27:09Z",
   "git": {
-    "head": "45ddf44a6e858af3160b614a2ef2ea2387fa4e38",
+    "head": "553df7f9009f38b8e225bd43b317d5a8894529c2",
     "branch": "main",
-    "clean_tree": true
+    "clean_tree": false
   },
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.07,
+      "elapsed_sec": 0.08,
       "output": "All checks passed!\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.18,
-      "output": "2m\u001b[2m \u2502 gzip:  0.51 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-BZVtVOqL.css  \u001b[39m\u001b[1m\u001b[2m  3.52 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.37 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-ClIoXnKN.js   \u001b[39m\u001b[1m\u001b[2m184.35 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 55.72 kB\u001b[22m\u001b[2m \u2502 map: 456.30 kB\u001b[22m\n\u001b[32m\u2713 built in 521ms\u001b[39m\n"
+      "elapsed_sec": 2.54,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CJWWGL7s.css  \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.53 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-vlSYuouo.js   \u001b[39m\u001b[1m\u001b[2m186.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 56.38 kB\u001b[22m\u001b[2m \u2502 map: 462.84 kB\u001b[22m\n\u001b[32m\u2713 built in 522ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 83.17,
-      "elapsed_sec": 1.93
+      "coverage_percent": 73.23,
+      "elapsed_sec": 2.55
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.23
+      "elapsed_sec": 0.22
     },
     "security_scan": {
       "passed": true,
@@ -34,11 +34,34 @@
     },
     "playwright": {
       "passed": true,
-      "expected": 5,
+      "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 9067.942000000001
+      "duration_ms": 37949.649000000005
     }
   },
-  "overall_status": "PASSED"
+  "canonical_case_nmb_204": {
+    "shipment_id": "NMB-204",
+    "fixture_sha256": "81f95835386fb8b2d6bccc50ffd20d8037f98c6dc7a802ec95854a6c872b363d",
+    "excursion_duration_minutes": 40.0,
+    "peak_temperature_celsius": 10.5,
+    "degree_minutes_auc": 50.5,
+    "review_posture": "QUARANTINE_PENDING_QUALIFIED_REVIEW"
+  },
+  "external_gates": {
+    "live_providers": {
+      "status": "BLOCKED",
+      "nebius_token_factory": "MISSING_KEY",
+      "served_nvidia_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+      "tavily_search": "MISSING_KEY",
+      "notice": "Fail-closed check. Real inference and retrieval verified when keys provided."
+    },
+    "public_deployment": {
+      "status": "BLOCKED",
+      "reason": "Hosting deployment credentials/access not provided in local environment.",
+      "reproducible_deployment_command": "docker compose up --build -d"
+    }
+  },
+  "internal_verification_status": "PASSED",
+  "overall_status": "PASSED (INTERNAL GATES VERIFIED; EXTERNAL GATES BLOCKED PENDING CREDENTIALS)"
 }

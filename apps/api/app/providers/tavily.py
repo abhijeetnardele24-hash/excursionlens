@@ -1,17 +1,19 @@
 """
 apps/api/app/providers/tavily.py — Tavily Search Integration & Source Normalization
 
-Searches authoritative public domains:
+Searches authoritative public health and standards domains:
 - cdc.gov (Vaccine storage and handling toolkit)
 - fda.gov (ICH Q1 stability & temperature excursion guidance)
 - who.int (Controlled temperature chain & immunization supply guidelines)
+- gs1.org (Healthcare barcode & shipment traceability standards)
 
-Produces normalized, immutable SourceRecord items with SHA-256 digests.
+Produces normalized SourceRecord items with SHA-256 digests and explicit retrieval receipts.
 """
 
 import hashlib
 import time
 from typing import Any
+from urllib.parse import urlparse
 
 import httpx
 
@@ -21,11 +23,10 @@ AUTHORITATIVE_DOMAINS = [
     "cdc.gov",
     "fda.gov",
     "who.int",
-    "immunize.org",
     "gs1.org"
 ]
 
-# Canonical authoritative reference guidance (pre-vetted public CDC/FDA/WHO records)
+# Canonical pre-vetted public reference guidance for offline benchmark evaluation
 CACHED_AUTHORITATIVE_GUIDANCE = [
     {
         "id": "SRC-CDC-01",
@@ -34,7 +35,7 @@ CACHED_AUTHORITATIVE_GUIDANCE = [
         "domain": "cdc.gov",
         "published_or_updated_at": "2024-03-01",
         "snippet": (
-            "In the event of a temperature excursion: 1. Immediately quarantine affected vaccines "
+            "In the event of a temperature excursion: 1. Immediately isolate affected vaccines "
             "in an operational unit at 2°C–8°C. 2. Mark 'DO NOT USE - DO NOT DISCARD'. 3. Record "
             "minimum and maximum temperatures, duration of excursion, and inventory affected. "
             "4. Contact the immunization program or vaccine manufacturer for disposition guidance."
@@ -78,15 +79,74 @@ class TavilySearchProvider:
     def __init__(self, api_key: str = "", app_mode: str = "live"):
         self.api_key = api_key.strip()
         self.app_mode = app_mode.lower()
-        self.is_live = bool(self.api_key and not self.api_key.startswith("your_"))
+        self.has_key = bool(self.api_key and not self.api_key.startswith("your_") and len(self.api_key) > 8)
+
+    def probe_connectivity(self) -> dict[str, Any]:
+        """Probes Tavily search endpoint to verify live API key authorization."""
+        start_time = time.time()
+        if not self.has_key:
+            return {
+                "status": "NOT_CONFIGURED",
+                "provider": "Tavily",
+                "latency_ms": 0,
+                "allowlist": AUTHORITATIVE_DOMAINS,
+                "error_category": "MISSING_KEY",
+                "failure_reason": "TAVILY_API_KEY is not configured or contains placeholder."
+            }
+
+        payload = {
+            "api_key": self.api_key,
+            "query": "CDC cold chain vaccine storage handling 2 to 8 C",
+            "search_depth": "basic",
+            "include_domains": AUTHORITATIVE_DOMAINS,
+            "max_results": 1
+        }
+
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.post("https://api.tavily.com/search", json=payload)
+                latency = int((time.time() - start_time) * 1000)
+
+                if resp.status_code == 200:
+                    data = resp.json()
+                    results = data.get("results", [])
+                    domains_found = list({urlparse(r.get("url", "")).netloc.lower() for r in results if r.get("url")})
+                    return {
+                        "status": "LIVE_SUCCESS",
+                        "provider": "Tavily",
+                        "latency_ms": latency,
+                        "allowlist": AUTHORITATIVE_DOMAINS,
+                        "sample_domains_found": domains_found,
+                        "error_category": None,
+                        "failure_reason": None
+                    }
+                else:
+                    return {
+                        "status": "FAILED",
+                        "provider": "Tavily",
+                        "latency_ms": latency,
+                        "allowlist": AUTHORITATIVE_DOMAINS,
+                        "error_category": f"HTTP_{resp.status_code}",
+                        "failure_reason": f"Tavily endpoint returned HTTP {resp.status_code}: {resp.text[:200]}"
+                    }
+        except Exception as e:
+            latency = int((time.time() - start_time) * 1000)
+            return {
+                "status": "FAILED",
+                "provider": "Tavily",
+                "latency_ms": latency,
+                "allowlist": AUTHORITATIVE_DOMAINS,
+                "error_category": type(e).__name__,
+                "failure_reason": f"Connection exception probing Tavily endpoint: {e}"
+            }
 
     def search_guidance(self, query: str, max_results: int = 3) -> tuple[list[SourceRecord], dict[str, Any]]:
         """Search authoritative guidance. In live mode with keys, makes real HTTPS call; in fixture mode, returns verified cached records."""
         start_time = time.time()
         retrieval_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
-        # If live credentials available
-        if self.is_live and self.app_mode == "live":
+        # 1. Attempt live call if key exists
+        if self.has_key:
             try:
                 tavily_payload = {
                     "api_key": self.api_key,
@@ -105,12 +165,20 @@ class TavilySearchProvider:
                         source_records = []
                         for idx, r in enumerate(raw_results):
                             url = r.get("url", "")
-                            domain = url.split("//")[-1].split("/")[0].lower()
-                            # Enforce domain allowlist filter
+                            parsed = urlparse(url)
+                            # Enforce HTTPS scheme
+                            if parsed.scheme != "https":
+                                continue
+
+                            domain = parsed.netloc.lower()
+                            # Enforce strict domain allowlist
                             if not any(domain == ad or domain.endswith("." + ad) for ad in AUTHORITATIVE_DOMAINS):
                                 continue
 
+                            # Treat content as untrusted; truncate to 400 characters
                             content = r.get("content", "").strip()
+                            clean_content = content[:400] if len(content) > 400 else content
+
                             rec = SourceRecord(
                                 id=f"SRC-LIVE-{idx + 1:02d}",
                                 url=url,
@@ -118,8 +186,8 @@ class TavilySearchProvider:
                                 domain=domain,
                                 published_or_updated_at=None,
                                 retrieved_at=retrieval_iso,
-                                snippet=content[:400] if len(content) > 400 else content,
-                                content_digest=sha256_digest(content),
+                                snippet=clean_content,
+                                content_digest=sha256_digest(clean_content),
                                 query=query
                             )
                             source_records.append(rec)
@@ -131,14 +199,19 @@ class TavilySearchProvider:
                                 "query": query,
                                 "latency_ms": latency_ms,
                                 "source_count": len(source_records),
-                                "domains": list(set(s.domain for s in source_records))
+                                "domains": list(set(s.domain for s in source_records)),
+                                "is_live": True,
+                                "failure_reason": None
                             }
                             return source_records, receipt
-            except Exception:
-                # Fall through to cached records if live call network error, with explicit note
-                pass
+                    else:
+                        failure_reason = f"Tavily HTTP {resp.status_code}: {resp.text[:200]}"
+            except Exception as e:
+                failure_reason = f"Tavily live search exception: {type(e).__name__} - {e}"
+        else:
+            failure_reason = "TAVILY_API_KEY is not configured or contains placeholder."
 
-        # Return authentic pre-vetted cached authoritative guidance
+        # Explicit fallback to pre-vetted cached guidance with failure reason
         source_records = []
         for item in CACHED_AUTHORITATIVE_GUIDANCE[:max_results]:
             rec = SourceRecord(
@@ -156,11 +229,13 @@ class TavilySearchProvider:
 
         latency_ms = int((time.time() - start_time) * 1000)
         receipt = {
-            "status": "CACHED_AUTHORITATIVE_FIXTURE" if not self.is_live else "FALLBACK_FIXTURE",
-            "provider": "Tavily (Pre-Vetted Reference Cache)",
+            "status": "DEMO_FIXTURE_FALLBACK",
+            "provider": "Tavily (Pre-Vetted Public Health Cache)",
             "query": query,
             "latency_ms": latency_ms,
             "source_count": len(source_records),
-            "domains": list(set(s.domain for s in source_records))
+            "domains": list(set(s.domain for s in source_records)),
+            "is_live": False,
+            "failure_reason": failure_reason
         }
         return source_records, receipt

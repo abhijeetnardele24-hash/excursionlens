@@ -9,12 +9,12 @@
 
 ## Inspiration
 
-Every year, an estimated $35 billion in pharmaceutical products, biotherapeutics, and childhood vaccines are lost due to cold-chain failures during logistics and transit. In life-sciences distribution under 21 CFR Part 11 and WHO Good Distribution Practice, an out-of-range temperature alert triggers an agonizing operational bottleneck:
-- Quality Assurance (QA) teams must manually correlate scattered PDF manifests, isolated IoT data logger CSV files, and refrigerated van telemetry.
+Every year, an estimated $35 billion in pharmaceutical products, biotherapeutics, and childhood vaccines are lost due to cold-chain failures during logistics and transit. In life-sciences cold-chain distribution:
+- Quality Assurance (QA) teams must manually correlate scattered manifests, isolated IoT data logger CSV files, and refrigerated van telemetry.
 - Operators risk either releasing compromised medicines to patients or destroying millions of dollars of completely viable product because they cannot isolate whether a breach reached the thermal core of the vial or merely warmed the surface air during cross-dock pallet transfer.
-- Generic LLM wrappers fail catastrophically here: they hallucinate approval, make illegal release decisions, and fabricate regulatory citations.
+- Generic LLM wrappers fail catastrophically here: they hallucinate approval, attempt unauthorized release decisions, and fabricate regulatory citations.
 
-We built **ExcursionLens** to prove that agentic AI can be safely deployed in high-consequence regulated environments through deterministic sensory anchoring, adversarial skeptic reasoning, and bounded web research.
+We built **ExcursionLens** to prove that agentic AI can be safely deployed in high-consequence operational environments through deterministic sensory anchoring, adversarial skeptic reasoning, and bounded web research.
 
 ---
 
@@ -25,10 +25,12 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 2. **Authoritative Guideline Retrieval via Tavily:** Dynamically queries live public health guidance exclusively from trusted repositories (`cdc.gov`, `fda.gov`, `who.int`), extracting verifiable citations for vaccine stability and mean kinetic temperature limits.
 3. **Competing Causal Reasoning via NVIDIA Nemotron:** Leverages `nvidia/llama-3.1-nemotron-70b-instruct` on the Nebius Token Factory to synthesize three competing causal hypotheses (e.g., cross-dock ambient staging exposure vs. reefer compressor power circuit failure vs. surface logger detachment).
 4. **Adversarial Skeptic Pass:** The agent actively runs a counter-falsification pass to challenge its own hypotheses against cold physical evidence (e.g., verifying that nominal vehicle alternator voltage directly contradicts the auxiliary power failure hypothesis).
-5. **Counterfactual Preventive Control Workbench:** Allows operations teams to simulate "what-if" interventions (e.g., enforcing a 5-minute door closing SLA or reading secondary thermal-mass core probes) to evaluate how preventive controls would have mitigated the breach.
-6. **Immutable Quality Review Packet:** Produces an auditable, print-ready 21 CFR Part 11 review packet with SHA-256 evidence digests.
+5. **Counterfactual Preventive Control Workbench:** Allows operations teams to simulate "what-if" interventions (e.g., enforcing a 5-minute door closing SLA or reading secondary thermal-mass core probes) to evaluate synthetic sensitivity replay without physical overclaims.
+6. **Quality Review Packet:** Produces a standardized, print-ready quality review packet with SHA-256 evidence digests.
 
 **Core Safety Invariant:** ExcursionLens strictly enforces an **Anti-Auto-Release Invariant**. The system is architecturally prohibited from making final release dispositions; all investigations terminate in `QUARANTINE_PENDING_QUALIFIED_REVIEW` with actionable human-review files.
+
+> **Decision-Support Boundary Notice:** ExcursionLens outputs are investigation-support evidence generated from synthetic or user-supplied telemetry. They do not determine product safety, potency, regulatory compliance or disposition. Follow organizational SOPs and obtain review from an authorized quality professional.
 
 ---
 

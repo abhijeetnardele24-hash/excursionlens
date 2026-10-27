@@ -148,6 +148,6 @@
       "details": "Secondary internal core probe recorded peak 6.8°C (vs primary surface logger 10.5°C), showing thermal lag."
     }
   ],
-  "input_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_digest": "81f95835386fb8b2d6bccc50ffd20d8037f98c6dc7a802ec95854a6c872b363d",
   "schema_version": "1.0"
 }

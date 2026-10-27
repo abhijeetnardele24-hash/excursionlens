@@ -23,12 +23,18 @@ from .models import (
 
 
 def parse_iso_datetime(dt_str: str) -> datetime:
-    """Parse ISO 8601 string into UTC datetime."""
-    # Replace 'Z' with '+00:00' for standard fromisoformat parsing
-    clean = dt_str.replace("Z", "+00:00")
-    dt = datetime.fromisoformat(clean)
+    """Parse ISO 8601 string into UTC datetime. Requires explicit timezone awareness."""
+    if not isinstance(dt_str, str) or not dt_str.strip():
+        raise ValueError("Invalid timestamp: timestamp string is required and cannot be empty.")
+    clean = dt_str.strip().replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(clean)
+    except Exception as e:
+        raise ValueError(f"Malformed ISO 8601 timestamp '{dt_str}': {e}") from e
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=UTC)
+        raise ValueError(
+            f"Timestamp '{dt_str}' is timezone-naive. Timezone-aware ISO 8601 (e.g. ending in 'Z' or '+00:00') is required."
+        )
     return dt.astimezone(UTC)
 
 
@@ -46,30 +52,36 @@ class DeterministicExcursionEngine:
         if not case.readings:
             raise ValueError("ShipmentCase must contain at least one sensor reading.")
 
+        if len(case.readings) > 10000:
+            raise ValueError(f"Case exceeds maximum reading limit of 10,000 readings (received {len(case.readings)}).")
+
         min_allowed = case.temperature_policy.min_celsius
         max_allowed = case.temperature_policy.max_celsius
 
-        # 1. Normalize and sort readings by timestamp
+        # 1. Normalize and deduplicate by composite (sensor_id, timestamp) key
         readings_with_dt: list[tuple[datetime, SensorReading]] = []
         anomalies: list[str] = []
-        seen_timestamps = set()
+        seen_sensor_timestamps: set[tuple[str, str]] = set()
 
         for r in case.readings:
             dt = parse_iso_datetime(r.timestamp)
-            if r.timestamp in seen_timestamps:
-                anomalies.append(f"Duplicate reading timestamp detected and deduplicated: {r.timestamp}")
+            sensor = r.sensor_id or "default"
+            key = (sensor, r.timestamp)
+            if key in seen_sensor_timestamps:
+                anomalies.append(f"Duplicate reading for sensor '{sensor}' at timestamp {r.timestamp} was deduplicated.")
             else:
-                seen_timestamps.add(r.timestamp)
+                seen_sensor_timestamps.add(key)
                 readings_with_dt.append((dt, r))
 
-        readings_with_dt.sort(key=lambda x: x[0])
+        readings_with_dt.sort(key=lambda x: (x[0], x[1].sensor_id or ""))
 
         if len(readings_with_dt) < 1:
             raise ValueError("No valid unique readings available.")
 
         # 2. Check for out-of-order origin in raw data if any
         raw_timestamps = [parse_iso_datetime(r.timestamp) for r in case.readings]
-        if raw_timestamps != [dt for dt, _ in readings_with_dt]:
+        sorted_raw = sorted(raw_timestamps)
+        if raw_timestamps != sorted_raw:
             anomalies.append("Raw readings were not in chronological order; normalized by timestamp.")
 
         # 3. Compute baseline statistics
