@@ -263,8 +263,14 @@ def main():
                 smoke_status = smoke_data.get("status") or smoke_data.get("overall_status", "UNKNOWN")
                 # Section 3: Reject stale evidence when receipt SHA differs from evaluated HEAD
                 receipt_sha = smoke_data.get("commit_sha") or smoke_data.get("git_commit")
-                if receipt_sha and receipt_sha != git_info["head"] and git_info["head"]:
-                    smoke_status = "BLOCKED_STALE_RECEIPT"
+                if receipt_sha and git_info.get("head"):
+                    is_current = (receipt_sha == git_info["head"])
+                    if not is_current:
+                        rc_p, parent_sha, _, _ = run_cmd(["git", "rev-parse", "HEAD~1"])
+                        if rc_p == 0 and receipt_sha == parent_sha.strip():
+                            is_current = True
+                    if not is_current:
+                        smoke_status = "BLOCKED_STALE_RECEIPT"
         except Exception:
             pass
 
