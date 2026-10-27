@@ -1,8 +1,11 @@
 {
-  "timestamp": "2026-10-27T20:24:51Z",
+  "schema_version": "1.0",
+  "commit_sha": "68feb30d7a38538b9cbf562c28eb15c326f54186",
+  "timestamp": "2026-10-27T22:31:59Z",
   "status": "BLOCKED",
   "nebius_smoke": {
     "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "selected_catalog_model": null,
     "status": "MISSING_KEY",
     "latency_ms": null,
     "prompt_tokens": null,
@@ -14,12 +17,13 @@
     "key_preview": "<none>"
   },
   "tavily_smoke": {
-    "query": "CDC cold chain storage handling temperature excursion 2 to 8 C",
+    "query": "CDC vaccine storage handling temperature excursion 2 to 8 C",
+    "query_digest": "5f89c71f5b5756579c358508a71711b188f0eb4b20f6ca00d841636e7c1372d0",
     "status": "MISSING_KEY",
     "latency_ms": null,
     "results_count": 0,
     "source_domains": [],
-    "query_digest": "4c653fd1a651fae1cca54b5f7fb4227a839f92ab83010444a5eb986668a7e50a",
+    "source_digests": [],
     "key_present": false,
     "key_preview": "<none>"
   },

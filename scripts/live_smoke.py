@@ -363,7 +363,19 @@ def run_live_smoke() -> int:
     else:
         overall_status = "BLOCKED" if (not tavily_receipt["key_present"] and not nebius_receipt["key_present"]) else "FAILED"
 
+    def _get_git_sha() -> str:
+        try:
+            import subprocess
+            res = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
+            if res.returncode == 0:
+                return res.stdout.strip()
+        except Exception:
+            pass
+        return "unknown"
+
     receipt = {
+        "schema_version": "1.0",
+        "commit_sha": _get_git_sha(),
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "status": overall_status,
         "nebius_smoke": nebius_receipt,

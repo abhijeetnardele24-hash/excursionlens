@@ -342,7 +342,7 @@ class DeterministicExcursionEngine:
             summary=(
                 f"Range [{min_allowed:.1f}°C to {max_allowed:.1f}°C] across {len(sensor_partitions)} sensor(s). "
                 f"Recorded values spanned {min_temp:.1f}°C to {max_temp:.1f}°C (mean {mean_temp:.1f}°C). "
-                f"{'Excursion detected: ' + str(round(total_excursion_min, 1)) + ' cumulative out-of-range minutes.' if total_excursion_min > 0 else 'Zero excursion detected; compliant throughout.'}"
+                f"{'Excursion detected: ' + str(round(total_excursion_min, 1)) + ' cumulative out-of-range minutes.' if total_excursion_min > 0 else 'No excursion was detected in the supplied telemetry; all readings within configured temperature band.'}"
             ),
             source_event_ids=[],
             detector_version=self.version,

@@ -107,7 +107,7 @@ export const TemperatureTimeline: React.FC<TemperatureTimelineProps> = ({
           role="img"
           aria-label="Temperature time series chart showing out of range thermal breach"
         >
-          {/* Compliant band [2°C, 8°C] */}
+          {/* Configured temperature band [2°C, 8°C] */}
           <rect
             x={padding.left}
             y={y8}
@@ -124,7 +124,7 @@ export const TemperatureTimeline: React.FC<TemperatureTimelineProps> = ({
             fontWeight="700"
             letterSpacing="0.4px"
           >
-            COMPLIANT BAND (2.0°C - 8.0°C)
+            CONFIGURED BAND (2.0°C - 8.0°C)
           </text>
 
           {/* Excursion danger band > 8°C */}

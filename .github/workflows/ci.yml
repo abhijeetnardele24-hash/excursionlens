@@ -61,9 +61,9 @@ jobs:
 
       - name: Dependency Vulnerability Audit (Python & npm)
         run: |
-          pip-audit --desc on || true
-          npm audit || true
-          npm audit --prefix apps/web --audit-level=critical || true
+          pip-audit -r requirements.txt --desc on
+          npm audit --audit-level=high
+          npm audit --prefix apps/web --audit-level=high
 
       - name: Deterministic Benchmark Suite (12 Scenarios)
         run: |
@@ -110,7 +110,7 @@ jobs:
 
       - name: Docker Build, Container Startup, Health/Meta Probe & Clean Shutdown
         run: |
-          docker build -t excursionlens:ci .
+          docker build --build-arg GIT_COMMIT=${{ github.sha }} -t excursionlens:ci .
           docker run -d --name excursionlens-ci -p 8000:8000 excursionlens:ci
           sleep 5
           curl -f http://127.0.0.1:8000/api/health

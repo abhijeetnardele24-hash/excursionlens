@@ -6,7 +6,7 @@
 [![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20PASSED%20/%20EXTERNAL%20BLOCKED-275E4B?style=for-the-badge&logo=checkmarx)](docs/verification-results.json)
 [![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20(5%20Viewports)-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
 [![Benchmark](https://img.shields.io/badge/Frozen%20Benchmark-12%2F12%20Scenarios%20(100%25)-275E4B?style=for-the-badge&logo=speedtest)](benchmark/run_benchmark.py)
-[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-75.11%25-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
+[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-79.15%25-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
 [![License](https://img.shields.io/badge/License-Apache--2.0-365E7D?style=for-the-badge)](LICENSE)
 
 ---
@@ -146,7 +146,7 @@ Our frozen synthetic benchmark suite tests edge-case resilience directly against
 | `07_clock_timezone_mismatch.json` | Timezone Offset Ingestion | True | 35.0 min | 9.4°C | **PASS** |
 | `08_missing_reading_gap.json` | Sensor Telemetry Missing Gap | False | 0.0 min | 4.5°C | **PASS** |
 | `09_dual_cause_event.json` | Compound Door Open + Traffic Delay | True | 65.0 min | 11.5°C | **PASS** |
-| `10_no_true_excursion.json` | Fully Compliant Cold-Chain Run | False | 0.0 min | 4.9°C | **PASS** |
+| `10_no_true_excursion.json` | Telemetry Within Configured Band | False | 0.0 min | 4.9°C | **PASS** |
 | `11_ambiguous_evidence.json` | Borderline Threshold Oscillations | True | 30.0 min | 9.8°C | **PASS** |
 | `12_adversarial_prompt_injection.json` | Hostile Injected Telemetry Payload | True | 45.0 min | 12.5°C | **PASS** |
 
@@ -168,7 +168,7 @@ python scripts/verify.py
 - **Ruff Python Linter:** 0 violations across backend and test files.
 - **Python Static Typing (Mypy):** 0 type errors with `--check-untyped-defs`.
 - **Frontend Build:** Strict TypeScript check and Vite production bundle.
-- **Pytest Suite:** 75.11% statement coverage across 56 test cases with zero warnings.
+- **Pytest Suite:** 79.15% statement coverage across 80 test cases with zero warnings.
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
 - **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px) with **0 Axe accessibility violations**.
@@ -183,6 +183,15 @@ ExcursionLens is packaged as a single lightweight multi-stage Docker container:
 docker compose up --build
 ```
 Access the application at `http://localhost:8000`.
+
+---
+
+## Known Limitations & Operational Boundaries
+
+1. **Deterministic Offline Fixture Mode:** When credentials (`NEBIUS_TOKEN_FACTORY_KEY`, `TAVILY_API_KEY`) are not provided, ExcursionLens operates against frozen synthetic fixtures rather than live endpoints. It never claims `LIVE_TOKEN_FACTORY` or presents fabricated live receipts when operating in fixture mode.
+2. **Single-Compartment Focus:** Canonical scenarios model single-compartment refrigerated transit. Multi-compartment vehicles carrying mixed temperature profiles (e.g. -20°C core and +4°C ambient) require discrete telemetry series per compartment.
+3. **Decision-Support Boundary:** ExcursionLens outputs are investigative decision-support artifacts generated from sensor telemetry. In compliance with GxP regulations, the system cannot make an automatic release determination; physical goods remain segregated in `QUARANTINE_PENDING_QUALIFIED_REVIEW` until an authorized QA professional reviews and signs the packet.
+4. **Structured Telemetry Ingestion:** The ingestion engine expects structured ISO-8601 timestamps and numerical sensor telemetry. Proprietary logger binary blobs require preprocessing into tabular or JSON format before ingestion.
 
 ---
 

@@ -45,9 +45,22 @@ def main():
     print("  EXCURSIONLENS MASTER VERIFICATION SUITE")
     print("=" * 60)
 
+    git_info = get_git_info()
+    github_server = os.environ.get("GITHUB_SERVER_URL")
+    github_repo = os.environ.get("GITHUB_REPOSITORY")
+    github_run_id = os.environ.get("GITHUB_RUN_ID")
+    execution_context = (
+        f"{github_server}/{github_repo}/actions/runs/{github_run_id}"
+        if (github_server and github_repo and github_run_id)
+        else f"local ({os.environ.get('COMPUTERNAME', 'developer-machine')})"
+    )
+
     results = {
+        "schema_version": "1.0",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "git": get_git_info(),
+        "execution_context": execution_context,
+        "git": git_info,
+        "tree_clean_before_verification": git_info["clean_tree"],
         "gates": {},
     }
 
@@ -102,7 +115,8 @@ def main():
     env = {"PYTHONPATH": "."}
     rc, stdout, stderr, elapsed = run_cmd([
         sys.executable, "-m", "pytest", "apps/api/tests",
-        "--cov=apps.api.app",
+        "--cov=apps/api/app",
+        "--cov-branch",
         f"--cov-report=json:{cov_path}",
         "--cov-report=term"
     ], env=env)
@@ -247,6 +261,10 @@ def main():
             with open(smoke_path, "r", encoding="utf-8") as f:
                 smoke_data = json.load(f)
                 smoke_status = smoke_data.get("status") or smoke_data.get("overall_status", "UNKNOWN")
+                # Section 3: Reject stale evidence when receipt SHA differs from evaluated HEAD
+                receipt_sha = smoke_data.get("commit_sha") or smoke_data.get("git_commit")
+                if receipt_sha and receipt_sha != git_info["head"] and git_info["head"]:
+                    smoke_status = "BLOCKED_STALE_RECEIPT"
         except Exception:
             pass
 

@@ -10,6 +10,9 @@ RUN npm run build
 FROM python:3.11-slim AS runner
 WORKDIR /app
 
+ARG GIT_COMMIT=unknown
+ENV APP_COMMIT_SHA=${GIT_COMMIT}
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \

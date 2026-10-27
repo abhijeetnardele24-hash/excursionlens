@@ -40,7 +40,7 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 - **Authoritative Research:** Integrated Tavily Search API with strict domain allowlisting (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`), snippet truncation, and content digest verification.
 - **Backend Domain Engine:** Built with **Python 3.11+**, **FastAPI**, and **Pydantic v2**, executing 100% deterministic excursion window detection, area-under-the-curve (AUC) calculations, and claims validation.
 - **Frontend Operational Canvas:** Developed with **React 18**, **TypeScript**, and **Vite**, adhering to a forensic operations aesthetic (minimalist palette: Canvas `#F3F0E8`, Ink `#17201E`, Excursion `#B5482D`, Supported `#275E4B`).
-- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, Pytest suite with 75.11% statement coverage, and Playwright E2E + Axe accessibility scans (0 violations across 5 viewports).
+- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, Pytest suite with 79.15% statement coverage across 80 test cases, and Playwright E2E + Axe accessibility scans (0 violations across 5 viewports).
 
 ---
 

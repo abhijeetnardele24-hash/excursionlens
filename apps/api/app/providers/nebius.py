@@ -421,9 +421,54 @@ class NebiusTokenFactoryProvider:
                             c_data = resp.json()
                             raw_content = c_data["choices"][0]["message"]["content"]
                             clean_json = raw_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-                            parsed = json.loads(clean_json)
+                            try:
+                                parsed = json.loads(clean_json)
+                                hypotheses = [Hypothesis.model_validate(h) for h in parsed.get("hypotheses", [])]
+                                if not hypotheses:
+                                    raise ValueError("Returned empty hypotheses array")
+                            except Exception as parse_err:
+                                # Section 2C: Permit one bounded repair attempt with validator feedback
+                                repair_payload = {
+                                    "model": model_used,
+                                    "messages": [
+                                        {"role": "system", "content": system_prompt},
+                                        {"role": "user", "content": user_prompt},
+                                        {"role": "assistant", "content": raw_content},
+                                        {
+                                            "role": "user",
+                                            "content": (
+                                                f"Your previous response failed validation: {parse_err}. "
+                                                "Repair the output to strictly adhere to the JSON schema: "
+                                                '{"hypotheses": [{"id": "HYP-01", "label": "...", "summary": "...", '
+                                                '"supporting_evidence_ids": [...], "contradicting_evidence_ids": [...], '
+                                                '"unknowns": [...], "next_check": "...", "confidence_band": "HIGH|MEDIUM|LOW", '
+                                                '"status": "LEADING|ALTERNATIVE", "what_it_does_not_establish": "..."}]}. '
+                                                "Return ONLY the corrected JSON without markdown."
+                                            ),
+                                        },
+                                    ],
+                                    "temperature": 0.1,
+                                    "max_tokens": 1500,
+                                }
+                                try:
+                                    rep_resp = await client.post(f"{self.base_url}chat/completions", headers=headers, json=repair_payload)
+                                    if rep_resp.status_code == 200:
+                                        rep_data = rep_resp.json()
+                                        rep_content = rep_data["choices"][0]["message"]["content"]
+                                        rep_clean = rep_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                                        rep_parsed = json.loads(rep_clean)
+                                        hypotheses = [Hypothesis.model_validate(h) for h in rep_parsed.get("hypotheses", [])]
+                                        if hypotheses:
+                                            raw_content = rep_content
+                                            c_data = rep_data
+                                        else:
+                                            raise ValueError("Repaired output still contained empty hypotheses array")
+                                    else:
+                                        raise ValueError(f"Repair HTTP {rep_resp.status_code}: {rep_resp.text[:200]}")
+                                except Exception as rep_err:
+                                    last_err = f"Investigator schema validation failed after bounded repair attempt: {rep_err}"
+                                    break
 
-                            hypotheses = [Hypothesis.model_validate(h) for h in parsed.get("hypotheses", [])]
                             if hypotheses:
                                 receipt = {
                                     "status": "LIVE_SUCCESS",
@@ -618,9 +663,53 @@ class NebiusTokenFactoryProvider:
                             c_data = resp.json()
                             raw_content = c_data["choices"][0]["message"]["content"]
                             clean_json = raw_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-                            parsed = json.loads(clean_json)
+                            try:
+                                parsed = json.loads(clean_json)
+                                critiques = [SkepticCritique.model_validate(c) for c in parsed.get("critiques", [])]
+                                if not critiques:
+                                    raise ValueError("Returned empty critiques array")
+                            except Exception as parse_err:
+                                # Section 2C: Permit one bounded repair attempt with validator feedback
+                                repair_payload = {
+                                    "model": model_used,
+                                    "messages": [
+                                        {"role": "system", "content": system_prompt},
+                                        {"role": "user", "content": user_prompt},
+                                        {"role": "assistant", "content": raw_content},
+                                        {
+                                            "role": "user",
+                                            "content": (
+                                                f"Your previous skeptic output failed validation: {parse_err}. "
+                                                "Repair the output to strictly adhere to the JSON schema: "
+                                                '{"critiques": [{"hypothesis_id": "HYP-01", "attack_summary": "...", '
+                                                '"unsupported_claims": [...], "ignored_contradictions": [...], '
+                                                '"recommended_status": "LEADING|ALTERNATIVE|DOWNGRADED", "rationale": "..."}]}. '
+                                                "Return ONLY the corrected JSON without markdown."
+                                            ),
+                                        },
+                                    ],
+                                    "temperature": 0.1,
+                                    "max_tokens": 1200,
+                                }
+                                try:
+                                    rep_resp = await client.post(f"{self.base_url}chat/completions", headers=headers, json=repair_payload)
+                                    if rep_resp.status_code == 200:
+                                        rep_data = rep_resp.json()
+                                        rep_content = rep_data["choices"][0]["message"]["content"]
+                                        rep_clean = rep_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                                        rep_parsed = json.loads(rep_clean)
+                                        critiques = [SkepticCritique.model_validate(c) for c in rep_parsed.get("critiques", [])]
+                                        if critiques:
+                                            raw_content = rep_content
+                                            c_data = rep_data
+                                        else:
+                                            raise ValueError("Repaired skeptic output still contained empty critiques array")
+                                    else:
+                                        raise ValueError(f"Repair HTTP {rep_resp.status_code}: {rep_resp.text[:200]}")
+                                except Exception as rep_err:
+                                    last_err = f"Skeptic schema validation failed after bounded repair attempt: {rep_err}"
+                                    break
 
-                            critiques = [SkepticCritique.model_validate(c) for c in parsed.get("critiques", [])]
                             if critiques:
                                 receipt = {
                                     "status": "LIVE_SUCCESS",
@@ -673,7 +762,7 @@ class NebiusTokenFactoryProvider:
                     hypothesis_id=h.id,
                     attack_summary="Leading hypothesis relies on door open event, but fails to account for secondary core probe lag.",
                     unsupported_claims=["Assumed full payload reached 10.5°C without checking core vs surface differential."],
-                    ignored_contradictions=["Secondary logger (EVT-OPS-04) peaked at 6.8°C, suggesting bulk internal thermal mass remained compliant."],
+                    ignored_contradictions=["Secondary logger (EVT-OPS-04) peaked at 6.8°C, within the configured temperature band."],
                     recommended_status="LEADING",
                     rationale="Primary heat intrusion is corroborated by 24-minute door open duration, but physical disposition requires inspection of secondary core logger."
                 ))

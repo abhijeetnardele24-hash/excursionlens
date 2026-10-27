@@ -1,8 +1,32 @@
 # ExcursionLens Video Demonstration Script
 
-**Target Duration:** 2 minutes 30 seconds (Hard Cap: 2:45)  
+**Target Duration:** 2 minutes 30 seconds (Hard Cap: 2:45, Official Limit: 3:00)  
 **Tone:** Forensic, authoritative, calm, high signal-to-noise. No marketing hyperbole.  
 *Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
+
+---
+
+## Public Video Requirements & Hackathon Constraints
+
+> [!IMPORTANT]
+> **Devpost Submission Video Rules:**
+> - **Hosting:** Must be uploaded to YouTube or Vimeo and set to **Public** or **Unlisted** (do NOT set to Private).
+> - **Duration:** Must be strictly **under 3 minutes** (our script is timed to 2:30 with a 2:45 safety buffer).
+> - **Visual Standard:** Record in 1080p (1920×1080) at 60fps or 30fps. Must demonstrate the live working UI at `http://localhost:8000`.
+> - **Narration:** Clear spoken voiceover highlighting the deterministic baseline, Tavily grounding, NVIDIA Nemotron reasoning on Nebius Token Factory, skeptic falsification, and human review packet.
+
+---
+
+## Master Shot List & Scene Storyboard
+
+| Scene | Timecode | Visual / URL | Onscreen Action | Audio / Spoken Focus |
+|:---:|:---:|:---|:---|:---|
+| **01** | `0:00 - 0:30` | `http://localhost:8000` Header & Case Card | Hover NMB-204, Lot 88B, red quarantine badge | The $35B cold-chain blindspot; deterministic safety boundary |
+| **02** | `0:30 - 0:55` | Temperature Chart & Event Rail | Toggle table, highlight 40-min breach, 10.5°C peak, 10:18 UTC door event | 100% deterministic code; correlation of IoT logger with dock door |
+| **03** | `0:55 - 1:20` | Stage Tracker & Tavily Proof Panel | Click "Investigate Excursion", expand Tavily panel, show CDC/WHO sources | Authoritative public health retrieval; domain allowlisting |
+| **04** | `1:20 - 1:50` | Hypothesis Board & Skeptic Panel | Show 3 competing hypotheses; hover skeptic critique of reefer voltage | NVIDIA Nemotron reasoning on Nebius; adversarial contradiction pass |
+| **05** | `1:50 - 2:20` | Counterfactual Workbench & Modal | Select 5-min door limit, click replay (40min → 0min); open Review Packet | Sensitivity replay controls; printable review packet with SHA-256 digests |
+| **06** | `2:20 - 2:30` | Summary Header & Footer | Show clean audit state, receipts, version tag | Closing summary: IoT reality + Tavily grounding + Nemotron reasoning |
 
 ---
 
@@ -16,7 +40,7 @@
 
 ### Scene 2: Deterministic Baseline & Event Alignment (0:30 - 0:55)
 - **Visual:** Focus on the Temperature Telemetry Chart and the Custody/Operational Event Rail.
-- **Onscreen Action:** Toggle "Show Accessible Table" to show raw timestamps, then scroll through the interactive chart showing the 40-minute breach window peaking at 10.5°C against the 2.0°C to 8.0°C compliant band. Point to the door-open event at 10:18 UTC.
+- **Onscreen Action:** Toggle "Show Accessible Table" to show raw timestamps, then scroll through the interactive chart showing the 40-minute breach window peaking at 10.5°C against the 2.0°C to 8.0°C configured temperature band. Point to the door-open event at 10:18 UTC.
 - **Spoken Narration:**
   > "First, the foundation is 100% deterministic code. Before any AI call occurs, our Python domain engine parses the raw sensor time-series. For shipment NMB-204, it identifies a 40-minute breach above 8°C, peaking at 10.5°C with an area under the curve of 50.5 degree-minutes. Notice how the timeline aligns custody handshakes with vehicle IoT telemetry: exactly at 10:18 UTC, cargo door sensors trigger at Newburgh Transfer Hub Dock 3 during an unconditioned cross-dock transfer."
 

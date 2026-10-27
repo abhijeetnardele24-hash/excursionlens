@@ -8,20 +8,18 @@ Produces print-optimized HTML review packets conforming to cold-chain decision-s
 - Styled with forensic operations typography and print CSS.
 """
 
-import hashlib
 import html
+import os
 import subprocess
 import urllib.parse
 
-from ..domain.models import InvestigationRun, ShipmentCase, SourceRecord
-
-
-def _calc_source_digest(s: SourceRecord) -> str:
-    raw = f"{s.id}:{s.url}:{s.snippet}"
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+from ..domain.models import InvestigationRun, ShipmentCase
 
 
 def _get_git_commit_sha() -> str:
+    env_sha = os.environ.get("APP_COMMIT_SHA") or os.environ.get("GIT_COMMIT") or os.environ.get("GITHUB_SHA")
+    if env_sha and env_sha.strip():
+        return env_sha.strip()
     try:
         res = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -105,7 +103,7 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
             <td><code>{_esc(s.id)}</code></td>
             <td><a href="{_safe_url(s.url)}" target="_blank" rel="noopener noreferrer">{_esc(s.title)}</a></td>
             <td><code>{_esc(s.domain)}</code></td>
-            <td><code title="SHA-256 Digest">{_esc(_calc_source_digest(s)[:16])}…</code></td>
+            <td><code title="SHA-256 Digest">{_esc(s.content_digest[:16])}…</code></td>
             <td>{_esc(s.snippet)}</td>
         </tr>"""
         for s in run.sources
@@ -127,24 +125,23 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
         """
 
     formatted_doses = f"{case.product_profile.dose_count:,}" if case.product_profile.dose_count else "—"
-    is_live = (run.provider_mode == "LIVE_TOKEN_FACTORY")
     commit_sha = _get_git_commit_sha()
 
-    if not is_live:
+    if run.state == "FAILED_TRUTHFULLY":
         provider_badge = """
-            <span class="badge" style="background: #FFF3CD; color: #856404; font-weight: 700;">Synthetic Fixture Investigator</span>
-            <span class="badge" style="background: #E2E3E5; color: #383D41; font-weight: 700; margin-left: 6px;">Cached Fixture Grounding</span>
+            <span class="badge" style="background: #F8D7DA; color: #721C24; font-weight: 700;">Investigation Terminated Truthfully</span>
         """
-        hyp_heading = "3. Synthetic Fixture Causal Hypotheses &amp; Skeptic Critique"
-        source_heading = "4. Cached Fixture Grounding Evidence"
+        hyp_heading = "3. Causal Hypotheses (Terminated)"
+        source_heading = "4. Grounding Evidence"
         execution_audit_box = f"""
-        <div style="background: #F8F9FA; border: 1px solid var(--rules); border-radius: 4px; padding: 10px 14px; margin: 12px 0; font-size: 12px; color: var(--muted);">
-            <strong>Execution Provenance:</strong> Deterministic Synthetic Fixture Replay &bull;
+        <div style="background: #F8D7DA; border: 1px solid #F5C6CB; border-radius: 4px; padding: 10px 14px; margin: 12px 0; font-size: 12px; color: #721C24;">
+            <strong>Execution Provenance:</strong> Live Execution Terminated (Truthful Failure) &bull;
+            Run ID: <code>{_esc(run.id)}</code> &bull;
             Source Commit: <code>{_esc(commit_sha)}</code> &bull;
-            Provider Status: Synthetic/Fixture (Zero live external provider requests dispatched).
+            Reason: {_esc(run.failure_reason or 'Validation or live provider stage failed; stage halted to prevent false claims')}.
         </div>
         """
-    else:
+    elif run.provider_mode == "LIVE_TOKEN_FACTORY":
         inv_event = next((e for e in run.tool_events if e.tool_name in ("nebius_investigator", "HYPOTHESES_DRAFTED")), None)
         skep_event = next((e for e in run.tool_events if e.tool_name in ("nebius_skeptic", "SKEPTIC_REVIEWED")), None)
         tav_event = next((e for e in run.tool_events if e.tool_name in ("tavily_search", "RESEARCHING")), None)
@@ -161,21 +158,55 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
         source_heading = "4. Live Authoritative Guidance Evidence (Tavily Grounding)"
         execution_audit_box = f"""
         <div style="background: #EFF6FC; border: 1px solid #B4D6FA; border-radius: 4px; padding: 12px 14px; margin: 12px 0; font-size: 12px;">
-            <div style="font-weight: 700; color: #1B4B72; margin-bottom: 6px;">Cryptographic Execution Audit (Live Token Factory Mode)</div>
+            <div style="font-weight: 700; color: #1B4B72; margin-bottom: 6px;">Cryptographic Execution Audit (Fully Verified Live Token Factory Mode)</div>
             <table style="width: 100%; border: none; font-size: 11px;">
                 <tr>
+                    <td style="border: none; padding: 3px 6px;"><strong>Run ID:</strong> <code>{_esc(run.id)}</code></td>
                     <td style="border: none; padding: 3px 6px;"><strong>Served NVIDIA Model:</strong> <code>{_esc(run.served_model or run.requested_model)}</code></td>
-                    <td style="border: none; padding: 3px 6px;"><strong>Canonical Input Digest:</strong> <code>{_esc(run.request_digest or case.input_digest or '—')}</code></td>
                 </tr>
                 <tr>
+                    <td style="border: none; padding: 3px 6px;"><strong>Canonical Input Digest:</strong> <code>{_esc(run.request_digest or case.input_digest or '—')}</code></td>
                     <td style="border: none; padding: 3px 6px;"><strong>Investigator Receipt Digest:</strong> <code>{_esc(inv_digest)}</code></td>
+                </tr>
+                <tr>
                     <td style="border: none; padding: 3px 6px;"><strong>Skeptic Receipt Digest:</strong> <code>{_esc(skep_digest)}</code></td>
+                    <td style="border: none; padding: 3px 6px;"><strong>Source Commit SHA:</strong> <code>{_esc(commit_sha)}</code></td>
                 </tr>
                 <tr>
                     <td style="border: none; padding: 3px 6px;"><strong>Tavily Retrieval Status:</strong> <span class="badge" style="background: #E8F5E9; color: #2E7D32;">{_esc(tav_status)}</span></td>
-                    <td style="border: none; padding: 3px 6px;"><strong>Source Commit SHA:</strong> <code>{_esc(commit_sha)}</code></td>
+                    <td style="border: none; padding: 3px 6px;"><strong>Validation Status:</strong> <span class="badge" style="background: #E8F5E9; color: #2E7D32;">PASSED</span></td>
                 </tr>
             </table>
+        </div>
+        """
+    elif run.provider_mode == "DEMO_FIXTURE_FALLBACK":
+        provider_badge = """
+            <span class="badge" style="background: #FFF3CD; color: #856404; font-weight: 700;">Fixture Fallback (Live Attempt Degraded)</span>
+            <span class="badge" style="background: #E2E3E5; color: #383D41; font-weight: 700; margin-left: 6px;">Cached Guidance</span>
+        """
+        hyp_heading = "3. Deterministic Benchmark Causal Hypotheses &amp; Skeptic Critique"
+        source_heading = "4. Cached Fixture Grounding Evidence"
+        execution_audit_box = f"""
+        <div style="background: #FFF3CD; border: 1px solid #FFEEBA; border-radius: 4px; padding: 10px 14px; margin: 12px 0; font-size: 12px; color: #856404;">
+            <strong>Execution Provenance:</strong> Live Provider Request Attempted &bull; Fixture Fallback Engaged &bull;
+            Run ID: <code>{_esc(run.id)}</code> &bull;
+            Source Commit: <code>{_esc(commit_sha)}</code> &bull;
+            Note: Live external provider credentials configured or partially attempted; fell back truthfully to benchmark fixtures ({_esc(run.failure_reason or 'partial provider response')}).
+        </div>
+        """
+    else:
+        provider_badge = """
+            <span class="badge" style="background: #E9ECEF; color: #495057; font-weight: 700;">Synthetic Fixture Investigator</span>
+            <span class="badge" style="background: #E2E3E5; color: #383D41; font-weight: 700; margin-left: 6px;">Cached Fixture Grounding</span>
+        """
+        hyp_heading = "3. Synthetic Fixture Causal Hypotheses &amp; Skeptic Critique"
+        source_heading = "4. Cached Fixture Grounding Evidence"
+        execution_audit_box = f"""
+        <div style="background: #F8F9FA; border: 1px solid var(--rules); border-radius: 4px; padding: 10px 14px; margin: 12px 0; font-size: 12px; color: var(--muted);">
+            <strong>Execution Provenance:</strong> Deterministic Synthetic Fixture Replay &bull;
+            Run ID: <code>{_esc(run.id)}</code> &bull;
+            Source Commit: <code>{_esc(commit_sha)}</code> &bull;
+            Provider Status: Synthetic Benchmark Fixture (Zero live external provider requests dispatched).
         </div>
         """
 

@@ -1,34 +1,26 @@
 {
-  "timestamp": "2026-10-27T20:45:47Z",
+  "timestamp": "2026-10-27T22:31:59Z",
   "nebius": {
     "base_url": "https://api.tokenfactory.nebius.com/v1/",
     "key_present": false,
     "key_preview": "<none>",
     "status": "MISSING_KEY",
-    "available_models_count": 0,
-    "nvidia_models": [],
-    "selected_fast_model": null,
-    "selected_deep_model": null,
-    "probe_latency_ms": null,
+    "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "latency_ms": null,
     "probe_success": false
   },
   "tavily": {
     "key_present": false,
     "key_preview": "<none>",
     "status": "MISSING_KEY",
-    "allowlist": [
-      "cdc.gov",
-      "fda.gov",
-      "who.int",
-      "gs1.org"
-    ],
-    "probe_latency_ms": null,
+    "latency_ms": null,
     "probe_success": false,
-    "sample_domains_found": []
+    "domains_found": []
   },
   "overall_ready": false,
+  "overall_status": "BLOCKED",
   "failure_reasons": [
-    "NEBIUS_TOKEN_FACTORY_KEY is missing or contains placeholder.",
-    "TAVILY_API_KEY is missing or contains placeholder."
+    "TAVILY_API_KEY is not configured or contains placeholder.",
+    "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
   ]
 }

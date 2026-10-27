@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface AppHeaderProps {
-  providerMode: 'LIVE_TOKEN_FACTORY' | 'DEMO_FIXTURE_FALLBACK' | 'DEMO_FIXTURE' | 'NOT_CONFIGURED' | 'FAILED' | 'ERROR';
+  providerMode: 'LIVE_TOKEN_FACTORY' | 'DEMO_FIXTURE_FALLBACK' | 'DEMO_FIXTURE' | 'CONFIGURED_PENDING_VERIFICATION' | 'NOT_CONFIGURED' | 'FAILED' | 'ERROR';
   selectedModel: string;
   isInvestigating: boolean;
   hasRun: boolean;
@@ -73,19 +73,25 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             className={`badge ${
               providerMode === 'LIVE_TOKEN_FACTORY'
                 ? 'badge-supported'
+                : providerMode === 'CONFIGURED_PENDING_VERIFICATION'
+                ? 'badge-neutral'
                 : providerMode === 'DEMO_FIXTURE_FALLBACK'
                 ? 'badge-unknown'
                 : providerMode === 'DEMO_FIXTURE'
                 ? 'badge-neutral'
                 : 'badge-excursion'
             }`}
-            title="Provider runtime mode"
+            title={`Provider runtime mode: ${providerMode}`}
           >
             {providerMode === 'LIVE_TOKEN_FACTORY'
               ? '● LIVE TOKEN FACTORY'
+              : providerMode === 'CONFIGURED_PENDING_VERIFICATION'
+              ? '● LIVE VERIFICATION PENDING'
               : providerMode === 'DEMO_FIXTURE_FALLBACK'
-              ? '● DEMO FALLBACK'
-              : '● DEMO FIXTURE'}
+              ? '● DEMO FIXTURE FALLBACK'
+              : providerMode === 'DEMO_FIXTURE'
+              ? '● DEMO FIXTURE'
+              : '● PROVIDER FAILED'}
           </span>
           <span className="badge badge-accent" title="NVIDIA Open-Source Model">
             {selectedModel.replace('nvidia/', '')}

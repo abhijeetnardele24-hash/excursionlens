@@ -43,6 +43,9 @@ RATE_LIMIT_RECORDS: dict[str, list[float]] = defaultdict(list)
 
 
 def get_git_commit_sha() -> str:
+    env_sha = os.environ.get("APP_COMMIT_SHA") or os.environ.get("GIT_COMMIT") or os.environ.get("GITHUB_SHA")
+    if env_sha and env_sha.strip() and env_sha.strip() != "unknown":
+        return env_sha.strip()
     try:
         res = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -50,7 +53,7 @@ def get_git_commit_sha() -> str:
             text=True,
             check=False,
         )
-        if res.returncode == 0:
+        if res.returncode == 0 and res.stdout.strip():
             return res.stdout.strip()
     except Exception:
         pass

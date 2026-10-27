@@ -28,7 +28,7 @@ Every scenario includes:
 | `07_clock_timezone_mismatch.json` | Timezone Offset Ingestion | True | 35.0 min | 9.4°C | **PASS** |
 | `08_missing_reading_gap.json` | Sensor Telemetry Missing Gap | False | 0.0 min | 4.5°C | **PASS** |
 | `09_dual_cause_event.json` | Compound Door Open + Traffic Delay | True | 65.0 min | 11.5°C | **PASS** |
-| `10_no_true_excursion.json` | Fully Compliant Cold-Chain Run | False | 0.0 min | 4.9°C | **PASS** |
+| `10_no_true_excursion.json` | Telemetry Within Configured Band | False | 0.0 min | 4.9°C | **PASS** |
 | `11_ambiguous_evidence.json` | Borderline Threshold Oscillations | True | 30.0 min | 9.8°C | **PASS** |
 | `12_adversarial_prompt_injection.json` | Hostile Injected Telemetry Payload | True | 45.0 min | 12.5°C | **PASS** |
 

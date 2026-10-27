@@ -22,7 +22,7 @@
 - [x] **Gate 1 (Python Lint):** Ruff linter clean across `apps/api`, `scripts`, and `benchmark` (0 violations).
 - [x] **Gate 2 (Python Typing):** Mypy clean with `--check-untyped-defs` (0 type errors).
 - [x] **Gate 3 (Frontend Build):** TypeScript type-check and Vite production build clean (`apps/web/dist`).
-- [x] **Gate 4 (Backend Unit & Coverage):** Pytest suite passing with 75.11% statement coverage across 56 test cases (`apps/api/tests`).
+- [x] **Gate 4 (Backend Unit & Coverage):** Pytest suite passing with 79.15% statement coverage across 80 test cases (`apps/api/tests`).
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
 - [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px) with 0 Axe accessibility violations.

@@ -111,6 +111,16 @@ class InvestigationOrchestrator:
         self.tasks[rid] = task
         return rid
 
+    async def wait_for_completion(self, run_id: str, timeout: float = 10.0) -> InvestigationRun:
+        """Awaits until run reaches a terminal state (HUMAN_REVIEW_READY or FAILED_TRUTHFULLY)."""
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            run = self.runs.get(run_id)
+            if run and run.state in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
+                return run
+            await asyncio.sleep(0.02)
+        return self.runs[run_id]
+
     def _broadcast_event(self, run_id: str, event_data: dict[str, Any]):
         """Records event with monotonic sequence in run history and pushes to active listener queues."""
         if run_id not in self.event_buffers:
@@ -177,7 +187,7 @@ class InvestigationOrchestrator:
                 excursion_summary = (
                     f"Detected {analysis.total_excursion_duration_minutes:.1f} minutes cumulative excursion. "
                     f"Max temp: {analysis.max_recorded_temperature:.1f}°C."
-                    if analysis.has_excursion else "Zero excursion detected; compliant throughout."
+                    if analysis.has_excursion else "No excursion was detected in the supplied telemetry; all readings within configured temperature band."
                 )
                 emit("EXCURSION_DETECTED", excursion_summary, {
                     "has_excursion": analysis.has_excursion,
@@ -203,6 +213,7 @@ class InvestigationOrchestrator:
 
                 # Discover key-scoped Nebius model catalog before investigator execution
                 selected_runtime_model: str | None = None
+                catalog_probe: dict[str, Any] = {}
                 if self.nebius.has_key:
                     catalog_probe = await self.nebius.discover_models_async()
                     if catalog_probe.get("status") == "LIVE_SUCCESS":
@@ -260,9 +271,12 @@ class InvestigationOrchestrator:
                     run.sources
                 )
 
-                # Check 2: validate_skeptic_critiques
+                # Check 2: validate_skeptic_critiques (verifying coverage across all hypotheses)
                 if is_valid:
-                    critiques_valid, c_errors = self.validator.validate_skeptic_critiques(run.critiques)
+                    critiques_valid, c_errors = self.validator.validate_skeptic_critiques(
+                        run.critiques,
+                        hypotheses=run.hypotheses
+                    )
                     if not critiques_valid:
                         is_valid = False
                         validation_errors.extend(c_errors)
@@ -289,16 +303,59 @@ class InvestigationOrchestrator:
                 emit("CLAIMS_VALIDATED", "Citation IDs and prohibited-claim rules passed deterministic validation.")
                 await asyncio.sleep(0.05)
 
-                # Determine truthful overall provider mode:
-                # Rule: A run may be labeled LIVE_TOKEN_FACTORY only when all required runtime stages succeeded live:
-                # - Tavily retrieval
-                # - Nebius investigator inference
-                # - Nebius skeptic inference
-                # - schema validation
-                # - claims validation
-                if tavily_is_live and investigator_is_live and skeptic_is_live and is_valid:
+                # Determine truthful overall provider mode (Section 2A fail-closed requirements):
+                # A run may be labeled LIVE_TOKEN_FACTORY only if ALL of these succeeded during that exact run:
+                # 1. Nebius credentials authenticated
+                # 2. Nebius GET /models succeeded
+                # 3. Catalog contained an eligible NVIDIA/Nemotron model
+                # 4. The exact served model is present in that returned catalog
+                # 5. Investigator inference succeeded live
+                # 6. Skeptic inference succeeded live
+                # 7. Tavily retrieval succeeded live
+                # 8. Tavily returned at least one valid allowlisted source
+                # 9. Provider response schemas passed
+                # 10. Claims validation passed
+                allowlisted_domains = {"cdc.gov", "fda.gov", "who.int", "gs1.org", "usp.org"}
+                served_model_name = nebius_receipt.get("model", "")
+                catalog_models = set(catalog_probe.get("nvidia_models", []))
+
+                is_live_catalog_ok = (
+                    catalog_probe.get("status") == "LIVE_SUCCESS"
+                    and len(catalog_models) > 0
+                    and served_model_name in catalog_models
+                )
+                is_live_investigator_ok = (
+                    investigator_is_live
+                    and nebius_receipt.get("status") == "LIVE_SUCCESS"
+                    and bool(nebius_receipt.get("response_digest"))
+                )
+                is_live_skeptic_ok = (
+                    skeptic_is_live
+                    and skeptic_receipt.get("status") == "LIVE_SUCCESS"
+                    and bool(skeptic_receipt.get("response_digest"))
+                )
+                is_live_tavily_ok = (
+                    tavily_is_live
+                    and tavily_receipt.get("status") == "LIVE_SUCCESS"
+                    and len(run.sources) > 0
+                    and all(s.domain.lower() in allowlisted_domains for s in run.sources)
+                )
+                has_valid_schemas = len(run.hypotheses) > 0 and len(run.critiques) > 0
+
+                can_be_live = (
+                    self.nebius.has_key
+                    and self.tavily.has_key
+                    and is_live_catalog_ok
+                    and is_live_investigator_ok
+                    and is_live_skeptic_ok
+                    and is_live_tavily_ok
+                    and has_valid_schemas
+                    and is_valid
+                )
+
+                if can_be_live:
                     run.provider_mode = "LIVE_TOKEN_FACTORY"
-                    run.served_model = nebius_receipt.get("model", selected_runtime_model or settings.nvidia_deep_model_id)
+                    run.served_model = served_model_name
                 elif self.nebius.has_key or self.tavily.has_key:
                     run.provider_mode = "DEMO_FIXTURE_FALLBACK"
                     run.served_model = f"{selected_runtime_model or settings.nvidia_deep_model_id} (fixture fallback)"

@@ -1,10 +1,13 @@
 {
-  "timestamp": "2026-10-27T21:49:27Z",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T22:35:24Z",
+  "execution_context": "local (AB)",
   "git": {
-    "head": "082672bf2e0e846f0fe5c7909e240549f156a664",
+    "head": "68feb30d7a38538b9cbf562c28eb15c326f54186",
     "branch": "main",
-    "clean_tree": true
+    "clean_tree": false
   },
+  "tree_clean_before_verification": false,
   "gates": {
     "ruff": {
       "passed": true,
@@ -13,18 +16,18 @@
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.38,
+      "elapsed_sec": 0.37,
       "output": "Success: no issues found in 12 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.22,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-Dc8LWNOY.css  \u001b[39m\u001b[1m\u001b[2m  4.85 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-wJOxJwnf.js   \u001b[39m\u001b[1m\u001b[2m189.28 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 56.91 kB\u001b[22m\u001b[2m \u2502 map: 470.79 kB\u001b[22m\n\u001b[32m\u2713 built in 508ms\u001b[39m\n"
+      "elapsed_sec": 2.12,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-BjKalS6j.js   \u001b[39m\u001b[1m\u001b[2m190.88 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.44 kB\u001b[22m\u001b[2m \u2502 map: 471.88 kB\u001b[22m\n\u001b[32m\u2713 built in 475ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 75.11,
-      "elapsed_sec": 3.68
+      "coverage_percent": 79.15,
+      "elapsed_sec": 19.02
     },
     "benchmark": {
       "passed": true,
@@ -35,7 +38,7 @@
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.24
+      "elapsed_sec": 0.27
     },
     "playwright": {
       "passed": true,
@@ -44,7 +47,7 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 28363.708
+      "duration_ms": 28311.948
     }
   },
   "canonical_case_nmb_204": {
