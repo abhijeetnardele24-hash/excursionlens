@@ -7,12 +7,13 @@ all 12 frozen synthetic scenarios against benchmark_expectations.json.
 Emits structured machine-readable results to test-results/benchmark-results.json.
 """
 
+import json
 import os
 import sys
-import json
 import time
-from apps.api.app.domain.models import ShipmentCase
+
 from apps.api.app.domain.detector import DeterministicExcursionEngine
+from apps.api.app.domain.models import ShipmentCase
 
 
 def run_benchmark() -> int:

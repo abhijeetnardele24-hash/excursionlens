@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" width="100%" height="100%" style="background-color: #17201E; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#275E4B" />
+      <stop offset="100%" stop-color="#1A4033" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B5482D" />
+      <stop offset="100%" stop-color="#8E351F" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E2B28" />
+      <stop offset="100%" stop-color="#172220" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Header Banner -->
+  <text x="50" y="52" fill="#F3F0E8" font-size="22" font-weight="800" letter-spacing="-0.5">EXCURSIONLENS ARCHITECTURE &amp; INVESTIGATION PIPELINE</text>
+  <text x="50" y="78" fill="#A2ADA6" font-size="13">Cold-Chain Temperature Excursion Agent — Deterministic Sensor Truth, Tavily Research, &amp; NVIDIA Nemotron on Nebius Token Factory</text>
+
+  <!-- Pillar 1: Case Input & Manifest -->
+  <g transform="translate(50, 115)" filter="url(#shadow)">
+    <rect width="230" height="495" rx="8" fill="url(#cardGrad)" stroke="#2D403B" stroke-width="1.5"/>
+    <rect width="230" height="38" rx="8" fill="#253531"/>
+    <text x="16" y="24" fill="#F3F0E8" font-size="12" font-weight="700">1. INPUT &amp; TELEMETRY</text>
+
+    <g transform="translate(15, 55)">
+      <rect width="200" height="65" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="12" y="22" fill="#B5482D" font-size="10" font-weight="700">SHIPMENT PROFILE</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="12" font-weight="600">NMB-204 Biologic</text>
+      <text x="12" y="54" fill="#A2ADA6" font-size="10">450 doses · 2.0°C-8.0°C policy</text>
+    </g>
+
+    <g transform="translate(15, 135)">
+      <rect width="200" height="65" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="12" y="22" fill="#275E4B" font-size="10" font-weight="700">TIME-SERIES TELEMETRY</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="12" font-weight="600">5-Min Sensor Intervals</text>
+      <text x="12" y="54" fill="#A2ADA6" font-size="10">Albany DC &rarr; Kingston Clinic</text>
+    </g>
+
+    <g transform="translate(15, 215)">
+      <rect width="200" height="85" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="12" y="22" fill="#365E7D" font-size="10" font-weight="700">OPERATIONAL &amp; CUSTODY</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="11">10:18 Door Open (24m)</text>
+      <text x="12" y="56" fill="#EAE7DE" font-size="11">10:20 Dock 3 Transfer</text>
+      <text x="12" y="72" fill="#EAE7DE" font-size="11">Nominal Reefer Telemetry</text>
+    </g>
+
+    <g transform="translate(15, 315)">
+      <rect width="200" height="155" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="12" y="22" fill="#9A6A1F" font-size="10" font-weight="700">SAFETY BOUNDARY</text>
+      <text x="12" y="42" fill="#EAE7DE" font-size="10.5" font-style="italic">
+        <tspan x="12" y="42">"Investigation support only.</tspan>
+        <tspan x="12" y="58">Not a product disposition,</tspan>
+        <tspan x="12" y="74">medical decision, or</tspan>
+        <tspan x="12" y="90">regulatory release."</tspan>
+      </text>
+      <text x="12" y="118" fill="#B5482D" font-size="10" font-weight="700">MANDATORY QUARANTINE</text>
+      <text x="12" y="134" fill="#A2ADA6" font-size="9">Auto-release strictly forbidden</text>
+    </g>
+  </g>
+
+  <!-- Flow Connector 1 -> 2 -->
+  <path d="M 280 360 L 330 360" stroke="#275E4B" stroke-width="2.5" stroke-dasharray="4 4" fill="none"/>
+  <polygon points="330,355 342,360 330,365" fill="#275E4B"/>
+
+  <!-- Pillar 2: Deterministic Engine -->
+  <g transform="translate(345, 115)" filter="url(#shadow)">
+    <rect width="230" height="495" rx="8" fill="url(#cardGrad)" stroke="#2D403B" stroke-width="1.5"/>
+    <rect width="230" height="38" rx="8" fill="#253531"/>
+    <text x="16" y="24" fill="#F3F0E8" font-size="12" font-weight="700">2. DETERMINISTIC CORE</text>
+
+    <g transform="translate(15, 55)">
+      <rect width="200" height="95" rx="5" fill="#141D1B" stroke="#275E4B"/>
+      <text x="12" y="22" fill="#275E4B" font-size="10" font-weight="700">EXCURSION DETECTOR</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="11">Duration: 42.0 minutes</text>
+      <text x="12" y="56" fill="#EAE7DE" font-size="11">Peak Temp: 10.5°C</text>
+      <text x="12" y="72" fill="#EAE7DE" font-size="11">Degree-Minutes: 44.8°C·min</text>
+      <text x="12" y="86" fill="#A2ADA6" font-size="9">OBS-EXCURSION-01 Generated</text>
+    </g>
+
+    <g transform="translate(15, 165)">
+      <rect width="200" height="75" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="12" y="22" fill="#365E7D" font-size="10" font-weight="700">ANOMALY VERIFIER</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="11">Sampling Gap Detection</text>
+      <text x="12" y="56" fill="#EAE7DE" font-size="11">Impossible Jump Filter</text>
+      <text x="12" y="70" fill="#A2ADA6" font-size="9">Timezone normalization</text>
+    </g>
+
+    <g transform="translate(15, 255)">
+      <rect width="200" height="105" rx="5" fill="#141D1B" stroke="#275E4B"/>
+      <text x="12" y="22" fill="#275E4B" font-size="10" font-weight="700">TAVILY RESEARCH TOOL</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="11">Live Allowlist Search</text>
+      <text x="12" y="56" fill="#A2ADA6" font-size="10">cdc.gov &bull; fda.gov &bull; who.int</text>
+      <text x="12" y="72" fill="#EAE7DE" font-size="11">Normalized Source Records</text>
+      <text x="12" y="88" fill="#275E4B" font-size="9" font-weight="700">SRC-CDC-01 &bull; SRC-FDA-01</text>
+    </g>
+
+    <g transform="translate(15, 375)">
+      <rect width="200" height="95" rx="5" fill="#141D1B" stroke="#B5482D"/>
+      <text x="12" y="22" fill="#B5482D" font-size="10" font-weight="700">CLAIMS VALIDATOR</text>
+      <text x="12" y="40" fill="#EAE7DE" font-size="10">Rejects unknown IDs</text>
+      <text x="12" y="54" fill="#EAE7DE" font-size="10">Rejects unverified URLs</text>
+      <text x="12" y="68" fill="#EAE7DE" font-size="10">Rejects disposition claims</text>
+      <text x="12" y="84" fill="#B5482D" font-size="9" font-weight="700">FAILS CLOSED ON ANOMALY</text>
+    </g>
+  </g>
+
+  <!-- Flow Connector 2 -> 3 -->
+  <path d="M 575 360 L 625 360" stroke="#275E4B" stroke-width="2.5" stroke-dasharray="4 4" fill="none"/>
+  <polygon points="625,355 637,360 625,365" fill="#275E4B"/>
+
+  <!-- Pillar 3: NVIDIA Nemotron Agent on Nebius Token Factory -->
+  <g transform="translate(640, 115)" filter="url(#shadow)">
+    <rect width="210" height="495" rx="8" fill="url(#cardGrad)" stroke="#2D403B" stroke-width="1.5"/>
+    <rect width="210" height="38" rx="8" fill="url(#headerGrad)"/>
+    <text x="14" y="24" fill="#F3F0E8" font-size="11" font-weight="700">3. NEMOTRON (NEBIUS)</text>
+
+    <g transform="translate(12, 55)">
+      <rect width="186" height="120" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="10" y="20" fill="#275E4B" font-size="9.5" font-weight="700">INVESTIGATOR PASS</text>
+      <text x="10" y="38" fill="#EAE7DE" font-size="11" font-weight="600">HYP-01: Door Staging</text>
+      <text x="10" y="52" fill="#A2ADA6" font-size="9">Cites OBS-EXCURSION-01</text>
+      <text x="10" y="70" fill="#EAE7DE" font-size="11" font-weight="600">HYP-02: Reefer Power</text>
+      <text x="10" y="84" fill="#A2ADA6" font-size="9">Contradicted by 12.8V bus</text>
+      <text x="10" y="102" fill="#EAE7DE" font-size="11" font-weight="600">HYP-03: Surface Sensor</text>
+    </g>
+
+    <g transform="translate(12, 190)">
+      <rect width="186" height="110" rx="5" fill="#141D1B" stroke="#B5482D"/>
+      <text x="10" y="20" fill="#B5482D" font-size="9.5" font-weight="700">ADVERSARIAL SKEPTIC PASS</text>
+      <text x="10" y="38" fill="#EAE7DE" font-size="10">Attacks leading claim</text>
+      <text x="10" y="52" fill="#EAE7DE" font-size="10">Catches probe thermal lag</text>
+      <text x="10" y="66" fill="#B5482D" font-size="10" font-weight="700">Downgrades HYP-02</text>
+      <text x="10" y="82" fill="#A2ADA6" font-size="9">Requires receiving seal check</text>
+      <text x="10" y="96" fill="#A2ADA6" font-size="9">Identifies missing evidence</text>
+    </g>
+
+    <g transform="translate(12, 315)">
+      <rect width="186" height="70" rx="5" fill="#141D1B" stroke="#365E7D"/>
+      <text x="10" y="20" fill="#365E7D" font-size="9.5" font-weight="700">COUNTERFACTUAL REPLAY</text>
+      <text x="10" y="38" fill="#EAE7DE" font-size="10">Simulates 5-Min Door Close</text>
+      <text x="10" y="54" fill="#275E4B" font-size="10" font-weight="700">Excursion Drops: 42m &rarr; 0m</text>
+    </g>
+
+    <g transform="translate(12, 400)">
+      <rect width="186" height="75" rx="5" fill="#275E4B"/>
+      <text x="10" y="22" fill="#F3F0E8" font-size="10" font-weight="800">PROVIDER RECEIPT</text>
+      <text x="10" y="40" fill="#F3F0E8" font-size="10">Token Factory Latency: 340ms</text>
+      <text x="10" y="56" fill="#F3F0E8" font-size="10">SHA-256 Response Digest</text>
+      <text x="10" y="68" fill="#EAE7DE" font-size="8">Zero private reasoning leaked</text>
+    </g>
+  </g>
+
+  <!-- Flow Connector 3 -> 4 -->
+  <path d="M 850 360 L 890 360" stroke="#275E4B" stroke-width="2.5" stroke-dasharray="4 4" fill="none"/>
+  <polygon points="890,355 902,360 890,365" fill="#275E4B"/>
+
+  <!-- Pillar 4: Quality Review Packet & Human Sign-Off -->
+  <g transform="translate(905, 115)" filter="url(#shadow)">
+    <rect width="145" height="495" rx="8" fill="url(#cardGrad)" stroke="#2D403B" stroke-width="1.5"/>
+    <rect width="145" height="38" rx="8" fill="#253531"/>
+    <text x="10" y="24" fill="#F3F0E8" font-size="10.5" font-weight="700">4. HUMAN REVIEW</text>
+
+    <g transform="translate(10, 55)">
+      <rect width="125" height="90" rx="5" fill="#141D1B" stroke="#B5482D"/>
+      <text x="8" y="20" fill="#B5482D" font-size="8.5" font-weight="700">REVIEW POSTURE</text>
+      <text x="8" y="38" fill="#EAE7DE" font-size="9" font-weight="700">QUARANTINE</text>
+      <text x="8" y="52" fill="#EAE7DE" font-size="9">PENDING QA</text>
+      <text x="8" y="68" fill="#A2ADA6" font-size="8">Immediate hold on</text>
+      <text x="8" y="80" fill="#A2ADA6" font-size="8">vaccine batch</text>
+    </g>
+
+    <g transform="translate(10, 160)">
+      <rect width="125" height="95" rx="5" fill="#141D1B" stroke="#275E4B"/>
+      <text x="8" y="20" fill="#275E4B" font-size="8.5" font-weight="700">DISCRIMINATING CHECK</text>
+      <text x="8" y="36" fill="#EAE7DE" font-size="8.5">1. Inspect dock CCTV</text>
+      <text x="8" y="50" fill="#EAE7DE" font-size="8.5">2. Check receiving seal</text>
+      <text x="8" y="64" fill="#EAE7DE" font-size="8.5">3. Review core probe</text>
+      <text x="8" y="78" fill="#EAE7DE" font-size="8.5">4. Manufacturer SOP</text>
+    </g>
+
+    <g transform="translate(10, 270)">
+      <rect width="125" height="95" rx="5" fill="#141D1B" stroke="#2D403B"/>
+      <text x="8" y="20" fill="#365E7D" font-size="8.5" font-weight="700">AUDIT EXPORTS</text>
+      <text x="8" y="38" fill="#EAE7DE" font-size="9">Printable HTML Packet</text>
+      <text x="8" y="54" fill="#EAE7DE" font-size="9">Structured JSON</text>
+      <text x="8" y="70" fill="#A2ADA6" font-size="8">Immutable evidence trail</text>
+      <text x="8" y="82" fill="#A2ADA6" font-size="8">Sign-off fields included</text>
+    </g>
+
+    <g transform="translate(10, 380)">
+      <rect width="125" height="95" rx="5" fill="#141D1B" stroke="#B5482D"/>
+      <text x="8" y="20" fill="#B5482D" font-size="8.5" font-weight="700">HUMAN SIGN-OFF</text>
+      <text x="8" y="38" fill="#EAE7DE" font-size="8.5">Pharmacist / QA Lead</text>
+      <text x="8" y="52" fill="#EAE7DE" font-size="8.5">Disposition Date/Time</text>
+      <text x="8" y="68" fill="#A2ADA6" font-size="8">Final decision strictly</text>
+      <text x="8" y="80" fill="#A2ADA6" font-size="8">by qualified human</text>
+    </g>
+  </g>
+
+  <!-- Footer Banner -->
+  <rect x="50" y="628" width="1000" height="28" rx="4" fill="#141D1B" stroke="#253531"/>
+  <text x="65" y="646" fill="#A2ADA6" font-size="10.5">ExcursionLens — Bounded Multi-Step Agentic Architecture &bull; Nebius x NVIDIA Global AI Hackathon (Best Apps &amp; Agents Track)</text>
+  <text x="940" y="646" fill="#275E4B" font-size="10.5" font-weight="700">STATUS: VERIFIED</text>
+</svg>

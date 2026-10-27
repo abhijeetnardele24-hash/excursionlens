@@ -16,11 +16,14 @@ Scenarios defined in PROJECT_BLUEPRINT.md Section 10.1:
 12. Adversarial note with prompt injection
 """
 
-import os
 import json
-from datetime import datetime, timedelta, timezone
-from apps.api.app.domain.models import ShipmentCase, SensorReading, CustodyEvent, OperationalEvent
+import os
+from datetime import UTC, datetime, timedelta, timezone
+
 from apps.api.app.domain.detector import DeterministicExcursionEngine, format_iso_utc
+from apps.api.app.domain.models import (
+    ShipmentCase,
+)
 
 
 def make_base_case(case_id: str, title: str) -> dict:
@@ -66,7 +69,7 @@ def generate_all_scenarios():
 
     # 1. Door left open
     c1 = make_base_case("CASE-01-DOOR-OPEN", "01 Door Left Open at Transfer Dock")
-    t0 = datetime(2026, 10, 25, 8, 0, tzinfo=timezone.utc)
+    t0 = datetime(2026, 10, 25, 8, 0, tzinfo=UTC)
     for i in range(30):
         t = t0 + timedelta(minutes=i * 5)
         # Excursion from step 10 to 18 (40 min) reaching 11.2 C

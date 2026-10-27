@@ -1,0 +1,89 @@
+# Devpost Submission — ExcursionLens
+
+**Project Name:** ExcursionLens  
+**Tagline:** Evidence-first cold-chain temperature excursion investigation agent powered by NVIDIA Nemotron on Nebius Token Factory and authoritative Tavily search.  
+**Track:** Best Apps and Agents  
+**Bonus Track:** Best Use of Tavily  
+
+---
+
+## Inspiration
+
+Every year, an estimated $35 billion in pharmaceutical products, biotherapeutics, and childhood vaccines are lost due to cold-chain failures during logistics and transit. In life-sciences distribution under 21 CFR Part 11 and WHO Good Distribution Practice, an out-of-range temperature alert triggers an agonizing operational bottleneck:
+- Quality Assurance (QA) teams must manually correlate scattered PDF manifests, isolated IoT data logger CSV files, and refrigerated van telemetry.
+- Operators risk either releasing compromised medicines to patients or destroying millions of dollars of completely viable product because they cannot isolate whether a breach reached the thermal core of the vial or merely warmed the surface air during cross-dock pallet transfer.
+- Generic LLM wrappers fail catastrophically here: they hallucinate approval, make illegal release decisions, and fabricate regulatory citations.
+
+We built **ExcursionLens** to prove that agentic AI can be safely deployed in high-consequence regulated environments through deterministic sensory anchoring, adversarial skeptic reasoning, and bounded web research.
+
+---
+
+## What It Does
+
+ExcursionLens is an operational investigation copilot for pharmaceutical cold-chain logistics:
+1. **Deterministic Sensor Ingestion & Alignment:** Automatically parses multimodal time-series telemetry (sampling frequency, sensor drift, ambient vs product temperatures, bus voltage) and aligns it with custody handshakes and cargo door sensors.
+2. **Authoritative Guideline Retrieval via Tavily:** Dynamically queries live public health guidance exclusively from trusted repositories (`cdc.gov`, `fda.gov`, `who.int`), extracting verifiable citations for vaccine stability and mean kinetic temperature limits.
+3. **Competing Causal Reasoning via NVIDIA Nemotron:** Leverages `nvidia/llama-3.1-nemotron-70b-instruct` on the Nebius Token Factory to synthesize three competing causal hypotheses (e.g., cross-dock ambient staging exposure vs. reefer compressor power circuit failure vs. surface logger detachment).
+4. **Adversarial Skeptic Pass:** The agent actively runs a counter-falsification pass to challenge its own hypotheses against cold physical evidence (e.g., verifying that nominal vehicle alternator voltage directly contradicts the auxiliary power failure hypothesis).
+5. **Counterfactual Preventive Control Workbench:** Allows operations teams to simulate "what-if" interventions (e.g., enforcing a 5-minute door closing SLA or reading secondary thermal-mass core probes) to evaluate how preventive controls would have mitigated the breach.
+6. **Immutable Quality Review Packet:** Produces an auditable, print-ready 21 CFR Part 11 review packet with SHA-256 evidence digests.
+
+**Core Safety Invariant:** ExcursionLens strictly enforces an **Anti-Auto-Release Invariant**. The system is architecturally prohibited from making final release dispositions; all investigations terminate in `QUARANTINE_PENDING_QUALIFIED_REVIEW` with actionable human-review files.
+
+---
+
+## How We Built It
+
+- **Inference & Reasoning:** Hosted on **Nebius Token Factory** utilizing `nvidia/llama-3.1-nemotron-70b-instruct` for high-throughput, structured JSON hypothesis generation and adversarial critique.
+- **Authoritative Research:** Integrated **Tavily Search API** with strict domain allowlisting (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`), snippet truncation, and content digest verification.
+- **Backend Domain Engine:** Built with **Python 3.11+**, **FastAPI**, and **Pydantic v2**, executing 100% deterministic excursion window detection, area-under-the-curve (AUC) calculations, and claims validation.
+- **Frontend Operational Canvas:** Developed with **React 18**, **TypeScript**, and **Vite**, adhering to a forensic operations aesthetic (minimalist palette: Canvas `#F3F0E8`, Ink `#17201E`, Excursion `#B5482D`, Supported `#275E4B`).
+- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, Pytest suite with 83% statement coverage, and Playwright E2E + Axe accessibility scans (0 violations across 5 viewports).
+
+---
+
+## Challenges We Overcame
+
+1. **Eliminating Hallucinated Compliance Claims:** Generative models naturally tend to generate soothing language ("The excursion is minor; the shipment is safe for use"). We built a deterministic Claims Validator that parses every LLM hypothesis and programmatically strips prohibited release assertions, enforcing segregation boundaries.
+2. **Aligning Asynchronous Multimodal Streams:** Reconciling 5-minute periodic IoT logger telemetry with irregular custody events (driver handoffs, dock arrival, gate scans) along a continuous UTC axis required custom temporal interpolation and event-offset mapping.
+3. **Adversarial Contradiction Modeling:** Getting Nemotron to rigorously evaluate counter-evidence required crafting a dedicated Skeptic prompt that specifically penalizes hypotheses contradicting telemetry facts (such as vehicle alternator bus voltage).
+
+---
+
+## Accomplishments We're Proud Of
+
+- **100% Deterministic Reproducibility:** Identical sensor logs yield mathematically identical breach windows and AUC metrics across every run.
+- **Zero Axe Accessibility Violations:** Fully accessible UI tested and verified with `@axe-core/playwright` across 5 distinct screen viewports (320px to 1920px).
+- **Graceful Fixture Degradation:** When run without API keys, ExcursionLens functions in an honest, transparent `DEMO_FIXTURE` mode with pre-validated synthetic receipts without ever fabricating provider success.
+
+---
+
+## What We Learned
+
+- High-consequence AI requires *bounded state machines*, not unconstrained agentic loops. Defining explicit stages (`VALIDATE_SCHEMA` → `DETECT_EXCURSION` → `TAVILY_GUIDANCE` → `NEMOTRON_HYPOTHESES` → `ADVERSARIAL_SKEPTIC` → `VALIDATE_CITATIONS` → `REVIEW_PACKET`) creates the transparency required for regulated industries.
+- Nebius Token Factory provided rapid, low-latency execution for large 70B parameter Nemotron models, making multi-pass reasoning (hypothesis generation + adversarial critique) practical in near-real-time.
+
+---
+
+## What's Next for ExcursionLens
+
+- Direct integration with GS1 Digital Link barcodes and active cellular logger APIs (Sensitech, TempTale, Emerson GO).
+- Support for multi-compartment refrigerated shipping containers with heterogeneous temperature zones (-20°C mRNA vaccines and +4°C monoclonal antibodies on the same pallet).
+- Automated Corrective and Preventive Action (CAPA) ticket generation directly into enterprise QMS software (Veeva Vault, TrackWise).
+
+---
+
+## Built With
+
+- `python`
+- `fastapi`
+- `pydantic`
+- `nebius-token-factory`
+- `nvidia-nemotron`
+- `tavily-api`
+- `react`
+- `typescript`
+- `vite`
+- `playwright`
+- `axe-core`
+- `docker`

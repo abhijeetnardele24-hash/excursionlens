@@ -4,9 +4,10 @@ apps/api/tests/test_detector.py — Unit Tests for Deterministic Excursion Engin
 
 import json
 import os
+
 import pytest
-from apps.api.app.domain.models import ShipmentCase
 from apps.api.app.domain.detector import DeterministicExcursionEngine
+from apps.api.app.domain.models import ShipmentCase
 
 
 @pytest.fixture

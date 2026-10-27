@@ -47,7 +47,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .vite/
-apps/web/dist/
+# apps/web/dist/
 apps/web/dist-ssr/
 
 # Test and coverage artifacts

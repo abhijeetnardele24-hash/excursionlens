@@ -10,19 +10,20 @@ Writes redacted execution proof to docs/live-smoke-receipt.json.
 Never logs secrets or private reasoning.
 """
 
+import hashlib
+import json
 import os
 import sys
-import json
 import time
-import hashlib
-from typing import Dict, Any, Optional
+from typing import Any
+
 import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-def redact_string(s: Optional[str]) -> str:
+def redact_string(s: str | None) -> str:
     if not s:
         return "<none>"
     s = s.strip()
@@ -42,10 +43,9 @@ def run_live_smoke():
         "https://api.tokenfactory.nebius.com/v1/"
     ).rstrip("/") + "/"
     tavily_key = os.getenv("TAVILY_API_KEY", "").strip()
-    fast_model = os.getenv("NVIDIA_FAST_MODEL_ID", "").strip() or "nvidia/nemotron-mini-4b-instruct"
     deep_model = os.getenv("NVIDIA_DEEP_MODEL_ID", "").strip() or "nvidia/llama-3.1-nemotron-70b-instruct"
 
-    receipt: Dict[str, Any] = {
+    receipt: dict[str, Any] = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "status": "FAILED",
         "nebius_smoke": {
@@ -108,7 +108,7 @@ def run_live_smoke():
                     receipt["failure_reasons"].append(reason)
                     print(f"   ❌ {reason}")
         except Exception as e:
-            reason = f"Tavily exception: {str(e)}"
+            reason = f"Tavily exception: {e!s}"
             receipt["tavily_smoke"]["status"] = "ERROR"
             receipt["failure_reasons"].append(reason)
             print(f"   ❌ {reason}")
@@ -194,7 +194,7 @@ def run_live_smoke():
                     receipt["failure_reasons"].append(reason)
                     print(f"   ❌ {reason}")
         except Exception as e:
-            reason = f"Nebius exception: {str(e)}"
+            reason = f"Nebius exception: {e!s}"
             receipt["nebius_smoke"]["status"] = "ERROR"
             receipt["failure_reasons"].append(reason)
             print(f"   ❌ {reason}")

@@ -1,0 +1,224 @@
+/* ==============================================================================
+   ExcursionLens Design System: Forensic Operations Notebook
+   Strict tokens, high-contrast typography, restrained purposeful motion
+   ============================================================================== */
+
+:root {
+  --canvas: #F3F0E8;
+  --surface: #FFFFFF;
+  --surface-raised: #FAF9F5;
+  --ink: #17201E;
+  --ink-secondary: #3D4442;
+  --muted: #5D625D;
+  --rules: #C8C1B3;
+  --rules-subtle: #DFDACF;
+
+  /* Semantic status colors */
+  --excursion: #B5482D;
+  --excursion-bg: #FBEBE8;
+  --supported: #275E4B;
+  --supported-bg: #EAF2EE;
+  --unknown: #9A6A1F;
+  --unknown-bg: #F9F3E6;
+  --accent: #365E7D;
+  --accent-bg: #EDF3F8;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Layout */
+  --max-width: 1400px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Tabular numerals for charts, timers, and telemetry */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background-color: var(--ink);
+  color: #FFFFFF;
+  border: 1px solid var(--ink);
+  padding: 8px 16px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #2B3533;
+}
+
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rules);
+  padding: 8px 14px;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--surface-raised);
+  border-color: var(--ink-secondary);
+}
+
+.btn-danger {
+  background-color: var(--excursion);
+  color: #FFFFFF;
+  border: 1px solid var(--excursion);
+  padding: 8px 14px;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #963B23;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-family: var(--font-mono);
+}
+
+.badge-excursion {
+  background: var(--excursion-bg);
+  color: var(--excursion);
+  border: 1px solid rgba(181, 72, 45, 0.3);
+}
+
+.badge-supported {
+  background: var(--supported-bg);
+  color: var(--supported);
+  border: 1px solid rgba(39, 94, 75, 0.3);
+}
+
+.badge-unknown {
+  background: var(--unknown-bg);
+  color: var(--unknown);
+  border: 1px solid rgba(154, 106, 31, 0.3);
+}
+
+.badge-neutral {
+  background: var(--surface-raised);
+  color: var(--muted);
+  border: 1px solid var(--rules);
+}
+
+.badge-accent {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid rgba(54, 94, 125, 0.3);
+}
+
+/* Card primitives */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rules);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--rules-subtle);
+  padding-bottom: 8px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+
+.operational-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .operational-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modal and Drawers */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 32, 30, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--surface);
+  border: 1px solid var(--rules);
+  border-radius: var(--radius-md);
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Motion: Reduced motion media query */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

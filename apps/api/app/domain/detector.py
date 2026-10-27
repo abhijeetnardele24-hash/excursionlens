@@ -10,16 +10,15 @@ Core principles:
 - Produces immutable Observation IDs with cryptographic references.
 """
 
-from typing import List, Dict, Any, Tuple, Optional
-from datetime import datetime, timezone
-import math
+from datetime import UTC, datetime
+
 from .models import (
-    ShipmentCase,
-    SensorReading,
-    Observation,
     CaseAnalysisResult,
     CustodyEvent,
-    OperationalEvent
+    Observation,
+    OperationalEvent,
+    SensorReading,
+    ShipmentCase,
 )
 
 
@@ -29,13 +28,13 @@ def parse_iso_datetime(dt_str: str) -> datetime:
     clean = dt_str.replace("Z", "+00:00")
     dt = datetime.fromisoformat(clean)
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc)
+        dt = dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
 
 
 def format_iso_utc(dt: datetime) -> str:
     """Format UTC datetime as standard ISO 8601 string."""
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 class DeterministicExcursionEngine:
@@ -51,8 +50,8 @@ class DeterministicExcursionEngine:
         max_allowed = case.temperature_policy.max_celsius
 
         # 1. Normalize and sort readings by timestamp
-        readings_with_dt: List[Tuple[datetime, SensorReading]] = []
-        anomalies: List[str] = []
+        readings_with_dt: list[tuple[datetime, SensorReading]] = []
+        anomalies: list[str] = []
         seen_timestamps = set()
 
         for r in case.readings:
@@ -94,8 +93,8 @@ class DeterministicExcursionEngine:
         expected_interval_min = round(median_delta_sec / 60.0, 1)
 
         # 5. Anomaly Detection: Gaps and Impossible Jumps
-        gap_observations: List[Observation] = []
-        jump_observations: List[Observation] = []
+        gap_observations: list[Observation] = []
+        jump_observations: list[Observation] = []
 
         for i in range(1, len(readings_with_dt)):
             prev_dt, prev_r = readings_with_dt[i - 1]
@@ -146,8 +145,8 @@ class DeterministicExcursionEngine:
 
         # 6. Excursion Window Detection
         # Continuous segments where temperature is either > max_allowed OR < min_allowed
-        excursion_windows: List[Observation] = []
-        current_window_readings: List[Tuple[datetime, SensorReading]] = []
+        excursion_windows: list[Observation] = []
+        current_window_readings: list[tuple[datetime, SensorReading]] = []
         window_counter = 0
 
         for i, (dt, r) in enumerate(readings_with_dt):
@@ -228,18 +227,18 @@ class DeterministicExcursionEngine:
             readings_analyzed=len(readings_with_dt),
             observations=all_observations,
             anomalies_detected=anomalies,
-            normalized_at=format_iso_utc(datetime.now(timezone.utc))
+            normalized_at=format_iso_utc(datetime.now(UTC))
         )
 
     def _build_excursion_observation(
         self,
         index: int,
-        window: List[Tuple[datetime, SensorReading]],
+        window: list[tuple[datetime, SensorReading]],
         min_allowed: float,
         max_allowed: float,
         expected_interval_min: float,
-        custody_events: List[CustodyEvent],
-        operational_events: List[OperationalEvent]
+        custody_events: list[CustodyEvent],
+        operational_events: list[OperationalEvent]
     ) -> Observation:
         """Construct a detailed excursion window observation with event correlation."""
         start_dt = window[0][0]

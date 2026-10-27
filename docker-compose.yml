@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  excursionlens:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: excursionlens:latest
+    container_name: excursionlens-app
+    ports:
+      - "8000:8000"
+    environment:
+      - NEBIUS_API_KEY=${NEBIUS_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - NEBIUS_BASE_URL=${NEBIUS_BASE_URL:-https://api.tokenfactory.nebius.com/v1}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-nvidia/llama-3.1-nemotron-70b-instruct}
+      - ENVIRONMENT=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

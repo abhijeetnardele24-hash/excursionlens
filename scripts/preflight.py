@@ -13,12 +13,13 @@ Purpose:
   8. Fails closed and truthfully if credentials are missing or invalid.
 """
 
+import hashlib
+import json
 import os
 import sys
-import json
 import time
-import hashlib
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 import httpx
 from dotenv import load_dotenv
 
@@ -34,7 +35,7 @@ AUTHORITATIVE_ALLOWLIST = [
 ]
 
 
-def redact_string(s: Optional[str]) -> str:
+def redact_string(s: str | None) -> str:
     """Safely redact secrets for logging and receipts."""
     if not s:
         return "<none>"
@@ -61,7 +62,7 @@ class ProviderPreflight:
         self.deep_model_id = os.getenv("NVIDIA_DEEP_MODEL_ID", "").strip()
         self.app_mode = os.getenv("APP_MODE", "live").strip()
 
-        self.receipt: Dict[str, Any] = {
+        self.receipt: dict[str, Any] = {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "nebius": {
                 "base_url": self.nebius_base_url,
@@ -119,7 +120,7 @@ class ProviderPreflight:
                     return False
 
                 data = resp.json()
-                raw_models: List[Dict[str, Any]] = data.get("data", [])
+                raw_models: list[dict[str, Any]] = data.get("data", [])
                 self.receipt["nebius"]["available_models_count"] = len(raw_models)
 
                 # Filter for NVIDIA / Nemotron models
@@ -177,7 +178,7 @@ class ProviderPreflight:
         except Exception as e:
             latency = int((time.time() - start_time) * 1000)
             self.receipt["nebius"]["probe_latency_ms"] = latency
-            reason = f"Network or connection error probing Nebius Token Factory: {str(e)}"
+            reason = f"Network or connection error probing Nebius Token Factory: {e!s}"
             self.receipt["nebius"]["status"] = "NETWORK_ERROR"
             self.receipt["failure_reasons"].append(reason)
             print(f"   ❌ {reason}")
@@ -236,7 +237,7 @@ class ProviderPreflight:
         except Exception as e:
             latency = int((time.time() - start_time) * 1000)
             self.receipt["tavily"]["probe_latency_ms"] = latency
-            reason = f"Network or connection error probing Tavily Search API: {str(e)}"
+            reason = f"Network or connection error probing Tavily Search API: {e!s}"
             self.receipt["tavily"]["status"] = "NETWORK_ERROR"
             self.receipt["failure_reasons"].append(reason)
             print(f"   ❌ {reason}")

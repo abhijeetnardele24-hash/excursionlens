@@ -13,10 +13,9 @@ Exempts standard placeholders (e.g. 'your_nebius_token_factory_key_here').
 """
 
 import os
-import sys
 import re
 import subprocess
-from typing import List, Tuple
+import sys
 
 SUSPICIOUS_PATTERNS = [
     (r'(?i)bearer\s+[a-zA-Z0-9_\-\.]{20,}', "Exposed Bearer token"),
@@ -58,7 +57,7 @@ IGNORE_FILES = {
 }
 
 
-def scan_file_content(filepath: str, content: str) -> List[Tuple[int, str, str]]:
+def scan_file_content(filepath: str, content: str) -> list[tuple[int, str, str]]:
     findings = []
     lines = content.splitlines()
     for idx, line in enumerate(lines, 1):
@@ -70,7 +69,7 @@ def scan_file_content(filepath: str, content: str) -> List[Tuple[int, str, str]]
     return findings
 
 
-def scan_working_tree() -> List[str]:
+def scan_working_tree() -> list[str]:
     violations = []
     for root, dirs, files in os.walk("."):
         dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
@@ -89,7 +88,7 @@ def scan_working_tree() -> List[str]:
     return violations
 
 
-def scan_git_history() -> List[str]:
+def scan_git_history() -> list[str]:
     violations = []
     try:
         res = subprocess.run(

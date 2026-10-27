@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" style="background-color: #141D1B; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="thumbBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A2624" />
+      <stop offset="100%" stop-color="#121A18" />
+    </linearGradient>
+    <linearGradient id="accentCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F2E2B" />
+      <stop offset="100%" stop-color="#172220" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#thumbBg)" />
+
+  <!-- Brand Title -->
+  <g transform="translate(80, 80)">
+    <rect width="44" height="44" rx="8" fill="#B5482D" />
+    <text x="14" y="31" fill="#FFFFFF" font-size="24" font-weight="900">E</text>
+    <text x="60" y="32" fill="#F3F0E8" font-size="34" font-weight="900" letter-spacing="-0.8">ExcursionLens</text>
+    <text x="310" y="32" fill="#B5482D" font-size="16" font-weight="800" letter-spacing="1.5">NEBIUS &times; NVIDIA HACKATHON</text>
+    <text x="0" y="75" fill="#A2ADA6" font-size="20" font-weight="500">From a temperature alert to an evidence-backed investigation.</text>
+  </g>
+
+  <!-- Central Visual Narrative: Alert -> Evidence -> Human Review -->
+  <g transform="translate(80, 195)" filter="url(#shadow)">
+    <!-- Stage 1: The Alert -->
+    <g transform="translate(0, 0)">
+      <rect width="340" height="380" rx="10" fill="url(#accentCard)" stroke="#B5482D" stroke-width="2"/>
+      <rect width="340" height="44" rx="10" fill="#B5482D"/>
+      <text x="20" y="28" fill="#FFFFFF" font-size="14" font-weight="800" letter-spacing="0.5">1. SENSOR ALERT</text>
+
+      <g transform="translate(20, 65)">
+        <text x="0" y="20" fill="#EAE7DE" font-size="14" font-weight="700">Shipment NMB-204</text>
+        <text x="0" y="40" fill="#A2ADA6" font-size="12">450 Vaccine Doses (2°C–8°C Policy)</text>
+
+        <!-- Mini Chart -->
+        <rect x="0" y="60" width="300" height="130" rx="6" fill="#0E1614" stroke="#253531"/>
+        <!-- 8C threshold -->
+        <line x1="10" y1="110" x2="290" y2="110" stroke="#B5482D" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="15" y="104" fill="#B5482D" font-size="10" font-weight="700">8°C MAX THRESHOLD</text>
+        <!-- Curve with breach -->
+        <path d="M 10 135 L 60 135 L 100 130 L 140 85 L 180 75 L 220 90 L 260 135 L 290 135" fill="none" stroke="#F3F0E8" stroke-width="2.5"/>
+        <circle cx="180" cy="75" r="5" fill="#B5482D"/>
+        <text x="170" y="65" fill="#B5482D" font-size="11" font-weight="800">10.5°C</text>
+
+        <rect x="0" y="210" width="300" height="40" rx="6" fill="#FBEBE8"/>
+        <text x="14" y="235" fill="#B5482D" font-size="12" font-weight="800">42 MIN CUMULATIVE BREACH</text>
+      </g>
+    </g>
+
+    <!-- Connector 1 -> 2 -->
+    <path d="M 355 190 L 375 190" stroke="#275E4B" stroke-width="3" stroke-dasharray="4 4"/>
+    <polygon points="375,185 385,190 375,195" fill="#275E4B"/>
+
+    <!-- Stage 2: Competing Hypotheses & Tavily Evidence -->
+    <g transform="translate(395, 0)">
+      <rect width="340" height="380" rx="10" fill="url(#accentCard)" stroke="#275E4B" stroke-width="2"/>
+      <rect width="340" height="44" rx="10" fill="#275E4B"/>
+      <text x="20" y="28" fill="#FFFFFF" font-size="14" font-weight="800" letter-spacing="0.5">2. COMPETING EVIDENCE</text>
+
+      <g transform="translate(20, 65)">
+        <!-- Hyp 1 Leading -->
+        <rect width="300" height="65" rx="6" fill="#141D1B" stroke="#275E4B" stroke-width="1.5"/>
+        <text x="14" y="22" fill="#275E4B" font-size="10" font-weight="800">LEADING HYPOTHESIS</text>
+        <text x="14" y="40" fill="#EAE7DE" font-size="12" font-weight="700">Dock 3 Transfer Heat Exposure</text>
+        <text x="14" y="55" fill="#A2ADA6" font-size="10">Corroborated by 24m door open</text>
+
+        <!-- Hyp 2 Downgraded -->
+        <g transform="translate(0, 75)">
+          <rect width="300" height="65" rx="6" fill="#141D1B" stroke="#B5482D" stroke-width="1.5"/>
+          <text x="14" y="22" fill="#B5482D" font-size="10" font-weight="800">DOWNGRADED BY SKEPTIC</text>
+          <text x="14" y="40" fill="#EAE7DE" font-size="12" font-weight="700">Reefer Auxiliary Power Failure</text>
+          <text x="14" y="55" fill="#A2ADA6" font-size="10">Contradicted by 12.8V bus telemetry</text>
+        </g>
+
+        <!-- Tavily Research Source -->
+        <g transform="translate(0, 150)">
+          <rect width="300" height="55" rx="6" fill="#141D1B" stroke="#365E7D"/>
+          <text x="14" y="20" fill="#365E7D" font-size="10" font-weight="800">TAVILY AUTHORITATIVE RESEARCH</text>
+          <text x="14" y="38" fill="#A2ADA6" font-size="10">CDC &bull; FDA ICH Q1A &bull; WHO Guidelines</text>
+        </g>
+
+        <!-- Counterfactual Replay -->
+        <g transform="translate(0, 215)">
+          <rect width="300" height="42" rx="6" fill="#141D1B" stroke="#9A6A1F"/>
+          <text x="14" y="18" fill="#9A6A1F" font-size="9" font-weight="800">COUNTERFACTUAL REPLAY</text>
+          <text x="14" y="32" fill="#275E4B" font-size="11" font-weight="700">5-Min Door Closure &rarr; Excursion: 0.0m</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Connector 2 -> 3 -->
+    <path d="M 750 190 L 770 190" stroke="#275E4B" stroke-width="3" stroke-dasharray="4 4"/>
+    <polygon points="770,185 780,190 770,195" fill="#275E4B"/>
+
+    <!-- Stage 3: Human Review Packet -->
+    <g transform="translate(790, 0)">
+      <rect width="330" height="380" rx="10" fill="url(#accentCard)" stroke="#365E7D" stroke-width="2"/>
+      <rect width="330" height="44" rx="10" fill="#365E7D"/>
+      <text x="20" y="28" fill="#FFFFFF" font-size="14" font-weight="800" letter-spacing="0.5">3. HUMAN REVIEW</text>
+
+      <g transform="translate(20, 65)">
+        <rect width="290" height="75" rx="6" fill="#FBEBE8" stroke="#B5482D"/>
+        <text x="14" y="24" fill="#B5482D" font-size="11" font-weight="800">QUALITY POSTURE: QUARANTINE</text>
+        <text x="14" y="44" fill="#17201E" font-size="11">Immediate hold on vaccine batch.</text>
+        <text x="14" y="60" fill="#5D625D" font-size="10">No automated disposition release.</text>
+
+        <!-- Document Preview -->
+        <g transform="translate(0, 90)">
+          <rect width="290" height="110" rx="6" fill="#141D1B" stroke="#253531"/>
+          <text x="14" y="26" fill="#F3F0E8" font-size="12" font-weight="700">Audit-Ready Review Packet</text>
+          <text x="14" y="46" fill="#A2ADA6" font-size="11">&bull; Printable Formatted HTML</text>
+          <text x="14" y="64" fill="#A2ADA6" font-size="11">&bull; Machine-Verifiable JSON</text>
+          <text x="14" y="82" fill="#A2ADA6" font-size="11">&bull; Formal Pharmacist Sign-Off Block</text>
+          <text x="14" y="100" fill="#275E4B" font-size="10" font-weight="700">CDC &amp; FDA Grounded Reference Trail</text>
+        </g>
+
+        <!-- Model Badge -->
+        <g transform="translate(0, 215)">
+          <rect width="290" height="42" rx="6" fill="#275E4B"/>
+          <text x="14" y="20" fill="#FFFFFF" font-size="10" font-weight="800">NVIDIA NEMOTRON ON NEBIUS</text>
+          <text x="14" y="34" fill="#EAE7DE" font-size="9">Structured Evidence Receipts &bull; 0 Secrets</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom Tagline Banner -->
+  <g transform="translate(80, 620)">
+    <text x="0" y="30" fill="#F3F0E8" font-size="20" font-weight="800" letter-spacing="-0.3">Alert &rarr; Evidence &rarr; Competing Hypotheses &rarr; Human Review</text>
+    <text x="800" y="30" fill="#275E4B" font-size="14" font-weight="700">NEBIUS TOKEN FACTORY &bull; NVIDIA NEMOTRON &bull; TAVILY</text>
+  </g>
+</svg>

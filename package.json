@@ -1,0 +1,21 @@
+{
+  "name": "excursionlens",
+  "version": "1.0.0",
+  "description": "ExcursionLens — Cold-Chain Temperature Excursion Investigation Agent",
+  "private": true,
+  "scripts": {
+    "lint": "python -m ruff check .",
+    "typecheck": "npm --prefix apps/web run lint",
+    "test:unit": "python -m pytest apps/api/tests/ -v",
+    "test:benchmark": "python benchmark/run_benchmark.py",
+    "test:security": "python scripts/security_scan.py",
+    "test:preflight": "python scripts/preflight.py",
+    "test:e2e": "playwright test",
+    "build": "npm --prefix apps/web run build",
+    "verify": "python scripts/verify.py"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.0"
+  }
+}
