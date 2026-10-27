@@ -1,4 +1,10 @@
+import fs from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
+
+const uvicornCommand =
+  process.platform === 'win32' && fs.existsSync('.\\.venv\\Scripts\\python.exe')
+    ? '.\\.venv\\Scripts\\python.exe -m uvicorn apps.api.app.main:app --port 8000 --host 127.0.0.1'
+    : 'python -m uvicorn apps.api.app.main:app --port 8000 --host 127.0.0.1';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -15,7 +21,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: '.\\.venv\\Scripts\\python.exe -m uvicorn apps.api.app.main:app --port 8000 --host 127.0.0.1',
+    command: uvicornCommand,
     url: 'http://127.0.0.1:8000/api/health',
     reuseExistingServer: true,
     timeout: 15000,
