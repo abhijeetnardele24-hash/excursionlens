@@ -8,10 +8,32 @@ Produces print-optimized HTML review packets conforming to cold-chain decision-s
 - Styled with forensic operations typography and print CSS.
 """
 
+import hashlib
 import html
+import subprocess
 import urllib.parse
 
-from ..domain.models import InvestigationRun, ShipmentCase
+from ..domain.models import InvestigationRun, ShipmentCase, SourceRecord
+
+
+def _calc_source_digest(s: SourceRecord) -> str:
+    raw = f"{s.id}:{s.url}:{s.snippet}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _get_git_commit_sha() -> str:
+    try:
+        res = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res.returncode == 0:
+            return res.stdout.strip()
+    except Exception:
+        pass
+    return "unknown"
 
 
 def _esc(val: object) -> str:
@@ -83,6 +105,7 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
             <td><code>{_esc(s.id)}</code></td>
             <td><a href="{_safe_url(s.url)}" target="_blank" rel="noopener noreferrer">{_esc(s.title)}</a></td>
             <td><code>{_esc(s.domain)}</code></td>
+            <td><code title="SHA-256 Digest">{_esc(_calc_source_digest(s)[:16])}…</code></td>
             <td>{_esc(s.snippet)}</td>
         </tr>"""
         for s in run.sources
@@ -104,6 +127,57 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
         """
 
     formatted_doses = f"{case.product_profile.dose_count:,}" if case.product_profile.dose_count else "—"
+    is_live = (run.provider_mode == "LIVE_TOKEN_FACTORY")
+    commit_sha = _get_git_commit_sha()
+
+    if not is_live:
+        provider_badge = """
+            <span class="badge" style="background: #FFF3CD; color: #856404; font-weight: 700;">Synthetic Fixture Investigator</span>
+            <span class="badge" style="background: #E2E3E5; color: #383D41; font-weight: 700; margin-left: 6px;">Cached Fixture Grounding</span>
+        """
+        hyp_heading = "3. Synthetic Fixture Causal Hypotheses &amp; Skeptic Critique"
+        source_heading = "4. Cached Fixture Grounding Evidence"
+        execution_audit_box = f"""
+        <div style="background: #F8F9FA; border: 1px solid var(--rules); border-radius: 4px; padding: 10px 14px; margin: 12px 0; font-size: 12px; color: var(--muted);">
+            <strong>Execution Provenance:</strong> Deterministic Synthetic Fixture Replay &bull;
+            Source Commit: <code>{_esc(commit_sha)}</code> &bull;
+            Provider Status: Synthetic/Fixture (Zero live external provider requests dispatched).
+        </div>
+        """
+    else:
+        inv_event = next((e for e in run.tool_events if e.tool_name in ("nebius_investigator", "HYPOTHESES_DRAFTED")), None)
+        skep_event = next((e for e in run.tool_events if e.tool_name in ("nebius_skeptic", "SKEPTIC_REVIEWED")), None)
+        tav_event = next((e for e in run.tool_events if e.tool_name in ("tavily_search", "RESEARCHING")), None)
+
+        inv_digest = (inv_event.output_digest if inv_event and inv_event.output_digest else run.response_digest) or "—"
+        skep_digest = (skep_event.output_digest if skep_event and skep_event.output_digest else "—")
+        tav_status = (tav_event.status if tav_event else "SUCCESS")
+
+        provider_badge = f"""
+            <span class="badge" style="background: #D4EDDA; color: #155724; font-weight: 700;">Live NVIDIA Nemotron: {_esc(run.served_model or run.requested_model)}</span>
+            <span class="badge" style="background: #D1ECF1; color: #0C5460; font-weight: 700; margin-left: 6px;">Live Tavily Grounding</span>
+        """
+        hyp_heading = f"3. Live Served Model ({_esc(run.served_model or run.requested_model)}) Hypotheses &amp; Skeptic Critique"
+        source_heading = "4. Live Authoritative Guidance Evidence (Tavily Grounding)"
+        execution_audit_box = f"""
+        <div style="background: #EFF6FC; border: 1px solid #B4D6FA; border-radius: 4px; padding: 12px 14px; margin: 12px 0; font-size: 12px;">
+            <div style="font-weight: 700; color: #1B4B72; margin-bottom: 6px;">Cryptographic Execution Audit (Live Token Factory Mode)</div>
+            <table style="width: 100%; border: none; font-size: 11px;">
+                <tr>
+                    <td style="border: none; padding: 3px 6px;"><strong>Served NVIDIA Model:</strong> <code>{_esc(run.served_model or run.requested_model)}</code></td>
+                    <td style="border: none; padding: 3px 6px;"><strong>Canonical Input Digest:</strong> <code>{_esc(run.request_digest or case.input_digest or '—')}</code></td>
+                </tr>
+                <tr>
+                    <td style="border: none; padding: 3px 6px;"><strong>Investigator Receipt Digest:</strong> <code>{_esc(inv_digest)}</code></td>
+                    <td style="border: none; padding: 3px 6px;"><strong>Skeptic Receipt Digest:</strong> <code>{_esc(skep_digest)}</code></td>
+                </tr>
+                <tr>
+                    <td style="border: none; padding: 3px 6px;"><strong>Tavily Retrieval Status:</strong> <span class="badge" style="background: #E8F5E9; color: #2E7D32;">{_esc(tav_status)}</span></td>
+                    <td style="border: none; padding: 3px 6px;"><strong>Source Commit SHA:</strong> <code>{_esc(commit_sha)}</code></td>
+                </tr>
+            </table>
+        </div>
+        """
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -277,10 +351,12 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
                 <p style="margin: 0; color: var(--muted); font-size: 13px;">Shipment ID: <strong>{_esc(case.shipment.shipment_id)}</strong> &bull; Product: <strong>{_esc(case.product_profile.product_name)}</strong> &bull; Run ID: <code>{_esc(run.id)}</code></p>
             </div>
             <div style="text-align: right;">
-                <span class="badge" style="background: #E8F0FE; color: var(--accent);">NVIDIA Nemotron via Nebius</span><br>
+                {provider_badge}<br>
                 <small style="color: var(--muted);">Generated: {_esc(run.completed_at or run.created_at)}</small>
             </div>
         </div>
+
+        {execution_audit_box}
 
         <div class="posture-banner">
             <div class="posture-title">Recommended Review Posture: {_esc(run.review_posture.replace('_', ' '))}</div>
@@ -314,15 +390,15 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
     </section>
 
     <section class="report-section">
-        <h2>3. NVIDIA Nemotron Causal Hypotheses &amp; Skeptic Critique</h2>
+        <h2>{hyp_heading}</h2>
         {hyp_cards}
     </section>
 
     <section class="report-section">
-        <h2>4. Authoritative Guidance Evidence (Tavily Grounding)</h2>
+        <h2>{source_heading}</h2>
         <table>
             <thead>
-                <tr><th style="width: 120px;">Source ID</th><th>Title &amp; Canonical Reference</th><th>Domain</th><th>Relevant Excerpt</th></tr>
+                <tr><th style="width: 120px;">Source ID</th><th>Title &amp; Canonical Reference</th><th>Domain</th><th style="width: 160px;">Source Digest</th><th>Relevant Excerpt</th></tr>
             </thead>
             <tbody>
                 {source_rows}

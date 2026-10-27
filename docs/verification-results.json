@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-10-27T20:51:39Z",
+  "timestamp": "2026-10-27T21:49:27Z",
   "git": {
-    "head": "4e25f539540311c2354bf35bc185f35bbfb09284",
+    "head": "082672bf2e0e846f0fe5c7909e240549f156a664",
     "branch": "main",
-    "clean_tree": false
+    "clean_tree": true
   },
   "gates": {
     "ruff": {
@@ -11,15 +11,20 @@
       "elapsed_sec": 0.07,
       "output": "All checks passed!\n"
     },
+    "mypy": {
+      "passed": true,
+      "elapsed_sec": 0.38,
+      "output": "Success: no issues found in 12 source files\n"
+    },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.18,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CJWWGL7s.css  \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.53 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-vlSYuouo.js   \u001b[39m\u001b[1m\u001b[2m186.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 56.38 kB\u001b[22m\u001b[2m \u2502 map: 462.84 kB\u001b[22m\n\u001b[32m\u2713 built in 503ms\u001b[39m\n"
+      "elapsed_sec": 2.22,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-Dc8LWNOY.css  \u001b[39m\u001b[1m\u001b[2m  4.85 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-wJOxJwnf.js   \u001b[39m\u001b[1m\u001b[2m189.28 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 56.91 kB\u001b[22m\u001b[2m \u2502 map: 470.79 kB\u001b[22m\n\u001b[32m\u2713 built in 508ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 73.25,
-      "elapsed_sec": 2.33
+      "coverage_percent": 75.11,
+      "elapsed_sec": 3.68
     },
     "benchmark": {
       "passed": true,
@@ -30,14 +35,16 @@
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.25
+      "elapsed_sec": 0.24
     },
     "playwright": {
       "passed": true,
+      "logical_tests": 5,
+      "viewport_executions": 25,
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 29430.165999999997
+      "duration_ms": 28363.708
     }
   },
   "canonical_case_nmb_204": {
@@ -63,5 +70,5 @@
     }
   },
   "internal_verification_status": "PASSED",
-  "overall_status": "PASSED (INTERNAL GATES VERIFIED; EXTERNAL GATES BLOCKED PENDING CREDENTIALS)"
+  "overall_status": "INTERNAL_PASSED_EXTERNAL_BLOCKED"
 }

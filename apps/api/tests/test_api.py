@@ -92,7 +92,7 @@ def test_single_execution_workflow_and_sse():
     # 5. Counterfactual sensitivity replay
     cf_payload = {
         "intervention_type": "EXPEDITE_DOOR_CLOSING",
-        "parameters": {"simulated_door_open_minutes": 5}
+        "parameters": {"max_door_open_minutes": 5.0}
     }
     cf_res = client.post(f"/api/investigations/{run_id}/counterfactuals", json=cf_payload)
     assert cf_res.status_code == 200

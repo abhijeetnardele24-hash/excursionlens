@@ -128,3 +128,6 @@ class ClaimsValidator:
         if "counterfactual" in run_data and run_data["counterfactual"]:
             errors.extend(self.validate_text(run_data["counterfactual"].get("result_summary", ""), "Counterfactual summary"))
         return len(errors) == 0, errors
+
+
+DeterministicClaimsValidator = ClaimsValidator

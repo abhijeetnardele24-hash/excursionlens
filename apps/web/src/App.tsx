@@ -138,7 +138,7 @@ export const App: React.FC = () => {
   };
 
   // 3. Counterfactual Simulation
-  const handleSimulateCounterfactual = async (interventionType: string) => {
+  const handleSimulateCounterfactual = async (interventionType: string, parameters?: Record<string, unknown>) => {
     if (!run) return;
     try {
       const res = await fetch(`/api/investigations/${run.id}/counterfactuals`, {
@@ -146,12 +146,15 @@ export const App: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           intervention_type: interventionType,
-          parameters: {},
+          parameters: parameters || {},
         }),
       });
       if (res.ok) {
         const cfResult = await res.json();
         setRun((prev) => (prev ? { ...prev, counterfactual: cfResult } : prev));
+      } else {
+        const errJson = await res.json();
+        setError(`Simulation rejected: ${errJson.detail || 'Invalid parameters'}`);
       }
     } catch (e: any) {
       setError(`Simulation error: ${e.message}`);
@@ -161,7 +164,7 @@ export const App: React.FC = () => {
   if (!caseData) {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
-        <h2>Loading ExcursionLens Case Workspace...</h2>
+        <h2>Loading ExcursionLens Case Workspace…</h2>
         {error && <p style={{ color: 'var(--excursion)', marginTop: '10px' }}>{error}</p>}
         <button className="btn-primary" onClick={loadSampleCase} style={{ marginTop: '12px' }}>
           Retry Connection
@@ -175,6 +178,32 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Skip to Main Content Link for Keyboard / Screen Reader Accessibility */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      {/* Polite Live Region for Dynamic State Announcements */}
+      <div
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: '0',
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          border: '0',
+        }}
+      >
+        {isInvestigating ? `Investigation stage active: ${currentStage}` : ''}
+        {error ? `Alert: ${error}` : ''}
+      </div>
+
       {/* 1. Header */}
       <AppHeader
         providerMode={providerMode}
@@ -187,7 +216,7 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Operational Canvas */}
-      <main style={{ maxWidth: 'var(--max-width)', margin: '0 auto', width: '100%', padding: '20px', flexGrow: 1 }}>
+      <main id="main-content" style={{ maxWidth: 'var(--max-width)', margin: '0 auto', width: '100%', padding: '20px', flexGrow: 1 }}>
         {/* Shipment Summary & Review Posture Strip */}
         <section aria-label="Shipment Case Overview" style={{ marginBottom: '20px' }}>
           <ShipmentSummaryStrip caseData={caseData} run={run} />

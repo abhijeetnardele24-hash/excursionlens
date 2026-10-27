@@ -4,7 +4,7 @@ import { CounterfactualResult } from '../types';
 interface CounterfactualWorkbenchProps {
   runId: string;
   counterfactual?: CounterfactualResult;
-  onSimulate: (interventionType: string) => Promise<void>;
+  onSimulate: (interventionType: string, parameters?: Record<string, unknown>) => Promise<void>;
 }
 
 export const CounterfactualWorkbench: React.FC<CounterfactualWorkbenchProps> = ({
@@ -13,12 +13,20 @@ export const CounterfactualWorkbench: React.FC<CounterfactualWorkbenchProps> = (
   onSimulate,
 }) => {
   const [selectedIntervention, setSelectedIntervention] = useState('EXPEDITE_DOOR_CLOSING');
+  const [maxDoorOpenMinutes, setMaxDoorOpenMinutes] = useState<number>(5.0);
+  const [coreLagFactor, setCoreLagFactor] = useState<number>(0.65);
   const [loading, setLoading] = useState(false);
 
   const handleRun = async () => {
     setLoading(true);
     try {
-      await onSimulate(selectedIntervention);
+      const params =
+        selectedIntervention === 'EXPEDITE_DOOR_CLOSING'
+          ? { max_door_open_minutes: maxDoorOpenMinutes }
+          : selectedIntervention === 'RELOCATE_LOGGER_DEEP'
+          ? { core_lag_factor: coreLagFactor }
+          : {};
+      await onSimulate(selectedIntervention, params);
     } finally {
       setLoading(false);
     }
@@ -50,15 +58,68 @@ export const CounterfactualWorkbench: React.FC<CounterfactualWorkbenchProps> = (
             borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--rules)',
             backgroundColor: 'var(--surface)',
+            color: 'var(--ink)',
             fontSize: '13px',
             fontFamily: 'inherit',
           }}
         >
-          <option value="EXPEDITE_DOOR_CLOSING">1. Expedite Door Closing (5 min limit vs 24 min observed)</option>
-          <option value="RELOCATE_LOGGER_DEEP">2. Thermal Mass Probe Replay (Core probe peak 6.8°C)</option>
+          <option value="EXPEDITE_DOOR_CLOSING">1. Expedite Door Closing (Configurable threshold vs 24 min observed)</option>
+          <option value="RELOCATE_LOGGER_DEEP">2. Thermal Mass Probe Replay (Liquid vial core thermal lag)</option>
           <option value="BACKUP_REEFER_ENGAGED">3. Standby Active Chilling During Staging</option>
           <option value="NO_TRANSFER_DELAY">4. Direct Cross-Dock Transfer (Eliminate staging delay)</option>
         </select>
+
+        {selectedIntervention === 'EXPEDITE_DOOR_CLOSING' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label htmlFor="door-minutes-input" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink)' }}>
+              Max Door Minutes:
+            </label>
+            <input
+              id="door-minutes-input"
+              type="number"
+              min="1"
+              max="120"
+              step="1"
+              value={maxDoorOpenMinutes}
+              onChange={(e) => setMaxDoorOpenMinutes(Math.max(1, Math.min(120, parseFloat(e.target.value) || 5)))}
+              style={{
+                width: '60px',
+                padding: '4px 6px',
+                fontSize: '13px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--rules)',
+                backgroundColor: 'var(--surface)',
+                color: 'var(--ink)',
+              }}
+            />
+          </div>
+        )}
+
+        {selectedIntervention === 'RELOCATE_LOGGER_DEEP' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label htmlFor="core-lag-input" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink)' }}>
+              Core Lag Factor:
+            </label>
+            <input
+              id="core-lag-input"
+              type="number"
+              min="0.05"
+              max="0.95"
+              step="0.05"
+              value={coreLagFactor}
+              onChange={(e) => setCoreLagFactor(Math.max(0.05, Math.min(0.95, parseFloat(e.target.value) || 0.65)))}
+              style={{
+                width: '60px',
+                padding: '4px 6px',
+                fontSize: '13px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--rules)',
+                backgroundColor: 'var(--surface)',
+                color: 'var(--ink)',
+              }}
+            />
+          </div>
+        )}
 
         <button
           className="btn-primary"
@@ -66,7 +127,7 @@ export const CounterfactualWorkbench: React.FC<CounterfactualWorkbenchProps> = (
           disabled={loading || !runId}
           style={{ padding: '6px 14px' }}
         >
-          {loading ? 'Simulating...' : 'Replay Counterfactual'}
+          {loading ? 'Simulating…' : 'Replay Counterfactual'}
         </button>
       </div>
 

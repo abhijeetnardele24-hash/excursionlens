@@ -31,7 +31,7 @@ export const StageTracker: React.FC<StageTrackerProps> = ({
         <h2 className="card-title">Investigation Stage Stepper</h2>
         {isInvestigating && (
           <span className="badge badge-accent" style={{ animation: 'pulse 1.5s infinite' }}>
-            ● Stage Transition in Progress...
+            ● Stage Transition in Progress…
           </span>
         )}
       </div>

@@ -97,7 +97,7 @@ def test_counterfactual_produces_honest_calculated_narrative(minimal_case):
     cf_engine = CounterfactualEngine()
     req = CounterfactualRequest(
         intervention_type="EXPEDITE_DOOR_CLOSING",
-        parameters={"simulated_door_open_minutes": 5},
+        parameters={"max_door_open_minutes": 5.0},
     )
     res = cf_engine.simulate(minimal_case, req, "RUN-TEST")
     assert res.intervention_type == "EXPEDITE_DOOR_CLOSING"

@@ -52,7 +52,7 @@ def main():
     }
 
     # 1. Python Lint (Ruff)
-    print("\n[Gate 1/6] Running Ruff Linter on apps/...")
+    print("\n[Gate 1/7] Running Ruff Linter on apps/ and scripts/...")
     rc, stdout, stderr, elapsed = run_cmd([sys.executable, "-m", "ruff", "check", "apps/api", "scripts", "benchmark"])
     results["gates"]["ruff"] = {
         "passed": rc == 0,
@@ -64,9 +64,27 @@ def main():
     else:
         print(f"  ✗ Ruff lint failed:\n{stdout}\n{stderr}")
 
-    # 2. Frontend Typecheck & Build
-    print("\n[Gate 2/6] Running TypeScript Check & Vite Build on apps/web...")
-    rc, stdout, stderr, elapsed = run_cmd(["cmd.exe", "/c", "npm", "--prefix", "apps/web", "run", "build"])
+    # 2. Python Static Typing (Mypy with --check-untyped-defs)
+    print("\n[Gate 2/7] Running Mypy on apps/api/app...")
+    rc, stdout, stderr, elapsed = run_cmd([
+        sys.executable, "-m", "mypy", "apps/api/app",
+        "--ignore-missing-imports",
+        "--check-untyped-defs"
+    ])
+    results["gates"]["mypy"] = {
+        "passed": rc == 0,
+        "elapsed_sec": round(elapsed, 2),
+        "output": stdout if rc == 0 else f"{stdout}\n{stderr}",
+    }
+    if rc == 0:
+        print("  ✓ Mypy typing passed (0 type errors)")
+    else:
+        print(f"  ✗ Mypy typing failed:\n{stdout}\n{stderr}")
+
+    # 3. Frontend Typecheck & Build
+    print("\n[Gate 3/7] Running TypeScript Check & Vite Build on apps/web...")
+    npm_cmd = ["cmd.exe", "/c", "npm", "--prefix", "apps/web", "run", "build"] if sys.platform == "win32" else ["npm", "--prefix", "apps/web", "run", "build"]
+    rc, stdout, stderr, elapsed = run_cmd(npm_cmd)
     results["gates"]["frontend_build"] = {
         "passed": rc == 0,
         "elapsed_sec": round(elapsed, 2),
@@ -77,8 +95,8 @@ def main():
     else:
         print(f"  ✗ Frontend build failed:\n{stdout}\n{stderr}")
 
-    # 3. Backend Unit & Coverage (Pytest)
-    print("\n[Gate 3/6] Running Pytest & Coverage...")
+    # 4. Backend Unit & Coverage (Pytest)
+    print("\n[Gate 4/7] Running Pytest & Coverage...")
     cov_path = ROOT / "test-results" / "coverage.json"
     cov_path.parent.mkdir(parents=True, exist_ok=True)
     env = {"PYTHONPATH": "."}
@@ -108,22 +126,35 @@ def main():
     else:
         print(f"  ✗ Pytest failed:\n{stdout}\n{stderr}")
 
-    # 4. Deterministic Frozen Benchmark Suite (12 scenarios)
-    print("\n[Gate 4/6] Running Frozen Synthetic Benchmark Suite...")
+    # 5. Deterministic Frozen Benchmark Suite (parsed dynamically from benchmark-results.json)
+    print("\n[Gate 5/7] Running Frozen Synthetic Benchmark Suite...")
     rc, stdout, stderr, elapsed = run_cmd([sys.executable, "benchmark/run_benchmark.py"], env=env)
+    bm_path = ROOT / "test-results" / "benchmark-results.json"
+    bm_total = 0
+    bm_passed = 0
+    if bm_path.exists():
+        try:
+            with open(bm_path, "r", encoding="utf-8") as f:
+                bm_data = json.load(f)
+                bm_total = bm_data.get("total_scenarios", 0)
+                bm_passed = bm_data.get("passed_scenarios", 0)
+        except Exception:
+            pass
+
+    bm_success = (rc == 0) and (bm_total > 0) and (bm_passed == bm_total)
     results["gates"]["benchmark"] = {
-        "passed": rc == 0,
-        "total_scenarios": 12,
-        "passed_scenarios": 12 if rc == 0 else 0,
+        "passed": bm_success,
+        "total_scenarios": bm_total,
+        "passed_scenarios": bm_passed,
         "elapsed_sec": round(elapsed, 2),
     }
-    if rc == 0:
-        print("  ✓ 12/12 Frozen Synthetic Benchmark scenarios passed")
+    if bm_success:
+        print(f"  ✓ {bm_passed}/{bm_total} Frozen Synthetic Benchmark scenarios passed")
     else:
-        print(f"  ✗ Benchmark failed:\n{stdout}\n{stderr}")
+        print(f"  ✗ Benchmark failed: {bm_passed}/{bm_total} passed:\n{stdout}\n{stderr}")
 
-    # 5. Security & Secret Scan
-    print("\n[Gate 5/6] Running Security & Secret Scanner...")
+    # 6. Security & Secret Scan
+    print("\n[Gate 6/7] Running Security & Secret Scanner...")
     rc, stdout, stderr, elapsed = run_cmd([sys.executable, "scripts/security_scan.py"])
     results["gates"]["security_scan"] = {
         "passed": rc == 0,
@@ -135,11 +166,29 @@ def main():
     else:
         print(f"  ✗ Security scan failed:\n{stdout}\n{stderr}")
 
-    # 6. Playwright E2E & Axe Accessibility Results
-    print("\n[Gate 6/6] Parsing Playwright & Axe E2E Results...")
+    # 7. Playwright E2E & Axe Accessibility Results
+    print("\n[Gate 7/7] Verifying Playwright & Axe E2E Results...")
     pw_results_path = ROOT / "test-results" / "playwright-results.json"
+
+    # Check freshness: verify result was generated recently (not stale)
+    is_fresh = False
+    if pw_results_path.exists():
+        mtime = os.path.getmtime(pw_results_path)
+        if (time.time() - mtime) < 1800:  # within 30 minutes
+            is_fresh = True
+
+    if not is_fresh:
+        print("  Playwright results missing or stale. Running test suite...")
+        npx_cmd = ["cmd.exe", "/c", "npx", "playwright", "test"] if sys.platform == "win32" else ["npx", "playwright", "test"]
+        pw_rc, pw_out, pw_err, pw_elapsed = run_cmd(npx_cmd)
+        if pw_rc != 0:
+            print(f"  Playwright execution exited with code {pw_rc}:\n{pw_err}")
+
     pw_passed = False
     pw_stats = {}
+    logical_tests_count = 0
+    viewport_executions_count = 0
+
     if pw_results_path.exists():
         try:
             with open(pw_results_path, "r", encoding="utf-8") as f:
@@ -148,9 +197,22 @@ def main():
                 expected = pw_stats.get("expected", 0)
                 unexpected = pw_stats.get("unexpected", 0)
                 flaky = pw_stats.get("flaky", 0)
+                viewport_executions_count = expected
+
+                logical_specs = set()
+                def extract_specs(suite_list):
+                    for s in suite_list:
+                        extract_specs(s.get("suites", []))
+                        for spec in s.get("specs", []):
+                            logical_specs.add(spec.get("title", ""))
+                extract_specs(pw_data.get("suites", []))
+                logical_tests_count = len(logical_specs)
+
                 pw_passed = unexpected == 0 and expected > 0
                 results["gates"]["playwright"] = {
                     "passed": pw_passed,
+                    "logical_tests": logical_tests_count,
+                    "viewport_executions": viewport_executions_count,
                     "expected": expected,
                     "unexpected": unexpected,
                     "flaky": flaky,
@@ -162,7 +224,7 @@ def main():
         results["gates"]["playwright"] = {"passed": False, "error": "test-results/playwright-results.json not found"}
 
     if pw_passed:
-        print(f"  ✓ Playwright & Axe passed: {pw_stats.get('expected')} viewport runs passed across 5 viewports")
+        print(f"  ✓ Playwright & Axe passed: {logical_tests_count} logical journeys ({viewport_executions_count} viewport executions) across 5 viewports")
     else:
         print(f"  ✗ Playwright status: {results['gates'].get('playwright')}")
 
@@ -178,7 +240,7 @@ def main():
 
     # External Provider Smoke Status
     smoke_path = ROOT / "docs" / "live-smoke-receipt.json"
-    smoke_status = "NOT_RUN"
+    smoke_status = "BLOCKED"
     smoke_data = {}
     if smoke_path.exists():
         try:
@@ -206,7 +268,13 @@ def main():
     # Internal Gates Status
     internal_passed = all(g.get("passed", False) for g in results["gates"].values())
     results["internal_verification_status"] = "PASSED" if internal_passed else "FAILED"
-    results["overall_status"] = "PASSED (INTERNAL GATES VERIFIED; EXTERNAL GATES BLOCKED PENDING CREDENTIALS)" if internal_passed else "FAILED"
+
+    if not internal_passed:
+        results["overall_status"] = "FAILED"
+    elif smoke_status == "LIVE_VERIFIED":
+        results["overall_status"] = "LIVE_VERIFIED"
+    else:
+        results["overall_status"] = "INTERNAL_PASSED_EXTERNAL_BLOCKED"
 
     # Write out verification-results.json
     out_file = ROOT / "docs" / "verification-results.json"
@@ -217,6 +285,7 @@ def main():
     print("\n" + "=" * 60)
     print(f"  INTERNAL VERIFICATION STATUS: {results['internal_verification_status']}")
     print(f"  EXTERNAL GATES: Live Providers={smoke_status}, Deployment=BLOCKED")
+    print(f"  OVERALL STATUS: {results['overall_status']}")
     print(f"  Written to: {out_file.relative_to(ROOT)}")
     print("=" * 60)
 

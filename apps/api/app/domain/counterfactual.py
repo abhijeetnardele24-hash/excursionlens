@@ -82,7 +82,11 @@ class CounterfactualEngine:
                 door_start_dt = parse_iso_datetime(door_open_events[0].timestamp)
 
             # Max duration target in minutes (default 5.0)
-            max_door_min = float(request.parameters.get("max_door_open_minutes", 5.0))
+            max_door_min = (
+                request.parameters.max_door_open_minutes
+                if request.parameters.max_door_open_minutes is not None
+                else 5.0
+            )
             changed_facts.append(f"Simulated operational SLA: cargo door open window restricted to <= {max_door_min} minutes.")
 
             # Attenuate temperatures beyond the expedited closing threshold
@@ -102,7 +106,11 @@ class CounterfactualEngine:
 
         elif canonical_intervention == "THERMAL_MASS_CORE_PROBE":
             # Simulates internal vial core thermal inertia vs surface sensor
-            core_lag_factor = float(request.parameters.get("core_lag_factor", 0.65))
+            core_lag_factor = (
+                request.parameters.core_lag_factor
+                if request.parameters.core_lag_factor is not None
+                else 0.65
+            )
             changed_facts.append(f"Simulated internal liquid vial core thermal inertia (attenuation factor {core_lag_factor}).")
 
             baseline_temp = 4.5
@@ -137,7 +145,7 @@ class CounterfactualEngine:
         if sim_dur == 0.0:
             summary = (
                 f"Synthetic sensitivity replay shows cumulative excursion reduced from {orig_dur:.1f} min to 0.0 min. "
-                f"Simulated peak temperature remained within compliant limits at {sim_peak:.1f}°C."
+                f"Simulated peak temperature remained within configured temperature band at {sim_peak:.1f}°C."
             )
         else:
             summary = (
@@ -149,7 +157,7 @@ class CounterfactualEngine:
             id=f"CF-{intervention}",
             run_id=run_id,
             intervention_type=intervention,
-            parameters=request.parameters,
+            parameters=request.parameters.model_dump(exclude_none=True),
             changed_fact_ids=changed_facts,
             unchanged_fact_ids=unchanged_facts,
             original_excursion_duration_minutes=round(orig_dur, 1),

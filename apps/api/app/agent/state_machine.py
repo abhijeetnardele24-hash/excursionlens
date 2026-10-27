@@ -112,9 +112,13 @@ class InvestigationOrchestrator:
         return rid
 
     def _broadcast_event(self, run_id: str, event_data: dict[str, Any]):
-        """Records event in run history and pushes to active listener queues."""
-        if run_id in self.event_buffers:
-            self.event_buffers[run_id].append(event_data)
+        """Records event with monotonic sequence in run history and pushes to active listener queues."""
+        if run_id not in self.event_buffers:
+            self.event_buffers[run_id] = []
+
+        seq = len(self.event_buffers[run_id]) + 1
+        event_data["seq"] = seq
+        self.event_buffers[run_id].append(event_data)
 
         if run_id in self.listeners:
             for q in list(self.listeners[run_id]):
@@ -124,7 +128,7 @@ class InvestigationOrchestrator:
                     pass
 
     async def _execute_run(self, run_id: str, case: ShipmentCase):
-        """Executes the 8-stage pipeline once within bounded wall-clock budget."""
+        """Executes the 8-stage pipeline once within bounded wall-clock budget and async timeouts."""
         run = self.runs[run_id]
         start_time = time.time()
 
@@ -148,138 +152,179 @@ class InvestigationOrchestrator:
             self._broadcast_event(run_id, event_obj)
 
         try:
-            emit("CREATED", f"Investigation initialized for case {case.id}")
-            await asyncio.sleep(0.05)
+            # Enforce bounded investigation timeout
+            timeout_limit = float(settings.investigation_timeout_seconds)
+            async with asyncio.timeout(timeout_limit):
+                emit("CREATED", f"Investigation initialized for case {case.id}")
+                await asyncio.sleep(0.05)
 
-            # 1. VALIDATING
-            emit("VALIDATING", "Validating case schema and reading bounds")
-            if not case.readings or len(case.readings) < 1:
-                run.state = "FAILED_TRUTHFULLY"
-                run.failure_reason = "Case contains 0 sensor readings."
-                emit("FAILED_TRUTHFULLY", run.failure_reason)
-                return
+                # 1. VALIDATING
+                emit("VALIDATING", "Validating case schema and reading bounds")
+                if not case.readings or len(case.readings) < 1:
+                    run.state = "FAILED_TRUTHFULLY"
+                    run.failure_reason = "Case contains 0 sensor readings."
+                    emit("FAILED_TRUTHFULLY", run.failure_reason)
+                    return
 
-            # 2. NORMALIZING
-            emit("NORMALIZING", "Normalizing time-series timestamps and telemetry points")
-            await asyncio.sleep(0.05)
+                # 2. NORMALIZING
+                emit("NORMALIZING", "Normalizing time-series timestamps and telemetry points")
+                await asyncio.sleep(0.05)
 
-            # 3. DETECT_EXCURSION (Deterministic)
-            analysis = self.detector.analyze_case(case)
-            run.observations = analysis.observations
+                # 3. DETECT_EXCURSION (Deterministic multi-sensor analysis)
+                analysis = self.detector.analyze_case(case)
+                run.observations = analysis.observations
 
-            excursion_summary = (
-                f"Detected {analysis.total_excursion_duration_minutes:.1f} minutes cumulative excursion. "
-                f"Max temp: {analysis.max_recorded_temperature:.1f}°C."
-                if analysis.has_excursion else "Zero excursion detected; compliant throughout."
-            )
-            emit("EXCURSION_DETECTED", excursion_summary, {
-                "has_excursion": analysis.has_excursion,
-                "duration_minutes": analysis.total_excursion_duration_minutes,
-                "max_temperature": analysis.max_recorded_temperature,
-                "observations_count": len(analysis.observations)
-            })
-            await asyncio.sleep(0.05)
+                excursion_summary = (
+                    f"Detected {analysis.total_excursion_duration_minutes:.1f} minutes cumulative excursion. "
+                    f"Max temp: {analysis.max_recorded_temperature:.1f}°C."
+                    if analysis.has_excursion else "Zero excursion detected; compliant throughout."
+                )
+                emit("EXCURSION_DETECTED", excursion_summary, {
+                    "has_excursion": analysis.has_excursion,
+                    "duration_minutes": analysis.total_excursion_duration_minutes,
+                    "max_temperature": analysis.max_recorded_temperature,
+                    "observations_count": len(analysis.observations)
+                })
+                await asyncio.sleep(0.05)
 
-            # 4. RESEARCHING (Tavily)
-            query = f"CDC FDA cold chain vaccine temperature excursion guidance for {case.product_profile.product_class}"
-            emit("RESEARCHING", f"Querying authoritative guidance via Tavily: '{query}'")
+                # 4. RESEARCHING (Tavily Async)
+                query = f"CDC FDA cold chain vaccine temperature excursion guidance for {case.product_profile.product_class}"
+                emit("RESEARCHING", f"Querying authoritative guidance via Tavily: '{query}'")
 
-            sources, tavily_receipt = self.tavily.search_guidance(query, max_results=3)
-            run.sources = sources
-            tavily_is_live = bool(tavily_receipt.get("is_live", False))
+                sources, tavily_receipt = await self.tavily.search_guidance_async(query, max_results=3)
+                run.sources = sources
+                tavily_is_live = bool(tavily_receipt.get("is_live", False))
 
-            emit("RESEARCHING", f"Retrieved {len(sources)} authoritative source records from CDC/FDA/WHO/GS1", {
-                "source_count": len(sources),
-                "tavily_receipt": tavily_receipt
-            })
-            await asyncio.sleep(0.05)
+                emit("RESEARCHING", f"Retrieved {len(sources)} authoritative source records from CDC/FDA/WHO/GS1", {
+                    "source_count": len(sources),
+                    "tavily_receipt": tavily_receipt
+                })
+                await asyncio.sleep(0.05)
 
-            # 5. HYPOTHESES_DRAFTED (Nebius + NVIDIA Nemotron)
-            emit("HYPOTHESES_DRAFTED", "Synthesizing competing causal hypotheses via NVIDIA Nemotron")
-            hypotheses, nebius_receipt = self.nebius.generate_hypotheses(case, run.observations, run.sources)
-            run.hypotheses = hypotheses
-            run.latency_ms = nebius_receipt.get("latency_ms")
-            run.usage = nebius_receipt.get("usage")
-            investigator_is_live = bool(nebius_receipt.get("is_live", False))
+                # Discover key-scoped Nebius model catalog before investigator execution
+                selected_runtime_model: str | None = None
+                if self.nebius.has_key:
+                    catalog_probe = await self.nebius.discover_models_async()
+                    if catalog_probe.get("status") == "LIVE_SUCCESS":
+                        selected_runtime_model = catalog_probe.get("selected_deep_model")
 
-            emit("HYPOTHESES_DRAFTED", f"Drafted {len(hypotheses)} competing causal hypotheses", {
-                "hypotheses_count": len(hypotheses),
-                "nebius_receipt": nebius_receipt
-            })
-            await asyncio.sleep(0.05)
+                # 5. HYPOTHESES_DRAFTED (Nebius Async + NVIDIA Nemotron)
+                emit("HYPOTHESES_DRAFTED", "Synthesizing competing causal hypotheses via NVIDIA Nemotron")
+                hypotheses, nebius_receipt = await self.nebius.generate_hypotheses_async(
+                    case,
+                    run.observations,
+                    run.sources,
+                    model_override=selected_runtime_model
+                )
+                run.hypotheses = hypotheses
+                run.latency_ms = nebius_receipt.get("latency_ms")
+                run.usage = nebius_receipt.get("usage")
+                investigator_is_live = bool(nebius_receipt.get("is_live", False))
 
-            # 6. SKEPTIC_REVIEWED
-            emit("SKEPTIC_REVIEWED", "Running adversarial skeptic pass to identify contradictions and overclaims")
-            critiques, skeptic_receipt = self.nebius.run_skeptic_pass(run.hypotheses, run.observations, run.sources)
-            run.critiques = critiques
-            skeptic_is_live = bool(skeptic_receipt.get("is_live", False))
+                emit("HYPOTHESES_DRAFTED", f"Drafted {len(hypotheses)} competing causal hypotheses", {
+                    "hypotheses_count": len(hypotheses),
+                    "nebius_receipt": nebius_receipt
+                })
+                await asyncio.sleep(0.05)
 
-            # Update hypothesis status from skeptic recommendation
-            for c in critiques:
-                for h in run.hypotheses:
-                    if h.id == c.hypothesis_id:
-                        h.status = c.recommended_status
+                # 6. SKEPTIC_REVIEWED (Nebius Async)
+                emit("SKEPTIC_REVIEWED", "Running adversarial skeptic pass to identify contradictions and overclaims")
+                critiques, skeptic_receipt = await self.nebius.run_skeptic_pass_async(
+                    run.hypotheses,
+                    run.observations,
+                    run.sources,
+                    model_override=selected_runtime_model
+                )
+                run.critiques = critiques
+                skeptic_is_live = bool(skeptic_receipt.get("is_live", False))
 
-            emit("SKEPTIC_REVIEWED", f"Completed skeptic pass: {len(critiques)} critiques evaluated", {
-                "critique_count": len(critiques),
-                "skeptic_receipt": skeptic_receipt
-            })
-            await asyncio.sleep(0.05)
+                # Update hypothesis status from skeptic recommendation
+                for c in critiques:
+                    for h in run.hypotheses:
+                        if h.id == c.hypothesis_id:
+                            h.status = c.recommended_status
 
-            # 7. CLAIMS_VALIDATED
-            emit("CLAIMS_VALIDATED", "Validating hypothesis claims and citations deterministically")
-            is_valid, validation_errors = self.validator.validate_hypotheses(
-                run.hypotheses,
-                run.observations,
-                run.sources
-            )
-            run.validation_result = {
-                "passed": is_valid,
-                "error_count": len(validation_errors),
-                "errors": validation_errors
-            }
+                emit("SKEPTIC_REVIEWED", f"Completed skeptic pass: {len(critiques)} critiques evaluated", {
+                    "critique_count": len(critiques),
+                    "skeptic_receipt": skeptic_receipt
+                })
+                await asyncio.sleep(0.05)
 
-            if not is_valid:
-                run.state = "FAILED_TRUTHFULLY"
-                run.failure_reason = "Claims validator failed: " + "; ".join(validation_errors)
-                emit("FAILED_TRUTHFULLY", run.failure_reason)
-                return
+                # 7. CLAIMS_VALIDATED
+                emit("CLAIMS_VALIDATED", "Validating hypothesis claims and citations deterministically")
 
-            emit("CLAIMS_VALIDATED", "100% of hypothesis claims and citations verified against evidence IDs")
-            await asyncio.sleep(0.05)
+                # Check 1: validate_hypotheses
+                is_valid, validation_errors = self.validator.validate_hypotheses(
+                    run.hypotheses,
+                    run.observations,
+                    run.sources
+                )
 
-            # Determine truthful overall provider mode:
-            # Rule: A run may be labeled LIVE_TOKEN_FACTORY only when all required runtime stages succeeded live:
-            # - Tavily retrieval
-            # - Nebius investigator inference
-            # - Nebius skeptic inference
-            # - schema validation
-            # - claims validation
-            if tavily_is_live and investigator_is_live and skeptic_is_live and is_valid:
-                run.provider_mode = "LIVE_TOKEN_FACTORY"
-                run.served_model = nebius_receipt.get("model", settings.nvidia_deep_model_id)
-            elif self.nebius.has_key or self.tavily.has_key:
-                run.provider_mode = "DEMO_FIXTURE_FALLBACK"
-                run.served_model = f"{settings.nvidia_deep_model_id} (fixture fallback)"
-            else:
-                run.provider_mode = "DEMO_FIXTURE"
-                run.served_model = f"{settings.nvidia_deep_model_id} (synthetic fixture)"
+                # Check 2: validate_skeptic_critiques
+                if is_valid:
+                    critiques_valid, c_errors = self.validator.validate_skeptic_critiques(run.critiques)
+                    if not critiques_valid:
+                        is_valid = False
+                        validation_errors.extend(c_errors)
 
-            # 8. HUMAN_REVIEW_READY
-            run.completed_at = format_iso_utc(datetime.now(UTC))
-            run.state = "HUMAN_REVIEW_READY"
-            run.review_posture = "QUARANTINE_PENDING_QUALIFIED_REVIEW" if analysis.has_excursion else "REQUEST_ADDITIONAL_EVIDENCE"
+                # Check 3: inspect_complete_run
+                if is_valid:
+                    run_valid, r_errors = self.validator.inspect_complete_run(run.model_dump())
+                    if not run_valid:
+                        is_valid = False
+                        validation_errors.extend(r_errors)
 
-            total_latency = int((time.time() - start_time) * 1000)
-            run.latency_ms = total_latency
+                run.validation_result = {
+                    "passed": is_valid,
+                    "error_count": len(validation_errors),
+                    "errors": validation_errors
+                }
 
-            emit("HUMAN_REVIEW_READY", f"Investigation complete in {total_latency}ms. Posture: {run.review_posture}", {
-                "review_posture": run.review_posture,
-                "total_latency_ms": total_latency,
-                "provider_mode": run.provider_mode,
-                "completed_run": run.model_dump()
-            })
+                if not is_valid:
+                    run.state = "FAILED_TRUTHFULLY"
+                    run.failure_reason = "Claims validator failed: " + "; ".join(validation_errors)
+                    emit("FAILED_TRUTHFULLY", run.failure_reason)
+                    return
 
+                emit("CLAIMS_VALIDATED", "Citation IDs and prohibited-claim rules passed deterministic validation.")
+                await asyncio.sleep(0.05)
+
+                # Determine truthful overall provider mode:
+                # Rule: A run may be labeled LIVE_TOKEN_FACTORY only when all required runtime stages succeeded live:
+                # - Tavily retrieval
+                # - Nebius investigator inference
+                # - Nebius skeptic inference
+                # - schema validation
+                # - claims validation
+                if tavily_is_live and investigator_is_live and skeptic_is_live and is_valid:
+                    run.provider_mode = "LIVE_TOKEN_FACTORY"
+                    run.served_model = nebius_receipt.get("model", selected_runtime_model or settings.nvidia_deep_model_id)
+                elif self.nebius.has_key or self.tavily.has_key:
+                    run.provider_mode = "DEMO_FIXTURE_FALLBACK"
+                    run.served_model = f"{selected_runtime_model or settings.nvidia_deep_model_id} (fixture fallback)"
+                else:
+                    run.provider_mode = "DEMO_FIXTURE"
+                    run.served_model = f"{settings.nvidia_deep_model_id} (synthetic fixture)"
+
+                # 8. HUMAN_REVIEW_READY
+                run.completed_at = format_iso_utc(datetime.now(UTC))
+                run.state = "HUMAN_REVIEW_READY"
+                run.review_posture = "QUARANTINE_PENDING_QUALIFIED_REVIEW" if analysis.has_excursion else "REQUEST_ADDITIONAL_EVIDENCE"
+
+                total_latency = int((time.time() - start_time) * 1000)
+                run.latency_ms = total_latency
+
+                emit("HUMAN_REVIEW_READY", f"Investigation complete in {total_latency}ms. Posture: {run.review_posture}", {
+                    "review_posture": run.review_posture,
+                    "total_latency_ms": total_latency,
+                    "provider_mode": run.provider_mode,
+                    "completed_run": run.model_dump()
+                })
+
+        except TimeoutError:
+            run.state = "FAILED_TRUTHFULLY"
+            run.failure_reason = f"Investigation exceeded configured timeout limit of {settings.investigation_timeout_seconds}s."
+            emit("FAILED_TRUTHFULLY", run.failure_reason)
         except asyncio.CancelledError:
             run.state = "FAILED_TRUTHFULLY"
             run.failure_reason = "Investigation was cancelled by user."
@@ -290,31 +335,45 @@ class InvestigationOrchestrator:
             emit("FAILED_TRUTHFULLY", run.failure_reason)
 
     async def subscribe(self, run_id: str) -> AsyncGenerator[dict[str, Any], None]:
-        """Subscribes to an investigation's event stream. Replays buffered past events and streams live ones."""
+        """Subscribes to an investigation's event stream without race conditions. Replays buffered past events and streams live ones."""
         if run_id not in self.runs:
             raise KeyError(f"Run ID '{run_id}' not found.")
 
-        # 1. Yield all previously buffered events
-        past_events = list(self.event_buffers.get(run_id, []))
-        for evt in past_events:
-            yield evt
-
-        # If already completed or failed, we are done
-        run = self.runs[run_id]
-        if run.state in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
-            return
-
-        # 2. Register queue for new events
+        # 1. Register queue for new events BEFORE taking past events snapshot to prevent missed-event races
         queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
         if run_id not in self.listeners:
             self.listeners[run_id] = []
         self.listeners[run_id].append(queue)
 
+        last_seq_yielded = 0
         try:
+            # 2. Yield all previously buffered events up to snapshot
+            past_events = list(self.event_buffers.get(run_id, []))
+            for evt in past_events:
+                seq = evt.get("seq", 0)
+                if seq > last_seq_yielded:
+                    last_seq_yielded = seq
+                yield evt
+
+            # If already completed or failed, drain remaining items and finish
+            run = self.runs[run_id]
+            if run.state in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
+                while not queue.empty():
+                    evt = queue.get_nowait()
+                    seq = evt.get("seq", 0)
+                    if seq > last_seq_yielded:
+                        last_seq_yielded = seq
+                        yield evt
+                return
+
+            # 3. Stream new events, deduplicating against replayed sequence numbers
             while True:
-                # Wait for next event with timeout
                 event = await asyncio.wait_for(queue.get(), timeout=30.0)
-                yield event
+                seq = event.get("seq", 0)
+                if seq > last_seq_yielded:
+                    last_seq_yielded = seq
+                    yield event
+
                 stage = event.get("stage")
                 if stage in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
                     break
@@ -325,9 +384,13 @@ class InvestigationOrchestrator:
                 self.listeners[run_id].remove(queue)
 
     def cancel_investigation(self, run_id: str) -> bool:
-        """Cancels a running investigation task."""
+        """Cancels a running investigation task and preserves FAILED_TRUTHFULLY terminal state."""
         task = self.tasks.get(run_id)
         if task and not task.done():
             task.cancel()
+            run = self.runs.get(run_id)
+            if run and run.state not in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
+                run.state = "FAILED_TRUTHFULLY"
+                run.failure_reason = "Investigation was cancelled by user."
             return True
         return False

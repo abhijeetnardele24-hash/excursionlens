@@ -1,7 +1,8 @@
 # ExcursionLens Video Demonstration Script
 
 **Target Duration:** 2 minutes 30 seconds (Hard Cap: 2:45)  
-**Tone:** Forensic, authoritative, calm, high signal-to-noise. No marketing hyperbole.
+**Tone:** Forensic, authoritative, calm, high signal-to-noise. No marketing hyperbole.  
+*Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
 
 ---
 

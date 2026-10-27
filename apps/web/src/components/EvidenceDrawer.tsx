@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Observation, SourceRecord } from '../types';
 
 interface EvidenceDrawerProps {
@@ -14,6 +14,57 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
   sources,
   onClose,
 }) => {
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!selectedId) return;
+
+    // Save previous active element for focus restoration
+    previouslyFocusedElement.current = document.activeElement as HTMLElement;
+
+    // Body scroll lock
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Focus first focusable item in drawer
+    const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable && focusable.length > 0) {
+      focusable[0].focus();
+    }
+
+    // Escape listener and focus trap
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && focusable && focusable.length > 0) {
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElement.current) {
+        previouslyFocusedElement.current.focus();
+      }
+    };
+  }, [selectedId, onClose]);
+
   if (!selectedId) {
     return null;
   }
@@ -22,9 +73,16 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
   const src = sources.find((s) => s.id === selectedId);
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Evidence details drawer"
+    >
       <div
-        className="modal-content"
+        ref={drawerRef}
+        className="modal-content drawer-content"
         onClick={(e) => e.stopPropagation()}
         style={{ padding: '24px', maxWidth: '600px' }}
       >
@@ -36,6 +94,7 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
           <button
             onClick={onClose}
             className="btn-secondary"
+            aria-label="Close evidence drawer"
             style={{ padding: '4px 8px', fontSize: '12px' }}
           >
             ✕ Close
@@ -103,7 +162,7 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
 
             <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
               <div><strong>Retrieved:</strong> {src.retrieved_at}</div>
-              <div><strong>Content Digest:</strong> <code style={{ fontSize: '10px' }}>{src.content_digest.slice(0, 24)}...</code></div>
+              <div><strong>Content Digest:</strong> <code style={{ fontSize: '10px' }}>{src.content_digest.slice(0, 24)}…</code></div>
             </div>
           </div>
         )}

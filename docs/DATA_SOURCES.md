@@ -1,5 +1,7 @@
 # ExcursionLens Data Sources & Provenance Specification
 
+*Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
+
 ExcursionLens operates on three distinct classes of data: physical IoT sensor telemetry, logistics custody records, and authoritative regulatory references.
 
 ---

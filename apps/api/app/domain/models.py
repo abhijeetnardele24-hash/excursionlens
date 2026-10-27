@@ -10,9 +10,10 @@ Strict, deterministic Pydantic v2 schemas for:
 - Counterfactual Interventions
 """
 
+import math
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 # ==============================================================================
 # 1. Shipment Case & Telemetry
@@ -101,11 +102,12 @@ class Observation(BaseModel):
     kind: ObservationKind
     start_at: str = Field(..., description="ISO 8601 interval start")
     end_at: str = Field(..., description="ISO 8601 interval end")
-    numeric_values: dict[str, float] = Field(default_factory=dict, description="Deterministic measured values")
-    unit: str = Field("celsius", description="Measurement unit")
     summary: str = Field(..., description="Fact-based deterministic explanation")
+    sensor_id: str | None = Field(default=None, description="Sensor identifier for multi-sensor partitioning")
+    numeric_values: dict[str, float] = Field(default_factory=dict, description="Deterministic measured values")
+    unit: str = Field(default="celsius", description="Measurement unit")
     source_event_ids: list[str] = Field(default_factory=list, description="Associated custody or operational event IDs")
-    detector_version: str = Field("1.0", description="Engine version")
+    detector_version: str = Field(default="1.0", description="Engine version")
 
 
 class CaseAnalysisResult(BaseModel):
@@ -187,21 +189,71 @@ class SkepticCritique(BaseModel):
 # 5. Counterfactual Replay
 # ==============================================================================
 
+class CounterfactualParameters(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    max_door_open_minutes: float | None = Field(
+        default=None,
+        description="Maximum door open window in minutes (must be > 0 and <= 120)"
+    )
+    core_lag_factor: float | None = Field(
+        default=None,
+        description="Thermal mass core lag attenuation factor (must be between 0.0 and 1.0)"
+    )
+
+    @field_validator("max_door_open_minutes")
+    @classmethod
+    def validate_door_minutes(cls, v: float | None) -> float | None:
+        if v is not None:
+            if math.isnan(v) or math.isinf(v):
+                raise ValueError("max_door_open_minutes must be a finite number")
+            if v <= 0.0 or v > 120.0:
+                raise ValueError("max_door_open_minutes must be positive and <= 120.0 minutes")
+        return v
+
+    @field_validator("core_lag_factor")
+    @classmethod
+    def validate_core_lag(cls, v: float | None) -> float | None:
+        if v is not None:
+            if math.isnan(v) or math.isinf(v):
+                raise ValueError("core_lag_factor must be a finite number")
+            if v < 0.0 or v > 1.0:
+                raise ValueError("core_lag_factor must be between 0.0 and 1.0")
+        return v
+
+
 class CounterfactualRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     intervention_type: Literal[
         "EXPEDITE_DOOR_CLOSING",
         "BACKUP_REEFER_ENGAGED",
         "RELOCATE_LOGGER_DEEP",
         "NO_TRANSFER_DELAY"
     ]
-    parameters: dict[str, Any] = Field(default_factory=dict)
+    parameters: CounterfactualParameters = Field(default_factory=CounterfactualParameters)
+
+    @model_validator(mode="after")
+    def validate_intervention_parameters(self) -> "CounterfactualRequest":
+        if self.intervention_type == "EXPEDITE_DOOR_CLOSING":
+            if self.parameters.core_lag_factor is not None:
+                raise ValueError("core_lag_factor is irrelevant for EXPEDITE_DOOR_CLOSING")
+        elif self.intervention_type == "RELOCATE_LOGGER_DEEP":
+            if self.parameters.max_door_open_minutes is not None:
+                raise ValueError("max_door_open_minutes is irrelevant for RELOCATE_LOGGER_DEEP")
+        else:
+            if self.parameters.max_door_open_minutes is not None:
+                raise ValueError(f"max_door_open_minutes is irrelevant for {self.intervention_type}")
+            if self.parameters.core_lag_factor is not None:
+                raise ValueError(f"core_lag_factor is irrelevant for {self.intervention_type}")
+        return self
 
 
 class CounterfactualResult(BaseModel):
     id: str
     run_id: str
     intervention_type: str
-    parameters: dict[str, Any]
+    parameters: CounterfactualParameters | dict[str, Any]
     changed_fact_ids: list[str]
     unchanged_fact_ids: list[str]
     original_excursion_duration_minutes: float

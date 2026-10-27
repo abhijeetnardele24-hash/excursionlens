@@ -1,42 +1,41 @@
-# Nebius Token Factory Developer Feedback & Experience Report
+# Nebius Token Factory Developer Architectural & Integration Notes
 
 **Project:** ExcursionLens (Cold-Chain Excursion Forensic Agent)  
-**Model Targeted:** `nvidia/llama-3.1-nemotron-70b-instruct`  
+**Model Targeted:** `nvidia/llama-3.1-nemotron-70b-instruct` (or dynamic catalog match)  
 **Endpoint Base:** `https://api.tokenfactory.nebius.com/v1`  
-**API Compatibility:** OpenAI v1 Chat Completions specification  
+**API Specification:** OpenAI v1 Chat Completions specification  
+*Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
 
 ---
 
-## 1. What Worked Exceptionally Well
+## 1. Architectural Design & API Surface Compatibility
 
-1. **Seamless Drop-In API Compatibility:**
-   - The standard `/v1/chat/completions` and `/v1/models` endpoints conform cleanly to the OpenAI specification.
-   - Initializing the standard `AsyncOpenAI` client or standard `httpx` async calls required zero custom monkey-patching.
+1. **Standard API Protocol Conformance:**
+   - The `/v1/chat/completions` and `/v1/models` endpoints follow the standard OpenAI REST specification.
+   - Initializing standard `httpx.AsyncClient` or OpenAI-compatible async calls integrates with standard bearer authentication and JSON payload contracts.
 
-2. **Inference Latency & Throughput on NVIDIA Nemotron-70B:**
-   - For a 70B parameter model, time-to-first-token (TTFT) and token generation velocity were outstanding. Multi-stage reasoning (generating three detailed competing causal hypotheses followed immediately by an adversarial critique pass) completed in under 4.5 seconds.
-   - Streamed chunk responses over Server-Sent Events (SSE) remained stable without dropped frames or unexpected socket closures.
+2. **Dynamic Model Discovery Design:**
+   - ExcursionLens incorporates runtime model discovery: querying `GET /v1/models` before investigator invocation to dynamically identify active NVIDIA/Nemotron model identifiers rather than hardcoding a single static slug.
 
-3. **Complex Instruction Following with Structured JSON:**
-   - NVIDIA Nemotron demonstrated exceptional adherence to structured JSON schemas when instructed with system prompts requesting strict JSON outputs containing observation citations (`OBS-*`) and confidence ratings.
-   - Unlike generic open-source instruction models, Nemotron consistently respected the negative constraint: refraining from hallucinating missing custody events and adhering strictly to the provided evidence packet.
+3. **Structured Output & Constraint Enforcement Architecture:**
+   - The orchestration pipeline is architected around structured JSON schemas requesting strict outputs with observation citations (`OBS-*`) and confidence ratings.
+   - Deterministic claims validation acts as a post-inference safeguard to enforce boundary invariants regardless of model output.
 
 ---
 
-## 2. Friction Points & Areas for Improvement
+## 2. Integration Observations & Platform Recommendations
 
-1. **Pre-flight Catalog Discovery & Model Naming Discrepancies:**
-   - Querying `GET /v1/models` returns a diverse catalog of hosted open models. However, standardizing model IDs (e.g., whether `nvidia/llama-3.1-nemotron-70b-instruct` or alternative aliases are pinned to exact quantizations) would benefit from clearer catalog documentation.
-   - Recommendation: Expose explicit metadata in the model object: quantization level (FP8/BF16), maximum context window, and recommended temperature range.
+1. **Catalog Metadata Enrichment:**
+   - In catalog discovery (`GET /v1/models`), exposing explicit metadata in the model object (quantization level, context window limits, and supported output constraints) provides clear capability matching for agentic runtimes.
 
 2. **Native JSON Schema Enforcement:**
-   - While prompt-instructed JSON generation worked reliably, native support for `response_format: { type: "json_object" }` or structured schema validation (grammar-constrained decoding) would ensure zero JSON parse exceptions for mission-critical enterprise workflows.
+   - Native support for grammar-constrained decoding (e.g. `response_format` with strict JSON schemas) is recommended for high-reliability operational agents to prevent parsing failures before validation.
 
-3. **Rate Limit Transparency & Response Headers:**
-   - Adding standard rate limit headers (`x-ratelimit-remaining-tokens`, `x-ratelimit-reset-requests`) on HTTP responses would allow clients to implement proactive exponential backoff before hitting 429 status codes.
+3. **Rate Limit Transparency:**
+   - Providing standard rate limit headers (`x-ratelimit-remaining-tokens`, `x-ratelimit-reset-requests`) enables robust client-side backoff and jitter management in high-throughput workflows.
 
 ---
 
-## 3. Overall Verdict
+## 3. Deployment Summary
 
-Nebius Token Factory provides an enterprise-grade, cost-effective inference platform for running heavyweight frontier open weights like NVIDIA Nemotron-70B. It enabled ExcursionLens to deliver complex causal reasoning and adversarial critique in near-real-time without the overhead of self-hosting GPU infrastructure.
+ExcursionLens is engineered with full architectural support for Nebius Token Factory and NVIDIA Nemotron. While local repository verification is conducted in deterministic fixture mode pending live provider credentials, the integration client, catalog auto-discovery, and fail-closed smoke verifier (`scripts/live_smoke.py`) are fully implemented and verified against mocked contracts.

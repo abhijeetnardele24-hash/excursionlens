@@ -239,3 +239,121 @@ class TavilySearchProvider:
             "failure_reason": failure_reason
         }
         return source_records, receipt
+
+    async def search_guidance_async(
+        self,
+        query: str,
+        max_results: int = 3,
+        max_retries: int = 2
+    ) -> tuple[list[SourceRecord], dict[str, Any]]:
+        """Asynchronously queries Tavily Search API with strict schema, allowlist and bounded retries."""
+        start_time = time.time()
+        retrieval_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+        if self.has_key:
+            tavily_payload = {
+                "api_key": self.api_key,
+                "query": query,
+                "search_depth": "basic",
+                "include_domains": AUTHORITATIVE_DOMAINS,
+                "max_results": max_results
+            }
+
+            last_err = ""
+            for attempt in range(max_retries + 1):
+                try:
+                    async with httpx.AsyncClient(timeout=15.0) as client:
+                        resp = await client.post("https://api.tavily.com/search", json=tavily_payload)
+                        latency_ms = int((time.time() - start_time) * 1000)
+
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            raw_results = data.get("results", [])
+                            source_records = []
+                            for idx, r in enumerate(raw_results):
+                                url = r.get("url", "")
+                                try:
+                                    parsed = urlparse(url)
+                                except Exception:
+                                    continue
+
+                                # Enforce HTTPS scheme
+                                if parsed.scheme.lower() != "https":
+                                    continue
+
+                                domain = parsed.netloc.lower()
+                                # Enforce strict domain allowlist
+                                if not any(domain == ad or domain.endswith("." + ad) for ad in AUTHORITATIVE_DOMAINS):
+                                    continue
+
+                                content = r.get("content", "").strip()
+                                clean_content = content[:400] if len(content) > 400 else content
+
+                                rec = SourceRecord(
+                                    id=f"SRC-LIVE-{idx + 1:02d}",
+                                    url=url,
+                                    title=r.get("title", "Authoritative Guidance"),
+                                    domain=domain,
+                                    published_or_updated_at=None,
+                                    retrieved_at=retrieval_iso,
+                                    snippet=clean_content,
+                                    content_digest=sha256_digest(clean_content),
+                                    query=query
+                                )
+                                source_records.append(rec)
+
+                            if source_records:
+                                receipt = {
+                                    "status": "LIVE_SUCCESS",
+                                    "provider": "Tavily",
+                                    "query": query,
+                                    "latency_ms": latency_ms,
+                                    "source_count": len(source_records),
+                                    "domains": list(set(s.domain for s in source_records)),
+                                    "is_live": True,
+                                    "failure_reason": None
+                                }
+                                return source_records, receipt
+                        elif resp.status_code in (429, 500, 502, 503, 504) and attempt < max_retries:
+                            last_err = f"Tavily HTTP {resp.status_code}"
+                            continue
+                        else:
+                            last_err = f"Tavily HTTP {resp.status_code}: {resp.text[:200]}"
+                            break
+                except Exception as e:
+                    last_err = f"Tavily live search exception: {type(e).__name__} - {e}"
+                    if attempt >= max_retries:
+                        break
+
+            failure_reason = last_err
+        else:
+            failure_reason = "TAVILY_API_KEY is not configured or contains placeholder."
+
+        # Fallback to pre-vetted cached guidance
+        source_records = []
+        for item in CACHED_AUTHORITATIVE_GUIDANCE[:max_results]:
+            rec = SourceRecord(
+                id=item["id"],
+                url=item["url"],
+                title=item["title"],
+                domain=item["domain"],
+                published_or_updated_at=item["published_or_updated_at"],
+                retrieved_at=retrieval_iso,
+                snippet=item["snippet"],
+                content_digest=sha256_digest(item["snippet"]),
+                query=query
+            )
+            source_records.append(rec)
+
+        latency_ms = int((time.time() - start_time) * 1000)
+        receipt = {
+            "status": "DEMO_FIXTURE_FALLBACK",
+            "provider": "Tavily (Pre-Vetted Public Health Cache)",
+            "query": query,
+            "latency_ms": latency_ms,
+            "source_count": len(source_records),
+            "domains": list(set(s.domain for s in source_records)),
+            "is_live": False,
+            "failure_reason": failure_reason
+        }
+        return source_records, receipt

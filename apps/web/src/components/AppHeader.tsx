@@ -107,7 +107,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           disabled={isInvestigating}
           style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
         >
-          {isInvestigating ? 'Investigating...' : 'Investigate Excursion'}
+          {isInvestigating ? 'Investigating…' : 'Investigate Excursion'}
         </button>
 
         {hasRun && (

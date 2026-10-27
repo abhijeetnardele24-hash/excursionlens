@@ -32,6 +32,7 @@ from .domain.models import (
     CounterfactualRequest,
     ShipmentCase,
 )
+from .domain.validator import DeterministicClaimsValidator
 from .reports.generator import generate_printable_html_report
 
 # In-memory case repository
@@ -128,6 +129,7 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
 orchestrator = InvestigationOrchestrator()
 counterfactual_engine = CounterfactualEngine()
 detector = DeterministicExcursionEngine()
+validator = DeterministicClaimsValidator()
 
 
 # ==============================================================================
@@ -300,6 +302,12 @@ def run_counterfactual(run_id: str, request: CounterfactualRequest):
         raise HTTPException(status_code=404, detail=f"Case '{run.case_id}' not found.")
 
     res = counterfactual_engine.simulate(case, request, run_id)
+    is_valid, errors = validator.validate_counterfactual(res)
+    if not is_valid:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Counterfactual validation failed closed: {'; '.join(errors)}"
+        )
     run.counterfactual = res
     return res
 
@@ -314,6 +322,12 @@ def get_html_report(run_id: str):
         raise HTTPException(status_code=404, detail=f"Case '{run.case_id}' not found.")
 
     html = generate_printable_html_report(run, case)
+    html_errors = validator.validate_text(html, "HTML Report")
+    if html_errors:
+        raise HTTPException(
+            status_code=500,
+            detail=f"HTML report failed deterministic safety checks: {'; '.join(html_errors)}"
+        )
     return HTMLResponse(content=html)
 
 
@@ -322,6 +336,12 @@ def get_json_report(run_id: str):
     run = orchestrator.get_run(run_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"Investigation run '{run_id}' not found.")
+    is_valid, errors = validator.inspect_complete_run(run.model_dump())
+    if not is_valid:
+        raise HTTPException(
+            status_code=500,
+            detail=f"JSON report failed deterministic safety checks: {'; '.join(errors)}"
+        )
     return run
 
 

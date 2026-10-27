@@ -72,14 +72,34 @@ class NebiusTokenFactoryProvider:
                     model_list = [m.get("id", "") for m in data.get("data", [])]
                     nvidia_models = [m for m in model_list if "nvidia" in m.lower() or "nemotron" in m.lower()]
 
-                    # Select active model if catalog contains matches
+                    if not nvidia_models:
+                        return {
+                            "status": "FAILED",
+                            "provider": "Nebius Token Factory",
+                            "base_url": self.base_url,
+                            "latency_ms": latency,
+                            "available_models_count": len(model_list),
+                            "nvidia_models": [],
+                            "selected_fast_model": None,
+                            "selected_deep_model": None,
+                            "error_category": "NO_NVIDIA_MODELS",
+                            "failure_reason": "Nebius model catalog contains zero NVIDIA or Nemotron models."
+                        }
+
+                    # Select active model strictly from actually returned models
                     selected_deep = self.deep_model_id
-                    if nvidia_models:
+                    if self.deep_model_id in nvidia_models:
+                        selected_deep = self.deep_model_id
+                    else:
                         deep_matches = [m for m in nvidia_models if "70b" in m.lower()]
-                        if deep_matches:
-                            selected_deep = deep_matches[0]
-                        else:
-                            selected_deep = nvidia_models[0]
+                        selected_deep = deep_matches[0] if deep_matches else nvidia_models[0]
+
+                    selected_fast = self.fast_model_id
+                    if self.fast_model_id in nvidia_models:
+                        selected_fast = self.fast_model_id
+                    else:
+                        fast_matches = [m for m in nvidia_models if "mini" in m.lower() or "8b" in m.lower()]
+                        selected_fast = fast_matches[0] if fast_matches else nvidia_models[0]
 
                     return {
                         "status": "LIVE_SUCCESS",
@@ -88,7 +108,7 @@ class NebiusTokenFactoryProvider:
                         "latency_ms": latency,
                         "available_models_count": len(model_list),
                         "nvidia_models": nvidia_models,
-                        "selected_fast_model": self.fast_model_id,
+                        "selected_fast_model": selected_fast,
                         "selected_deep_model": selected_deep,
                         "error_category": None,
                         "failure_reason": None
@@ -101,6 +121,8 @@ class NebiusTokenFactoryProvider:
                         "latency_ms": latency,
                         "available_models_count": 0,
                         "nvidia_models": [],
+                        "selected_fast_model": None,
+                        "selected_deep_model": None,
                         "error_category": f"HTTP_{resp.status_code}",
                         "failure_reason": f"Nebius models endpoint returned HTTP {resp.status_code}: {resp.text[:200]}"
                     }
@@ -113,6 +135,113 @@ class NebiusTokenFactoryProvider:
                 "latency_ms": latency,
                 "available_models_count": 0,
                 "nvidia_models": [],
+                "selected_fast_model": None,
+                "selected_deep_model": None,
+                "error_category": type(e).__name__,
+                "failure_reason": f"Connection exception probing Nebius models endpoint: {e}"
+            }
+
+    async def discover_models_async(self, client: httpx.AsyncClient | None = None) -> dict[str, Any]:
+        """Asynchronously probes live Nebius Token Factory model catalog with fail-closed checks."""
+        start_time = time.time()
+        if not self.has_key:
+            return {
+                "status": "NOT_CONFIGURED",
+                "provider": "Nebius Token Factory",
+                "base_url": self.base_url,
+                "latency_ms": 0,
+                "available_models_count": 0,
+                "nvidia_models": [],
+                "selected_fast_model": None,
+                "selected_deep_model": None,
+                "error_category": "MISSING_KEY",
+                "failure_reason": "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
+            }
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+        try:
+            http_client = client or httpx.AsyncClient(timeout=15.0)
+            close_client = client is None
+            try:
+                resp = await http_client.get(f"{self.base_url}models", headers=headers)
+            finally:
+                if close_client:
+                    await http_client.aclose()
+
+            latency = int((time.time() - start_time) * 1000)
+            if resp.status_code == 200:
+                data = resp.json()
+                model_list = [m.get("id", "") for m in data.get("data", [])]
+                nvidia_models = [m for m in model_list if "nvidia" in m.lower() or "nemotron" in m.lower()]
+
+                if not nvidia_models:
+                    return {
+                        "status": "FAILED",
+                        "provider": "Nebius Token Factory",
+                        "base_url": self.base_url,
+                        "latency_ms": latency,
+                        "available_models_count": len(model_list),
+                        "nvidia_models": [],
+                        "selected_fast_model": None,
+                        "selected_deep_model": None,
+                        "error_category": "NO_NVIDIA_MODELS",
+                        "failure_reason": "Nebius model catalog contains zero NVIDIA or Nemotron models."
+                    }
+
+                selected_deep = self.deep_model_id
+                if self.deep_model_id in nvidia_models:
+                    selected_deep = self.deep_model_id
+                else:
+                    deep_matches = [m for m in nvidia_models if "70b" in m.lower()]
+                    selected_deep = deep_matches[0] if deep_matches else nvidia_models[0]
+
+                selected_fast = self.fast_model_id
+                if self.fast_model_id in nvidia_models:
+                    selected_fast = self.fast_model_id
+                else:
+                    fast_matches = [m for m in nvidia_models if "mini" in m.lower() or "8b" in m.lower()]
+                    selected_fast = fast_matches[0] if fast_matches else nvidia_models[0]
+
+                return {
+                    "status": "LIVE_SUCCESS",
+                    "provider": "Nebius Token Factory",
+                    "base_url": self.base_url,
+                    "latency_ms": latency,
+                    "available_models_count": len(model_list),
+                    "nvidia_models": nvidia_models,
+                    "selected_fast_model": selected_fast,
+                    "selected_deep_model": selected_deep,
+                    "error_category": None,
+                    "failure_reason": None
+                }
+            else:
+                return {
+                    "status": "FAILED",
+                    "provider": "Nebius Token Factory",
+                    "base_url": self.base_url,
+                    "latency_ms": latency,
+                    "available_models_count": 0,
+                    "nvidia_models": [],
+                    "selected_fast_model": None,
+                    "selected_deep_model": None,
+                    "error_category": f"HTTP_{resp.status_code}",
+                    "failure_reason": f"Nebius models endpoint returned HTTP {resp.status_code}: {resp.text[:200]}"
+                }
+        except Exception as e:
+            latency = int((time.time() - start_time) * 1000)
+            return {
+                "status": "FAILED",
+                "provider": "Nebius Token Factory",
+                "base_url": self.base_url,
+                "latency_ms": latency,
+                "available_models_count": 0,
+                "nvidia_models": [],
+                "selected_fast_model": None,
+                "selected_deep_model": None,
                 "error_category": type(e).__name__,
                 "failure_reason": f"Connection exception probing Nebius models endpoint: {e}"
             }
@@ -121,11 +250,12 @@ class NebiusTokenFactoryProvider:
         self,
         case: ShipmentCase,
         observations: list[Observation],
-        sources: list[SourceRecord]
+        sources: list[SourceRecord],
+        model_override: str | None = None
     ) -> tuple[list[Hypothesis], dict[str, Any]]:
         """Investigator pass: Synthesizes competing hypotheses tied strictly to evidence IDs."""
         start_time = time.time()
-        model_used = self.deep_model_id
+        model_used = model_override.strip() if (model_override and model_override.strip()) else self.deep_model_id
 
         # 1. Attempt live call if key exists
         if self.has_key:
@@ -221,15 +351,130 @@ class NebiusTokenFactoryProvider:
         }
         return hypotheses, receipt
 
+    async def generate_hypotheses_async(
+        self,
+        case: ShipmentCase,
+        observations: list[Observation],
+        sources: list[SourceRecord],
+        model_override: str | None = None,
+        max_retries: int = 2
+    ) -> tuple[list[Hypothesis], dict[str, Any]]:
+        """Asynchronously executes investigator pass via httpx.AsyncClient with bounded retries."""
+        start_time = time.time()
+        model_used = model_override.strip() if (model_override and model_override.strip()) else self.deep_model_id
+
+        if self.has_key:
+            obs_index = [
+                {"id": o.id, "kind": o.kind, "summary": o.summary, "values": o.numeric_values, "events": o.source_event_ids}
+                for o in observations
+            ]
+            src_index = [{"id": s.id, "title": s.title, "domain": s.domain, "snippet": s.snippet} for s in sources]
+            custody_index = [{"id": c.id, "time": c.timestamp, "type": c.event_type, "notes": c.notes} for c in case.custody_events]
+            ops_index = [{"id": o.id, "time": o.timestamp, "type": o.event_type, "details": o.details} for o in case.operational_events]
+
+            system_prompt = (
+                "You are the ExcursionLens Investigator using NVIDIA Nemotron on Nebius Token Factory. "
+                "Analyze the provided cold-chain incident facts and generate 2 to 4 competing causal hypotheses. "
+                "CRITICAL RULES:\n"
+                "1. Every hypothesis MUST cite only existing observation IDs (e.g. OBS-EXCURSION-01) or source IDs (e.g. SRC-CDC-01).\n"
+                "2. You MUST NOT declare the product safe, effective, releasable, or compliant.\n"
+                "3. State supporting evidence, contradicting evidence, unknowns, and next check for each.\n"
+                "4. Output strictly valid JSON matching schema: "
+                "{\"hypotheses\": [{\"id\": \"HYP-01\", \"label\": \"...\", \"summary\": \"...\", \"supporting_evidence_ids\": [...], "
+                "\"contradicting_evidence_ids\": [...], \"unknowns\": [...], \"next_check\": \"...\", \"confidence_band\": \"HIGH|MEDIUM|LOW\", "
+                "\"status\": \"LEADING|ALTERNATIVE\", \"what_it_does_not_establish\": \"...\"}]}"
+            )
+
+            user_prompt = json.dumps({
+                "case_id": case.id,
+                "product": case.product_profile.product_name,
+                "policy": case.temperature_policy.model_dump(),
+                "observations": obs_index,
+                "sources": src_index,
+                "custody_events": custody_index,
+                "operational_events": ops_index
+            }, indent=2)
+
+            payload = {
+                "model": model_used,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "temperature": 0.2,
+                "max_tokens": 1500
+            }
+
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+            last_err = ""
+            for attempt in range(max_retries + 1):
+                try:
+                    async with httpx.AsyncClient(timeout=35.0) as client:
+                        resp = await client.post(f"{self.base_url}chat/completions", headers=headers, json=payload)
+                        latency = int((time.time() - start_time) * 1000)
+
+                        if resp.status_code == 200:
+                            c_data = resp.json()
+                            raw_content = c_data["choices"][0]["message"]["content"]
+                            clean_json = raw_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                            parsed = json.loads(clean_json)
+
+                            hypotheses = [Hypothesis.model_validate(h) for h in parsed.get("hypotheses", [])]
+                            if hypotheses:
+                                receipt = {
+                                    "status": "LIVE_SUCCESS",
+                                    "provider": "Nebius Token Factory",
+                                    "model": model_used,
+                                    "latency_ms": latency,
+                                    "usage": c_data.get("usage", {}),
+                                    "response_digest": sha256_digest(raw_content),
+                                    "is_live": True,
+                                    "failure_reason": None
+                                }
+                                return hypotheses, receipt
+                        elif resp.status_code in (429, 500, 502, 503, 504) and attempt < max_retries:
+                            last_err = f"Nebius HTTP {resp.status_code}"
+                            continue
+                        else:
+                            last_err = f"Nebius HTTP {resp.status_code}: {resp.text[:200]}"
+                            break
+                except Exception as e:
+                    last_err = f"Nebius live call exception: {type(e).__name__} - {e}"
+                    if attempt >= max_retries:
+                        break
+
+            failure_reason = last_err
+        else:
+            failure_reason = "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
+
+        hypotheses = self._build_fixture_hypotheses(case, observations, sources)
+        latency = int((time.time() - start_time) * 1000)
+        receipt = {
+            "status": "DEMO_FIXTURE_FALLBACK",
+            "provider": "Nebius Token Factory (Synthetic Benchmark Fixture)",
+            "model": model_used,
+            "latency_ms": latency,
+            "usage": None,
+            "response_digest": sha256_digest(json.dumps([h.model_dump() for h in hypotheses])),
+            "is_live": False,
+            "failure_reason": failure_reason
+        }
+        return hypotheses, receipt
+
     def run_skeptic_pass(
         self,
         hypotheses: list[Hypothesis],
         observations: list[Observation],
-        sources: list[SourceRecord]
+        sources: list[SourceRecord],
+        model_override: str | None = None
     ) -> tuple[list[SkepticCritique], dict[str, Any]]:
         """Skeptic pass: Adversarially reviews hypotheses to downgrade overclaims or identify ignored contradictions."""
         start_time = time.time()
-        model_used = self.deep_model_id
+        model_used = model_override.strip() if (model_override and model_override.strip()) else self.deep_model_id
 
         # 1. Attempt live call if key exists
         if self.has_key:
@@ -300,6 +545,110 @@ class NebiusTokenFactoryProvider:
             failure_reason = "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
 
         # Explicit fallback to deterministic benchmark skeptic critiques
+        critiques = self._build_fixture_critiques(hypotheses)
+        latency = int((time.time() - start_time) * 1000)
+        receipt = {
+            "status": "DEMO_FIXTURE_FALLBACK",
+            "provider": "Nebius Token Factory (Synthetic Benchmark Skeptic)",
+            "model": model_used,
+            "latency_ms": latency,
+            "usage": None,
+            "critique_count": len(critiques),
+            "response_digest": sha256_digest(json.dumps([c.model_dump() for c in critiques])),
+            "is_live": False,
+            "failure_reason": failure_reason
+        }
+        return critiques, receipt
+
+    async def run_skeptic_pass_async(
+        self,
+        hypotheses: list[Hypothesis],
+        observations: list[Observation],
+        sources: list[SourceRecord],
+        model_override: str | None = None,
+        max_retries: int = 2
+    ) -> tuple[list[SkepticCritique], dict[str, Any]]:
+        """Asynchronously executes skeptic pass via httpx.AsyncClient with bounded retries."""
+        start_time = time.time()
+        model_used = model_override.strip() if (model_override and model_override.strip()) else self.deep_model_id
+
+        if self.has_key:
+            obs_index = [{"id": o.id, "kind": o.kind, "summary": o.summary, "values": o.numeric_values} for o in observations]
+            hyp_index = [{"id": h.id, "label": h.label, "summary": h.summary, "supporting": h.supporting_evidence_ids, "contradicting": h.contradicting_evidence_ids} for h in hypotheses]
+
+            system_prompt = (
+                "You are the ExcursionLens Adversarial Skeptic using NVIDIA Nemotron on Nebius Token Factory. "
+                "Review the proposed causal hypotheses against the recorded observations. "
+                "Your role is to rigorously challenge unproven assumptions, identify ignored contradictions "
+                "(e.g. electrical bus voltage telemetry directly refuting refrigeration power loss), "
+                "and downgrade overclaimed hypotheses.\n"
+                "Output strictly valid JSON matching schema: "
+                "{\"critiques\": [{\"hypothesis_id\": \"HYP-01\", \"attack_summary\": \"...\", \"unsupported_claims\": [...], "
+                "\"ignored_contradictions\": [...], \"recommended_status\": \"LEADING|ALTERNATIVE|DOWNGRADED\", \"rationale\": \"...\"}]}"
+            )
+
+            user_prompt = json.dumps({
+                "hypotheses": hyp_index,
+                "observations": obs_index
+            }, indent=2)
+
+            payload = {
+                "model": model_used,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "temperature": 0.2,
+                "max_tokens": 1200
+            }
+
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+            last_err = ""
+            for attempt in range(max_retries + 1):
+                try:
+                    async with httpx.AsyncClient(timeout=35.0) as client:
+                        resp = await client.post(f"{self.base_url}chat/completions", headers=headers, json=payload)
+                        latency = int((time.time() - start_time) * 1000)
+
+                        if resp.status_code == 200:
+                            c_data = resp.json()
+                            raw_content = c_data["choices"][0]["message"]["content"]
+                            clean_json = raw_content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                            parsed = json.loads(clean_json)
+
+                            critiques = [SkepticCritique.model_validate(c) for c in parsed.get("critiques", [])]
+                            if critiques:
+                                receipt = {
+                                    "status": "LIVE_SUCCESS",
+                                    "provider": "Nebius Token Factory (Nemotron Skeptic)",
+                                    "model": model_used,
+                                    "latency_ms": latency,
+                                    "usage": c_data.get("usage", {}),
+                                    "critique_count": len(critiques),
+                                    "response_digest": sha256_digest(raw_content),
+                                    "is_live": True,
+                                    "failure_reason": None
+                                }
+                                return critiques, receipt
+                        elif resp.status_code in (429, 500, 502, 503, 504) and attempt < max_retries:
+                            last_err = f"Nebius HTTP {resp.status_code}"
+                            continue
+                        else:
+                            last_err = f"Nebius HTTP {resp.status_code}: {resp.text[:200]}"
+                            break
+                except Exception as e:
+                    last_err = f"Nebius skeptic live call exception: {type(e).__name__} - {e}"
+                    if attempt >= max_retries:
+                        break
+
+            failure_reason = last_err
+        else:
+            failure_reason = "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
+
         critiques = self._build_fixture_critiques(hypotheses)
         latency = int((time.time() - start_time) * 1000)
         receipt = {

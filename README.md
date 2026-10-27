@@ -1,12 +1,12 @@
 # ExcursionLens
 
 **Evidence-first operational agent for biopharmaceutical cold-chain temperature excursion forensics.**  
-Powered by **NVIDIA Nemotron-70B** on **Nebius Token Factory** and authoritative live search via **Tavily**.
+*Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
 
-[![Master Verification](https://img.shields.io/badge/Verification%20Suite-PASSED-275E4B?style=for-the-badge&logo=checkmarx)](docs/verification-results.json)
+[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20PASSED%20/%20EXTERNAL%20BLOCKED-275E4B?style=for-the-badge&logo=checkmarx)](docs/verification-results.json)
 [![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20(5%20Viewports)-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
 [![Benchmark](https://img.shields.io/badge/Frozen%20Benchmark-12%2F12%20Scenarios%20(100%25)-275E4B?style=for-the-badge&logo=speedtest)](benchmark/run_benchmark.py)
-[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-83.17%25-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
+[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-75.11%25-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
 [![License](https://img.shields.io/badge/License-Apache--2.0-365E7D?style=for-the-badge)](LICENSE)
 
 ---
@@ -159,18 +159,19 @@ python benchmark/run_benchmark.py
 
 ## Verification & Automated Test Suite
 
-ExcursionLens includes a master verification gate (`scripts/verify.py`) running 6 rigorous validation layers:
+ExcursionLens includes a master verification gate (`scripts/verify.py`) running 7 rigorous validation layers:
 
 ```bash
 python scripts/verify.py
 ```
 
 - **Ruff Python Linter:** 0 violations across backend and test files.
+- **Python Static Typing (Mypy):** 0 type errors with `--check-untyped-defs`.
 - **Frontend Build:** Strict TypeScript check and Vite production bundle.
-- **Pytest Suite:** 83.17% statement coverage with zero warnings.
+- **Pytest Suite:** 75.11% statement coverage across 56 test cases with zero warnings.
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
-- **Playwright E2E & Axe Accessibility:** 5 of 5 tests passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px) with **0 Axe accessibility violations**.
+- **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px) with **0 Axe accessibility violations**.
 
 ---
 
