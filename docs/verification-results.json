@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-10-27T19:17:22Z",
+  "timestamp": "2026-10-27T19:18:09Z",
   "git": {
-    "head": "0b6458da7353a3af51ea392217a556eb3fe1f4d2",
+    "head": "45ddf44a6e858af3160b614a2ef2ea2387fa4e38",
     "branch": "main",
-    "clean_tree": false
+    "clean_tree": true
   },
   "gates": {
     "ruff": {
@@ -14,12 +14,12 @@
     "frontend_build": {
       "passed": true,
       "elapsed_sec": 2.18,
-      "output": "2m\u001b[2m \u2502 gzip:  0.51 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-BZVtVOqL.css  \u001b[39m\u001b[1m\u001b[2m  3.52 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.37 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-ClIoXnKN.js   \u001b[39m\u001b[1m\u001b[2m184.35 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 55.72 kB\u001b[22m\u001b[2m \u2502 map: 456.30 kB\u001b[22m\n\u001b[32m\u2713 built in 507ms\u001b[39m\n"
+      "output": "2m\u001b[2m \u2502 gzip:  0.51 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-BZVtVOqL.css  \u001b[39m\u001b[1m\u001b[2m  3.52 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.37 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-ClIoXnKN.js   \u001b[39m\u001b[1m\u001b[2m184.35 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 55.72 kB\u001b[22m\u001b[2m \u2502 map: 456.30 kB\u001b[22m\n\u001b[32m\u2713 built in 521ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
       "coverage_percent": 83.17,
-      "elapsed_sec": 1.9
+      "elapsed_sec": 1.93
     },
     "benchmark": {
       "passed": true,
@@ -30,7 +30,7 @@
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.17
+      "elapsed_sec": 0.22
     },
     "playwright": {
       "passed": true,
