@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-10-27T20:27:09Z",
+  "timestamp": "2026-10-27T20:46:17Z",
   "git": {
-    "head": "553df7f9009f38b8e225bd43b317d5a8894529c2",
+    "head": "e9410390f9b042dcab13ae8d21d180d988345338",
     "branch": "main",
     "clean_tree": false
   },
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.08,
+      "elapsed_sec": 0.07,
       "output": "All checks passed!\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.54,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CJWWGL7s.css  \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.53 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-vlSYuouo.js   \u001b[39m\u001b[1m\u001b[2m186.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 56.38 kB\u001b[22m\u001b[2m \u2502 map: 462.84 kB\u001b[22m\n\u001b[32m\u2713 built in 522ms\u001b[39m\n"
+      "elapsed_sec": 2.18,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CJWWGL7s.css  \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.53 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-vlSYuouo.js   \u001b[39m\u001b[1m\u001b[2m186.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 56.38 kB\u001b[22m\u001b[2m \u2502 map: 462.84 kB\u001b[22m\n\u001b[32m\u2713 built in 493ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 73.23,
-      "elapsed_sec": 2.55
+      "coverage_percent": 73.25,
+      "elapsed_sec": 2.31
     },
     "benchmark": {
       "passed": true,
@@ -30,14 +30,14 @@
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.22
+      "elapsed_sec": 0.25
     },
     "playwright": {
       "passed": true,
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 37949.649000000005
+      "duration_ms": 29345.711000000003
     }
   },
   "canonical_case_nmb_204": {

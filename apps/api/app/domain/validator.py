@@ -39,7 +39,7 @@ class ClaimsValidator:
 
     def validate_text(self, text: str, context: str = "text") -> list[str]:
         """Scans arbitrary text for prohibited regulatory or disposition claims."""
-        errors = []
+        errors: list[str] = []
         if not text:
             return errors
         for pat in self.compiled_patterns:

@@ -50,8 +50,8 @@ class InvestigationOrchestrator:
         self.runs: dict[str, InvestigationRun] = {}
         self.cases: dict[str, ShipmentCase] = {}
         self.event_buffers: dict[str, list[dict[str, Any]]] = {}
-        self.listeners: dict[str, list[asyncio.Queue]] = {}
-        self.tasks: dict[str, asyncio.Task] = {}
+        self.listeners: dict[str, list[asyncio.Queue[dict[str, Any]]]] = {}
+        self.tasks: dict[str, asyncio.Task[Any]] = {}
 
     def get_run(self, run_id: str) -> InvestigationRun | None:
         return self.runs.get(run_id)
@@ -186,7 +186,7 @@ class InvestigationOrchestrator:
 
             sources, tavily_receipt = self.tavily.search_guidance(query, max_results=3)
             run.sources = sources
-            tavily_is_live = tavily_receipt.get("is_live", False)
+            tavily_is_live = bool(tavily_receipt.get("is_live", False))
 
             emit("RESEARCHING", f"Retrieved {len(sources)} authoritative source records from CDC/FDA/WHO/GS1", {
                 "source_count": len(sources),
@@ -200,7 +200,7 @@ class InvestigationOrchestrator:
             run.hypotheses = hypotheses
             run.latency_ms = nebius_receipt.get("latency_ms")
             run.usage = nebius_receipt.get("usage")
-            nebius_is_live = nebius_receipt.get("is_live", False)
+            investigator_is_live = bool(nebius_receipt.get("is_live", False))
 
             emit("HYPOTHESES_DRAFTED", f"Drafted {len(hypotheses)} competing causal hypotheses", {
                 "hypotheses_count": len(hypotheses),
@@ -212,6 +212,7 @@ class InvestigationOrchestrator:
             emit("SKEPTIC_REVIEWED", "Running adversarial skeptic pass to identify contradictions and overclaims")
             critiques, skeptic_receipt = self.nebius.run_skeptic_pass(run.hypotheses, run.observations, run.sources)
             run.critiques = critiques
+            skeptic_is_live = bool(skeptic_receipt.get("is_live", False))
 
             # Update hypothesis status from skeptic recommendation
             for c in critiques:
@@ -248,8 +249,13 @@ class InvestigationOrchestrator:
             await asyncio.sleep(0.05)
 
             # Determine truthful overall provider mode:
-            # Rule: The overall run must NOT be labeled live if any required AI stage used fixture output!
-            if nebius_is_live and tavily_is_live:
+            # Rule: A run may be labeled LIVE_TOKEN_FACTORY only when all required runtime stages succeeded live:
+            # - Tavily retrieval
+            # - Nebius investigator inference
+            # - Nebius skeptic inference
+            # - schema validation
+            # - claims validation
+            if tavily_is_live and investigator_is_live and skeptic_is_live and is_valid:
                 run.provider_mode = "LIVE_TOKEN_FACTORY"
                 run.served_model = nebius_receipt.get("model", settings.nvidia_deep_model_id)
             elif self.nebius.has_key or self.tavily.has_key:
@@ -299,7 +305,7 @@ class InvestigationOrchestrator:
             return
 
         # 2. Register queue for new events
-        queue = asyncio.Queue()
+        queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
         if run_id not in self.listeners:
             self.listeners[run_id] = []
         self.listeners[run_id].append(queue)

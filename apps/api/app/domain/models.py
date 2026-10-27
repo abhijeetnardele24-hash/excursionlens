@@ -235,6 +235,7 @@ ReviewPosture = Literal[
 
 ProviderMode = Literal[
     "LIVE_TOKEN_FACTORY",
+    "DEMO_FIXTURE_FALLBACK",
     "DEMO_FIXTURE",
     "ERROR"
 ]
