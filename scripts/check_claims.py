@@ -38,6 +38,26 @@ PROHIBITED_PATTERNS = [
         r"(?i)quoted\s+authoritative\s+excerpt",
         "Misleading label: Fixture summaries must not be presented as quoted authoritative excerpts.",
     ),
+    (
+        r"\b141\s+test\b",
+        "Stale test count: ExcursionLens test suite now contains 161 test cases, not 141.",
+    ),
+    (
+        r"\b0896105\b",
+        "Obsolete commit SHA: Obsolete commit 0896105 referenced in documentation.",
+    ),
+    (
+        r"\b40932942007\b",
+        "Obsolete CI run ID: Obsolete GitHub Actions run 40932942007 referenced in documentation.",
+    ),
+    (
+        r"\b40835420059\b",
+        "Obsolete CI run ID: Obsolete GitHub Actions run 40835420059 referenced in documentation.",
+    ),
+    (
+        r"\bb9b380a\b",
+        "Obsolete commit SHA: Obsolete commit b9b380a referenced in documentation.",
+    ),
 ]
 
 

@@ -303,6 +303,19 @@ def main():
         except Exception:
             pass
 
+    # Public Deployment Receipt Status
+    deploy_receipt_path = ROOT / "docs" / "deployment-receipt.json"
+    deploy_status = "BLOCKED"
+    deploy_reason = "Hosting deployment credentials/target not configured in environment."
+    if deploy_receipt_path.exists():
+        try:
+            with open(deploy_receipt_path, "r", encoding="utf-8") as f:
+                d_data = json.load(f)
+                deploy_status = d_data.get("status", "BLOCKED")
+                deploy_reason = d_data.get("reason", deploy_reason)
+        except Exception:
+            pass
+
     results["external_gates"] = {
         "live_providers": {
             "status": smoke_status,
@@ -313,8 +326,8 @@ def main():
             "notice": "Fail-closed check. Real inference and retrieval verified when keys provided.",
         },
         "public_deployment": {
-            "status": "BLOCKED",
-            "reason": "Hosting deployment credentials/access not provided in local environment.",
+            "status": deploy_status,
+            "reason": deploy_reason,
             "reproducible_deployment_command": "docker compose up --build -d",
         },
     }

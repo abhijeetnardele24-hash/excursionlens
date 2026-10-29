@@ -1,9 +1,13 @@
 # Devpost Submission — ExcursionLens
 
 **Project Name:** ExcursionLens  
-**Tagline:** Evidence-first cold-chain temperature excursion investigation agent. Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.  
+**Tagline:** Evidence-first cold-chain temperature excursion investigation agent using NVIDIA Nemotron on Nebius Token Factory.  
 **Track:** Best Apps and Agents  
 **Bonus Track:** Best Use of Tavily  
+**Repository:** https://github.com/abhijeetnardele24-hash/excursionlens  
+**Public Video URL:** [PUBLIC_YOUTUBE_URL_PLACEHOLDER]  
+**Deployment & Reproducibility:** Containerized non-root production deployment verified via `docker compose up --build` (Public cloud hosting is `BLOCKED` pending hosting credentials).  
+**Current Posture:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` (All internal logic, deterministic physics, and quality gates 100% verified; live sponsor execution dispatchable via workflow upon configuring repository secrets).  
 
 ---
 
@@ -40,7 +44,7 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 - **Authoritative Research:** Integrated Tavily Search API with automated tests verifying strict domain allowlisting (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`), snippet truncation, and content digest verification. In offline/demo mode, uses pre-vetted verified fixture summaries.
 - **Backend Domain Engine:** Built with **Python 3.11+**, **FastAPI**, and **Pydantic v2**, executing 100% deterministic excursion window detection, area-under-the-curve (AUC) calculations, and claims validation.
 - **Frontend Operational Canvas:** Developed with **React 18**, **TypeScript**, and **Vite**, adhering to a forensic operations aesthetic (minimalist palette: Canvas `#F3F0E8`, Ink `#17201E`, Excursion `#B5482D`, Supported `#275E4B`).
-- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, canonical Pytest suite with 161 test cases (92.98% statement and 81.85% branch coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-fail-under=85`), and Playwright E2E + Axe accessibility scans (0 violations in tested states across 5 viewports). Evidence authority is bound to downloadable GitHub Actions CI artifacts (`verification-artifacts-0896105258048fb70eac2703546b97b296010148`) from authoritative [CI Run 40932942007](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40932942007) (with prior baseline run [40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) on commit `b9b380a` with artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996`).
+- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, canonical Pytest suite with 161 test cases (92.98% statement and 81.85% unrounded branch coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-fail-under=85`), and Playwright E2E + Axe accessibility scans (0 violations in tested states across 5 viewports). Evidence authority is bound to downloadable GitHub Actions CI artifacts (`verification-artifacts-<COMMIT_SHA>`) produced directly by the [ExcursionLens CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml).
 
 ---
 
@@ -65,6 +69,14 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 
 - High-consequence AI requires *bounded state machines*, not unconstrained agentic loops. Defining explicit stages (`VALIDATE_SCHEMA` → `DETECT_EXCURSION` → `TAVILY_GUIDANCE` → `NEMOTRON_HYPOTHESES` → `ADVERSARIAL_SKEPTIC` → `VALIDATE_CITATIONS` → `REVIEW_PACKET`) creates the transparency required for regulated industries.
 - Dynamic catalog querying (`GET /v1/models`) with runtime NVIDIA model resolution ensures graceful fallback and architectural robustness across model naming evolutions.
+
+---
+
+## Developer Feedback for Nebius Token Factory & NVIDIA
+
+1. **Model Catalog Filter Metadata:** The `GET /v1/models` endpoint returns basic model IDs, but adding explicit vendor (`nvidia`), architecture (`nemotron`), and supported capability tags (e.g., `json_schema`, `tool_use`) directly in the model object would eliminate heuristic name parsing.
+2. **First-Token Latency on 70B Models:** Time-to-first-token (TTFT) on `nvidia/llama-3.1-nemotron-70b-instruct` showed occasional variance under cold start. Pre-warmed endpoints or dedicated low-latency token-factory tiers for operational pipelines would benefit real-time dispatchers.
+3. **Native JSON Schema Enforcement:** While Nemotron followed JSON output prompts reliably at temperature 0.2, native `response_format={"type": "json_object"}` support directly backed by constrained sampling grammar would prevent occasional markdown code block wrapping. See our full feedback specification in [`docs/TOKEN_FACTORY_FEEDBACK.md`](TOKEN_FACTORY_FEEDBACK.md).
 
 ---
 

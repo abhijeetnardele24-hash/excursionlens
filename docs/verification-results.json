@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-29T18:36:58Z",
+  "timestamp": "2026-10-29T19:15:45Z",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "git": {
-    "head": "f68e00791110fe944b3c197573ecf95a276f90f7",
+    "head": "b5959d2eb63df5904d214c9320f462d5f512e4ab",
     "branch": "main",
     "clean_tree": false
   },
@@ -12,36 +12,36 @@
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.12,
+      "elapsed_sec": 0.07,
       "output": "All checks passed!\n"
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.66,
+      "elapsed_sec": 0.4,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.39,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 513ms\u001b[39m\n"
+      "elapsed_sec": 2.36,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 538ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
       "coverage_percent": 90.71,
       "statement_coverage_percent": 93.43,
       "branch_coverage_percent": 82.43,
-      "elapsed_sec": 23.79
+      "elapsed_sec": 31.38
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.21
+      "elapsed_sec": 0.22
     },
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.4
+      "elapsed_sec": 0.35
     },
     "playwright": {
       "passed": true,
@@ -50,11 +50,11 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 35808.222
+      "duration_ms": 29618.066
     },
     "claims_check": {
       "passed": true,
-      "elapsed_sec": 0.08,
+      "elapsed_sec": 0.06,
       "output": "============================================================\n  EXCURSIONLENS DOCUMENTATION & CLAIMS AUDIT\n============================================================\n\u2705 Documentation & Claims Audit Passed! Zero overclaims or invalid identifiers found.\n"
     }
   },
@@ -68,8 +68,8 @@
   },
   "external_gates": {
     "live_providers": {
-      "status": "BLOCKED",
-      "reason": null,
+      "status": "BLOCKED/STALE_EVIDENCE",
+      "reason": "STALE_EVIDENCE",
       "nebius_token_factory": "MISSING_KEY",
       "served_nvidia_model": "nvidia/llama-3.1-nemotron-70b-instruct",
       "tavily_search": "MISSING_KEY",
@@ -77,7 +77,7 @@
     },
     "public_deployment": {
       "status": "BLOCKED",
-      "reason": "Hosting deployment credentials/access not provided in local environment.",
+      "reason": "Hosting deployment credentials/target not configured in environment.",
       "reproducible_deployment_command": "docker compose up --build -d"
     }
   },

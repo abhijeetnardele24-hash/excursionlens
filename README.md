@@ -12,7 +12,7 @@
 > [!NOTE]
 > **Submission & Verification Status:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
 > All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. Live provider verification and public cloud deployment remain blocked pending external keys and cloud hosting access.  
-> **Authoritative CI Verification:** Evaluated and verified in [GitHub Actions CI Run 40932942007](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40932942007) on commit `0896105` with downloadable artifact `verification-artifacts-0896105258048fb70eac2703546b97b296010148` (and prior baseline [CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) on commit `b9b380a` with artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996`). Authoritative Linux CI totals: **92.98% statement coverage** (1,471/1,582) and **81.85% branch coverage** (424/518, unrounded $\ge 80.0\%$, 90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17).
+> **Authoritative CI Verification:** Evaluated and verified in the [ExcursionLens GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) (see [All Workflow Runs](https://github.com/abhijeetnardele24-hash/excursionlens/actions)). Each authoritative CI run evaluates the exact Git commit and publishes a machine-readable downloadable artifact named `verification-artifacts-<COMMIT_SHA>`. Authoritative Linux CI totals: **92.98% statement coverage** (1,471/1,582 statements) and **81.85% unrounded branch coverage** (424/518 branches, $\ge 80.0\%$, 90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 across **161 passed test cases**).
 
 
 ---
@@ -174,24 +174,39 @@ python scripts/verify.py
 - **Ruff Python Linter:** 0 violations across backend and test files.
 - **Python Static Typing (Mypy):** 0 type errors with `--check-untyped-defs`.
 - **Frontend Build:** Strict TypeScript check and Vite production bundle.
-- **Pytest Suite:** 161 test cases passing with 92.98% statement coverage and 81.85% branch coverage (90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement).
+- **Pytest Suite:** 161 test cases passing with 92.98% statement coverage and 81.85% unrounded branch coverage (90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement).
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
 - **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in the tested states across all 5 viewports. (Automated scans verify targeted accessibility criteria and do not constitute complete WCAG certification).
 
-> **Evidence Authority:** The authoritative verification record for evaluated commit `0896105` is generated in [GitHub Actions CI Run 40932942007](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40932942007) with downloadable artifact `verification-artifacts-0896105258048fb70eac2703546b97b296010148` (with prior baseline commit `b9b380a` verified in [CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) with artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996`). Statement coverage: 92.98%, Branch coverage: 81.85% (exceeding the strict unrounded 80.0% gate under pytest 9.2.0).
+> **Evidence Authority:** The authoritative verification record for each evaluated commit is generated directly within the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) and uploaded as downloadable artifact `verification-artifacts-<COMMIT_SHA>`. Authoritative Linux CI totals: 161 Pytest cases passing, 92.98% statement coverage, and 81.85% unrounded branch coverage (exceeding the strict 80.0% unrounded gate under pytest 9.2.0).
 
 
 ---
 
-## Docker Deployment
+## Docker Container & Deployment Posture
 
-ExcursionLens is packaged as a single lightweight multi-stage Docker container:
+ExcursionLens is packaged as a single hardened, multi-stage Docker container running as a non-root application user:
 
 ```bash
 docker compose up --build
 ```
 Access the application at `http://localhost:8000`.
+
+- **Security Hardening:** The runtime container executes as non-root user `appuser` (UID 10001) with dropped capabilities.
+- **Deployment Status:** Public cloud hosting is recorded as `BLOCKED` pending hosting credentials; 100% reproducible local and containerized production execution is verified via Docker (`docker compose up --build`).
+
+---
+
+## 60-Second Quick Judge Tour
+
+For a step-by-step evaluation guide, see our comprehensive [Judge Tour Guide](docs/JUDGE_TOUR.md):
+
+1. **Header & Status:** Inspect `NMB-204` case metadata, temperature band (2.0°C–8.0°C), and truthful provider mode (`NOT_CONFIGURED` / `DEMO_FIXTURE`).
+2. **Telemetry & Rail:** Review the 40-minute breach peaking at 10.5°C and correlate with the 10:18 UTC Newburgh Hub door-open event.
+3. **Investigation Workflow:** Click **Investigate Excursion** to observe the 8-stage bounded state machine and verified regulatory guidance citations from CDC, FDA, and WHO.
+4. **Adversarial Skeptic:** Review the 3 competing hypotheses and the Skeptic critique proving alternator bus voltage refutes reefer failure.
+5. **Sensitivity & Quarantine:** In the Counterfactual Workbench, simulate a 5-minute door closure limit (reducing excursion duration from 40 min to 0 min) and inspect the printable Quarantine Review Packet.
 
 ---
 

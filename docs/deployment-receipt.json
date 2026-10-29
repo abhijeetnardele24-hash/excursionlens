@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "commit_sha": "b5959d2eb63df5904d214c9320f462d5f512e4ab",
+  "timestamp": "2026-10-29T19:09:12Z",
+  "status": "BLOCKED",
+  "reason": "Hosting deployment credentials/target not configured in environment.",
+  "reproducible_deployment_command": "docker compose up --build -d",
+  "container_security": {
+    "runtime_user": "appuser",
+    "uid": 10001,
+    "is_non_root": true
+  },
+  "failure_reasons": [
+    "DEPLOY_URL or public cloud hosting credentials not supplied."
+  ]
+}
