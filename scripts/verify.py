@@ -11,6 +11,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -40,6 +41,20 @@ def get_git_info():
         "clean_tree": len(status.strip()) == 0,
     }
 
+def evaluate_smoke_receipt(smoke_data: dict[str, Any], current_head: str) -> tuple[str, str | None]:
+    """
+    Evaluates live smoke receipt status against current commit HEAD.
+    Strict exact-SHA matching: any mismatch produces ('BLOCKED/STALE_EVIDENCE', 'STALE_EVIDENCE').
+    Zero compatibility waivers (HEAD~1 waiver removed).
+    """
+    raw_status = smoke_data.get("status") or smoke_data.get("overall_status", "BLOCKED")
+    receipt_sha = smoke_data.get("commit_sha") or smoke_data.get("git_commit")
+
+    if not current_head or not receipt_sha or receipt_sha != current_head:
+        return "BLOCKED/STALE_EVIDENCE", "STALE_EVIDENCE"
+
+    return raw_status, None
+
 def main():
     print("=" * 60)
     print("  EXCURSIONLENS MASTER VERIFICATION SUITE")
@@ -49,15 +64,23 @@ def main():
     github_server = os.environ.get("GITHUB_SERVER_URL")
     github_repo = os.environ.get("GITHUB_REPOSITORY")
     github_run_id = os.environ.get("GITHUB_RUN_ID")
+    is_ci = os.environ.get("GITHUB_ACTIONS") == "true" and bool(github_server and github_repo and github_run_id)
+
     execution_context = (
         f"{github_server}/{github_repo}/actions/runs/{github_run_id}"
-        if (github_server and github_repo and github_run_id)
-        else f"local ({os.environ.get('COMPUTERNAME', 'developer-machine')})"
+        if is_ci
+        else "LOCAL_DOCUMENTATION_SNAPSHOT"
+    )
+    evidence_authority = (
+        "AUTHORITATIVE_CI_ARTIFACT"
+        if is_ci
+        else "LOCAL_DOCUMENTATION_SNAPSHOT"
     )
 
     results = {
         "schema_version": "1.0",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "evidence_authority": evidence_authority,
         "execution_context": execution_context,
         "git": git_info,
         "tree_clean_before_verification": git_info["clean_tree"],
@@ -266,28 +289,20 @@ def main():
     # External Provider Smoke Status
     smoke_path = ROOT / "docs" / "live-smoke-receipt.json"
     smoke_status = "BLOCKED"
+    smoke_reason = None
     smoke_data = {}
     if smoke_path.exists():
         try:
             with open(smoke_path, "r", encoding="utf-8") as f:
                 smoke_data = json.load(f)
-                smoke_status = smoke_data.get("status") or smoke_data.get("overall_status", "UNKNOWN")
-                # Section 3: Reject stale evidence when receipt SHA differs from evaluated HEAD
-                receipt_sha = smoke_data.get("commit_sha") or smoke_data.get("git_commit")
-                if receipt_sha and git_info.get("head"):
-                    is_current = (receipt_sha == git_info["head"])
-                    if not is_current:
-                        rc_p, parent_sha, _, _ = run_cmd(["git", "rev-parse", "HEAD~1"])
-                        if rc_p == 0 and receipt_sha == parent_sha.strip():
-                            is_current = True
-                    if not is_current:
-                        smoke_status = "BLOCKED_STALE_RECEIPT"
+                smoke_status, smoke_reason = evaluate_smoke_receipt(smoke_data, git_info.get("head", ""))
         except Exception:
             pass
 
     results["external_gates"] = {
         "live_providers": {
             "status": smoke_status,
+            "reason": smoke_reason,
             "nebius_token_factory": smoke_data.get("nebius_smoke", {}).get("status", "NOT_CONFIGURED"),
             "served_nvidia_model": smoke_data.get("nebius_smoke", {}).get("tested_model", "nvidia/llama-3.1-nemotron-70b-instruct"),
             "tavily_search": smoke_data.get("tavily_smoke", {}).get("status", "NOT_CONFIGURED"),

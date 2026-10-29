@@ -174,12 +174,12 @@ python scripts/verify.py
 - **Ruff Python Linter:** 0 violations across backend and test files.
 - **Python Static Typing (Mypy):** 0 type errors with `--check-untyped-defs`.
 - **Frontend Build:** Strict TypeScript check and Vite production bundle.
-- **Pytest Suite:** 129 test cases passing with 92.82% statement coverage and 81.57% branch coverage (90.03% combined coverage under canonical `--cov-branch --cov-fail-under=85` enforcement).
+- **Pytest Suite:** 129 test cases passing with 92.82% statement coverage and 81.57% branch coverage (90.03% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement).
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
 - **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in the tested states across all 5 viewports.
 
-> **Evidence Authority:** The authoritative verification record for evaluated commit `4e6164c` is generated in [GitHub Actions CI Run 40831940858](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40831940858) with downloadable artifact `verification-artifacts-4e6164c111bd89ee3590400614e212d545ba8f85`. Statement coverage: 92.82%, Branch coverage: 81.57% (exceeding the strict unrounded 80.0% gate).
+> **Evidence Authority:** The authoritative verification record for evaluated commit `6f4fe62` is generated in [GitHub Actions CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359) with downloadable artifact `verification-artifacts-6f4fe62514053f059969582a4a6d2036a0e57ccb`. Statement coverage: 92.82%, Branch coverage: 81.57% (exceeding the strict unrounded 80.0% gate under pytest 9.2.0).
 
 
 ---

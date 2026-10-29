@@ -377,3 +377,74 @@ def test_runtime_status_recency_live_then_cancellation():
         assert m_resp.json()["provider_status"] == "DEMO_FIXTURE_FALLBACK"
         assert m_resp.json()["live_execution_verified"] is False
 
+
+def test_runtime_status_recency_same_second_live_then_fallback():
+    from apps.api.app.config import settings
+    from apps.api.app.domain.models import InvestigationRun
+    from apps.api.app.main import app, get_current_runtime_status, orchestrator
+
+    orchestrator.runs.clear()
+    with patch.object(settings, "nebius_key", "mock_key_nebius_12345"), \
+         patch.object(settings, "tavily_key", "mock_key_tavily_12345"):
+        # Run 1: live verified created at 10:00:00Z with high-sorting ID (e.g. RUN-ZZZ)
+        run1 = InvestigationRun(
+            id="RUN-ZZZ-LIVE-01",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:00:00Z",
+            provider_mode="LIVE_TOKEN_FACTORY",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run1.id] = run1
+
+        status, mode, verified = get_current_runtime_status()
+        assert status == "LIVE_VERIFIED"
+        assert verified is True
+
+        # Run 2: created within the SAME SECOND (10:00:00Z) with low-sorting ID (e.g. RUN-AAA)
+        run2 = InvestigationRun(
+            id="RUN-AAA-FALLBACK-02",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:00:00Z",
+            provider_mode="DEMO_FIXTURE_FALLBACK",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run2.id] = run2
+
+        # Verify get_current_runtime_status reports the newer fallback
+        status, mode, verified = get_current_runtime_status()
+        assert status == "DEMO_FIXTURE_FALLBACK"
+        assert mode == "DEMO_FIXTURE_FALLBACK"
+        assert verified is False
+
+        # Confirm /api/health and /api/meta both report the newer fallback
+        client = TestClient(app)
+        h_resp = client.get("/api/health")
+        assert h_resp.status_code == 200
+        h_data = h_resp.json()
+        assert h_data["provider_status"] == "DEMO_FIXTURE_FALLBACK"
+        assert h_data["provider_mode"] == "DEMO_FIXTURE_FALLBACK"
+        assert h_data["live_execution_verified"] is False
+
+        m_resp = client.get("/api/meta")
+        assert m_resp.status_code == 200
+        m_data = m_resp.json()
+        assert m_data["provider_status"] == "DEMO_FIXTURE_FALLBACK"
+        assert m_data["provider_mode"] == "DEMO_FIXTURE_FALLBACK"
+        assert m_data["live_execution_verified"] is False
+        assert m_data["provider"]["live_verified"] is False
+
+

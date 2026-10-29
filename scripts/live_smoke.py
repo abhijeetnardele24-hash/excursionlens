@@ -18,7 +18,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import urlparse
 
 import httpx
 
@@ -47,6 +47,47 @@ def redact_string(s: str | None) -> str:
 
 def sha256_digest(content: str) -> str:
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
+def is_valid_live_smoke_url(
+    raw_url: str,
+    allowed_domains: list[str] | set[str] = AUTHORITATIVE_DOMAINS
+) -> bool:
+    """
+    Validates URLs returned from search probes:
+    - Must be a valid string
+    - Scheme must strictly be 'https'
+    - Must NOT contain userinfo tricks (@ in netloc, username, or password)
+    - Port must be valid (or absent)
+    - Hostname must be extracted via urlparse(url).hostname (never netloc.split(':')[0])
+    - Hostname must match an allowlisted domain exactly or as a proper subdomain (.allowed_domain)
+    - Suffix attacks and lookalikes must be rejected
+    """
+    if not raw_url or not isinstance(raw_url, str):
+        return False
+    try:
+        parsed = urlparse(raw_url.strip())
+    except Exception:
+        return False
+
+    if parsed.scheme.lower() != "https":
+        return False
+
+    if parsed.username is not None or parsed.password is not None or "@" in (parsed.netloc or ""):
+        return False
+
+    try:
+        _ = parsed.port
+    except ValueError:
+        return False
+
+    hostname = parsed.hostname
+    if not hostname:
+        return False
+    hostname = hostname.lower().strip()
+
+    return any(hostname == ad or hostname.endswith("." + ad) for ad in allowed_domains)
+
 
 
 def verify_tavily(
@@ -113,20 +154,11 @@ def verify_tavily(
 
         for idx, r in enumerate(raw_results):
             raw_url = r.get("url", "")
-            try:
-                parsed = urlsplit(raw_url)
-            except Exception:
+            if not is_valid_live_smoke_url(raw_url, AUTHORITATIVE_DOMAINS):
                 continue
 
-            # Must be HTTPS
-            if parsed.scheme.lower() != "https":
-                continue
-
-            host = parsed.netloc.lower().split(":")[0]
-            # Must be allowlisted
-            if not any(host == ad or host.endswith("." + ad) for ad in AUTHORITATIVE_DOMAINS):
-                continue
-
+            parsed = urlparse(raw_url)
+            host = (parsed.hostname or "").lower()
             content = r.get("content", "").strip()
             content_dig = sha256_digest(content)
             source_digests.append(content_dig)
@@ -375,6 +407,7 @@ def run_live_smoke() -> int:
 
     receipt = {
         "schema_version": "1.0",
+        "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
         "commit_sha": _get_git_sha(),
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "status": overall_status,
@@ -393,6 +426,7 @@ def run_live_smoke() -> int:
     with open(prov_receipts_path, "w", encoding="utf-8") as f:
         json.dump({
             "schema_version": "1.0",
+            "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
             "commit_sha": receipt["commit_sha"],
             "timestamp": receipt["timestamp"],
             "nebius": {

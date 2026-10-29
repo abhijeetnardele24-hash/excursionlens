@@ -8,12 +8,14 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import httpx
+import pytest
 
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.live_smoke import verify_nebius, verify_tavily  # noqa: E402
+from scripts.live_smoke import is_valid_live_smoke_url, verify_nebius, verify_tavily  # noqa: E402
+from scripts.verify import evaluate_smoke_receipt  # noqa: E402
 
 
 def test_tavily_missing_key():
@@ -200,3 +202,71 @@ def test_nebius_valid_structured_output():
     assert receipt["selected_catalog_model"] == "nvidia/llama-3.1-nemotron-70b-instruct"
     assert receipt["response_digest"] is not None
     assert len(failures) == 0
+
+
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("https://www.cdc.gov/path", True),
+        ("https://cdc.gov:443/path", True),
+        ("https://cdc.gov:443@evil.example/path", False),
+        ("https://cdc.gov.evil.example/path", False),
+        ("https://evilcdc.gov/path", False),
+        ("https://cdc.gov:invalid_port/path", False),
+        ("http://www.cdc.gov/path", False),
+        ("", False),
+    ],
+)
+def test_live_smoke_url_validation_security(url: str, expected: bool):
+    assert is_valid_live_smoke_url(url) is expected
+
+
+def test_tavily_rejects_lookalikes_and_userinfo_tricks():
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "results": [
+            {"url": "https://cdc.gov:443@evil.example/path", "content": "Phishing attack spoofing domain in userinfo"},
+            {"url": "https://cdc.gov.evil.example/path", "content": "Lookalike subdomain attack"},
+            {"url": "https://evilcdc.gov/path", "content": "Suffix lookalike attack"},
+            {"url": "https://www.cdc.gov/path", "content": "Legitimate CDC guidance"},
+        ]
+    }
+    mock_client = MagicMock(spec=httpx.Client)
+    mock_client.post.return_value = mock_resp
+
+    receipt, failures = verify_tavily("mock_key_tvly_valid_length_here", client=mock_client)
+    assert receipt["status"] == "LIVE_SUCCESS"
+    assert receipt["results_count"] == 1
+    assert receipt["source_domains"] == ["www.cdc.gov"]
+    assert len(failures) == 0
+
+
+def test_parent_commit_live_receipt_cannot_verify_head():
+    head_sha = "6f4fe62514053f059969582a4a6d2036a0e57ccb"
+    parent_sha = "4e6164c111bd89ee3590400614e212d545ba8f85"
+
+    parent_receipt = {
+        "status": "LIVE_VERIFIED",
+        "commit_sha": parent_sha,
+        "timestamp": "2026-10-29T06:00:00Z",
+    }
+
+    status, reason = evaluate_smoke_receipt(parent_receipt, current_head=head_sha)
+    assert status == "BLOCKED/STALE_EVIDENCE"
+    assert reason == "STALE_EVIDENCE"
+
+
+def test_exact_commit_live_receipt_verifies_head():
+    head_sha = "6f4fe62514053f059969582a4a6d2036a0e57ccb"
+
+    matching_receipt = {
+        "status": "LIVE_VERIFIED",
+        "commit_sha": head_sha,
+        "timestamp": "2026-10-29T06:00:00Z",
+    }
+
+    status, reason = evaluate_smoke_receipt(matching_receipt, current_head=head_sha)
+    assert status == "LIVE_VERIFIED"
+    assert reason is None
+

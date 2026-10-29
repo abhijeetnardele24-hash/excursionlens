@@ -1,46 +1,47 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-29T06:55:07Z",
-  "execution_context": "https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40831940858",
+  "timestamp": "2026-10-29T07:24:27Z",
+  "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "git": {
-    "head": "4e6164c111bd89ee3590400614e212d545ba8f85",
+    "head": "6f4fe62514053f059969582a4a6d2036a0e57ccb",
     "branch": "main",
-    "clean_tree": true
+    "clean_tree": false
   },
-  "tree_clean_before_verification": true,
+  "tree_clean_before_verification": false,
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.03,
+      "elapsed_sec": 0.08,
       "output": "All checks passed!\n"
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.2,
+      "elapsed_sec": 0.47,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 3.36,
-      "output": "50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 1.01s\u001b[39m\n"
+      "elapsed_sec": 2.96,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 612ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 90.03,
-      "statement_coverage_percent": 92.82,
-      "branch_coverage_percent": 81.57,
-      "elapsed_sec": 10.41
+      "coverage_percent": 90.32,
+      "statement_coverage_percent": 93.09,
+      "branch_coverage_percent": 81.91,
+      "elapsed_sec": 33.48
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.24
+      "elapsed_sec": 0.28
     },
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.34
+      "elapsed_sec": 0.42
     },
     "playwright": {
       "passed": true,
@@ -49,7 +50,7 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 30510.404000000002
+      "duration_ms": 29547.490999999998
     }
   },
   "canonical_case_nmb_204": {
@@ -62,7 +63,8 @@
   },
   "external_gates": {
     "live_providers": {
-      "status": "BLOCKED",
+      "status": "BLOCKED/STALE_EVIDENCE",
+      "reason": "STALE_EVIDENCE",
       "nebius_token_factory": "MISSING_KEY",
       "served_nvidia_model": "nvidia/llama-3.1-nemotron-70b-instruct",
       "tavily_search": "MISSING_KEY",

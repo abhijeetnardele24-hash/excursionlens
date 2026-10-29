@@ -149,7 +149,15 @@ validator = DeterministicClaimsValidator()
 def get_current_runtime_status() -> tuple[ProviderStatus, str, bool]:
     latest_run = None
     if orchestrator.runs:
-        latest_run = max(orchestrator.runs.values(), key=lambda r: (r.created_at or "", r.id))
+        run_indices = {rid: idx for idx, rid in enumerate(orchestrator.runs.keys())}
+        latest_run = max(
+            orchestrator.runs.values(),
+            key=lambda r: (
+                r.created_at or "",
+                getattr(r, "created_seq", 0),
+                run_indices.get(r.id, 0),
+            ),
+        )
 
     latest_verified_live = False
     latest_failed_live = False

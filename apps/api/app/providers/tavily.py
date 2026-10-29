@@ -26,6 +26,32 @@ AUTHORITATIVE_DOMAINS = [
     "gs1.org"
 ]
 
+
+def is_valid_guidance_url(raw_url: str, allowed_domains: list[str] = AUTHORITATIVE_DOMAINS) -> bool:
+    """Validates authoritative guidance URLs strictly requiring HTTPS, valid hostname, and no userinfo."""
+    if not raw_url or not isinstance(raw_url, str):
+        return False
+    try:
+        parsed = urlparse(raw_url.strip())
+    except Exception:
+        return False
+
+    if parsed.scheme.lower() != "https":
+        return False
+    if parsed.username is not None or parsed.password is not None or "@" in (parsed.netloc or ""):
+        return False
+    try:
+        _ = parsed.port
+    except ValueError:
+        return False
+
+    hostname = parsed.hostname
+    if not hostname:
+        return False
+    hostname = hostname.lower().strip()
+    return any(hostname == ad or hostname.endswith("." + ad) for ad in allowed_domains)
+
+
 # Canonical pre-vetted public reference guidance for offline benchmark evaluation
 CACHED_AUTHORITATIVE_GUIDANCE = [
     {
@@ -165,15 +191,11 @@ class TavilySearchProvider:
                         source_records = []
                         for idx, r in enumerate(raw_results):
                             url = r.get("url", "")
-                            parsed = urlparse(url)
-                            # Enforce HTTPS scheme
-                            if parsed.scheme != "https":
+                            if not is_valid_guidance_url(url, AUTHORITATIVE_DOMAINS):
                                 continue
 
-                            domain = parsed.netloc.lower()
-                            # Enforce strict domain allowlist
-                            if not any(domain == ad or domain.endswith("." + ad) for ad in AUTHORITATIVE_DOMAINS):
-                                continue
+                            parsed = urlparse(url)
+                            domain = (parsed.hostname or "").lower()
 
                             # Treat content as untrusted; truncate to 400 characters
                             content = r.get("content", "").strip()
@@ -272,19 +294,11 @@ class TavilySearchProvider:
                             source_records = []
                             for idx, r in enumerate(raw_results):
                                 url = r.get("url", "")
-                                try:
-                                    parsed = urlparse(url)
-                                except Exception:
+                                if not is_valid_guidance_url(url, AUTHORITATIVE_DOMAINS):
                                     continue
 
-                                # Enforce HTTPS scheme
-                                if parsed.scheme.lower() != "https":
-                                    continue
-
-                                domain = parsed.netloc.lower()
-                                # Enforce strict domain allowlist
-                                if not any(domain == ad or domain.endswith("." + ad) for ad in AUTHORITATIVE_DOMAINS):
-                                    continue
+                                parsed = urlparse(url)
+                                domain = (parsed.hostname or "").lower()
 
                                 content = r.get("content", "").strip()
                                 clean_content = content[:400] if len(content) > 400 else content

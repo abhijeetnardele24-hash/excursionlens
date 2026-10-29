@@ -10,6 +10,7 @@ Strict, deterministic Pydantic v2 schemas for:
 - Counterfactual Interventions
 """
 
+import itertools
 import math
 from typing import Any, Literal
 
@@ -303,11 +304,15 @@ class ToolEvent(BaseModel):
     summary: str
 
 
+_run_sequence_counter = itertools.count(1)
+
+
 class InvestigationRun(BaseModel):
     id: str
     case_id: str
     state: AgentState
     created_at: str
+    created_seq: int = Field(default_factory=lambda: next(_run_sequence_counter), description="Monotonic creation sequence index")
     completed_at: str | None = None
     provider_mode: ProviderMode
     requested_model: str
