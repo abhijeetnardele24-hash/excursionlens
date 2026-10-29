@@ -6,13 +6,13 @@
 [![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20COMPLETE%20%2F%20ACTION%20REQUIRED-275E4B?style=for-the-badge&logo=checkmarx)](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)
 [![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20in%20Tested%20States-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
 [![Benchmark](https://img.shields.io/badge/Frozen%20Benchmark-12%2F12%20Scenarios%20(100%25)-275E4B?style=for-the-badge&logo=speedtest)](benchmark/run_benchmark.py)
-[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-92.64%25%20Stmt%20%7C%2081.32%25%20Branch-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
+[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-92.98%25%20Stmt%20%7C%2081.85%25%20Branch-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
 [![License](https://img.shields.io/badge/License-Apache--2.0-365E7D?style=for-the-badge)](LICENSE)
 
 > [!NOTE]
 > **Submission & Verification Status:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
 > All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. Live provider verification and public cloud deployment remain blocked pending external keys and cloud hosting access.  
-> **Authoritative CI Verification:** Evaluated and verified in [GitHub Actions CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) on commit `b9b380a` with downloadable artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996` (and baseline [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359) on commit `6f4fe62` with artifact `verification-artifacts-6f4fe62514053f059969582a4a6d2036a0e57ccb`). Authoritative Linux CI totals: **92.64% statement coverage** (1,459/1,575) and **81.32% branch coverage** (431/530, unrounded $\ge 80.0\%$, 89.84% combined coverage under canonical pytest 9.2.0 on Python 3.11.17).
+> **Authoritative CI Verification:** Evaluated and verified in [GitHub Actions CI Run 40932942007](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40932942007) on commit `0896105` with downloadable artifact `verification-artifacts-0896105258048fb70eac2703546b97b296010148` (and prior baseline [CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) on commit `b9b380a` with artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996`). Authoritative Linux CI totals: **92.98% statement coverage** (1,471/1,582) and **81.85% branch coverage** (424/518, unrounded $\ge 80.0\%$, 90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17).
 
 
 ---
@@ -174,12 +174,12 @@ python scripts/verify.py
 - **Ruff Python Linter:** 0 violations across backend and test files.
 - **Python Static Typing (Mypy):** 0 type errors with `--check-untyped-defs`.
 - **Frontend Build:** Strict TypeScript check and Vite production bundle.
-- **Pytest Suite:** 141 test cases passing with 92.64% statement coverage and 81.32% branch coverage (89.84% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement).
+- **Pytest Suite:** 161 test cases passing with 92.98% statement coverage and 81.85% branch coverage (90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement).
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
 - **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in the tested states across all 5 viewports. (Automated scans verify targeted accessibility criteria and do not constitute complete WCAG certification).
 
-> **Evidence Authority:** The authoritative verification record for evaluated commit `b9b380a` is generated in [GitHub Actions CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) with downloadable artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996` (with baseline commit `6f4fe62` verified in [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359) with artifact `verification-artifacts-6f4fe62514053f059969582a4a6d2036a0e57ccb`). Statement coverage: 92.64%, Branch coverage: 81.32% (exceeding the strict unrounded 80.0% gate under pytest 9.2.0).
+> **Evidence Authority:** The authoritative verification record for evaluated commit `0896105` is generated in [GitHub Actions CI Run 40932942007](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40932942007) with downloadable artifact `verification-artifacts-0896105258048fb70eac2703546b97b296010148` (with prior baseline commit `b9b380a` verified in [CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) with artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996`). Statement coverage: 92.98%, Branch coverage: 81.85% (exceeding the strict unrounded 80.0% gate under pytest 9.2.0).
 
 
 ---
