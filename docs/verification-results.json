@@ -1,35 +1,35 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-29T06:52:27Z",
-  "execution_context": "local (AB)",
+  "timestamp": "2026-10-29T06:55:07Z",
+  "execution_context": "https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40831940858",
   "git": {
-    "head": "4bf59c8d403a52a243625694e0837ce34191f740",
+    "head": "4e6164c111bd89ee3590400614e212d545ba8f85",
     "branch": "main",
-    "clean_tree": false
+    "clean_tree": true
   },
-  "tree_clean_before_verification": false,
+  "tree_clean_before_verification": true,
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.08,
+      "elapsed_sec": 0.03,
       "output": "All checks passed!\n"
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.5,
+      "elapsed_sec": 0.2,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.67,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 610ms\u001b[39m\n"
+      "elapsed_sec": 3.36,
+      "output": "50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 1.01s\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 90.52,
-      "statement_coverage_percent": 93.27,
-      "branch_coverage_percent": 82.16,
-      "elapsed_sec": 19.88
+      "coverage_percent": 90.03,
+      "statement_coverage_percent": 92.82,
+      "branch_coverage_percent": 81.57,
+      "elapsed_sec": 10.41
     },
     "benchmark": {
       "passed": true,
