@@ -40,7 +40,7 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 - **Authoritative Research:** Integrated Tavily Search API with strict domain allowlisting (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`), snippet truncation, and content digest verification.
 - **Backend Domain Engine:** Built with **Python 3.11+**, **FastAPI**, and **Pydantic v2**, executing 100% deterministic excursion window detection, area-under-the-curve (AUC) calculations, and claims validation.
 - **Frontend Operational Canvas:** Developed with **React 18**, **TypeScript**, and **Vite**, adhering to a forensic operations aesthetic (minimalist palette: Canvas `#F3F0E8`, Ink `#17201E`, Excursion `#B5482D`, Supported `#275E4B`).
-- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, Pytest suite with 79.15% statement coverage across 80 test cases, and Playwright E2E + Axe accessibility scans (0 violations across 5 viewports).
+- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, canonical Pytest suite with 113 test cases (91.37% statement and 80.16% branch coverage under `--cov-fail-under=85`), and Playwright E2E + Axe accessibility scans (0 violations in tested states across 5 viewports). Evidence authority is bound to downloadable GitHub Actions CI artifacts (`verification-artifacts-<SHA>`).
 
 ---
 
@@ -55,8 +55,9 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 ## Accomplishments We're Proud Of
 
 - **100% Deterministic Reproducibility:** Identical sensor logs yield mathematically identical breach windows and AUC metrics across every run.
-- **Zero Axe Accessibility Violations:** Fully accessible UI tested and verified with `@axe-core/playwright` across 5 distinct screen viewports (320px to 1920px).
-- **Graceful Fixture Degradation:** When run without API keys, ExcursionLens functions in an honest, transparent `DEMO_FIXTURE` mode with pre-validated synthetic receipts without ever fabricating provider success.
+- **Automated Axe Accessibility Verification:** Fully accessible UI tested and verified with `@axe-core/playwright`, detecting zero violations in tested states across 5 distinct screen viewports (320px to 1920px).
+- **Graceful Fixture Degradation & Truthful Fail-Closed State:** When run without API keys, ExcursionLens functions in an honest, transparent `DEMO_FIXTURE` mode with pre-validated synthetic receipts without ever fabricating provider success. Current posture is `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`.
+
 
 ---
 

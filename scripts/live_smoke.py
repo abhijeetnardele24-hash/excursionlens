@@ -392,8 +392,11 @@ def run_live_smoke() -> int:
     prov_receipts_path = docs_dir / "provider-receipts.json"
     with open(prov_receipts_path, "w", encoding="utf-8") as f:
         json.dump({
+            "schema_version": "1.0",
+            "commit_sha": receipt["commit_sha"],
             "timestamp": receipt["timestamp"],
             "nebius": {
+
                 "base_url": nebius_base_url,
                 "key_present": receipt["nebius_smoke"]["key_present"],
                 "key_preview": receipt["nebius_smoke"]["key_preview"],

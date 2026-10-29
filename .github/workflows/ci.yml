@@ -69,9 +69,10 @@ jobs:
         run: |
           python benchmark/run_benchmark.py
 
-      - name: Backend Unit & Integration Tests with Declared Coverage Threshold (>= 70%)
+      - name: Backend Unit & Integration Tests with Declared Coverage Threshold (>= 85% statement, >= 80% branch)
         run: |
-          python -m pytest --cov=apps/api/app --cov-report=term-missing --cov-fail-under=70 apps/api/tests
+          python -m pytest apps/api/tests --cov=apps/api/app --cov-branch --cov-report=term-missing --cov-report=json:test-results/coverage.json --cov-fail-under=85
+
 
       - name: Claims & Citation Security Tests
         run: |

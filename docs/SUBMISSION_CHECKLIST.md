@@ -4,7 +4,13 @@
 **Hackathon:** Nebius x NVIDIA Hackathon (Devpost)  
 **Tracks:** *Best Apps and Agents* | *Best Use of Tavily*  
 **Repository:** `https://github.com/abhijeetnardele24-hash/excursionlens`  
+**Current Posture:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
 *Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
+
+> [!NOTE]
+> **Evidence Authority Policy:**  
+> Committed JSON documents (such as `docs/verification-results.json` or `test-results/coverage.json`) are local snapshots for documentation convenience.  
+> The **authoritative verification record** for any evaluated commit SHA is generated in GitHub Actions CI as downloadable artifacts (`verification-artifacts-<SHA>`).
 
 ---
 
@@ -22,21 +28,23 @@
 - [x] **Gate 1 (Python Lint):** Ruff linter clean across `apps/api`, `scripts`, and `benchmark` (0 violations).
 - [x] **Gate 2 (Python Typing):** Mypy clean with `--check-untyped-defs` (0 type errors).
 - [x] **Gate 3 (Frontend Build):** TypeScript type-check and Vite production build clean (`apps/web/dist`).
-- [x] **Gate 4 (Backend Unit & Coverage):** Pytest suite passing with 79.15% statement coverage across 80 test cases (`apps/api/tests`).
+- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 113 test cases, 91.37% statement coverage, and 80.16% branch coverage (88.63% combined coverage under canonical `--cov-branch --cov-fail-under=85` enforcement).
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
-- [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px) with 0 Axe accessibility violations.
-- [x] Machine verification receipt generated at `docs/verification-results.json` (`INTERNAL_PASSED_EXTERNAL_BLOCKED`).
+- [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports.
+- [x] Machine verification receipt generated at `docs/verification-results.json` (`INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`).
 
 ---
 
-## 3. Product Features & Provider Status
+## 3. Product Features & Truthful Provider Status
 - [x] Canonical NMB-204 case fixture loaded and displayed.
 - [x] 100% deterministic excursion detector (40.0-min window, peak 10.5°C, AUC 50.5 degree-minutes).
 - [x] Multimodal custody and operational event rail aligned along UTC axis.
+- [x] Runtime mode cleanly disentangled: `application_environment` ("local" / "docker" / "production") vs `provider_status` (`NOT_CONFIGURED`, `CONFIGURED_PENDING_VERIFICATION`, `LIVE_VERIFIED`, `PARTIAL_FAILURE`, `DEMO_FIXTURE`, `DEMO_FIXTURE_FALLBACK`).
+- [x] Never returns `"mode": "live"` when external keys are absent.
 - [x] Deterministic synthetic fixture replay mode verified for Nebius & Tavily.
-- [ ] Live Nebius Token Factory inference verification (*BLOCKED pending credentials*).
-- [ ] Live Tavily Search integration verification (*BLOCKED pending credentials*).
+- [ ] Live Nebius Token Factory inference verification (*BLOCKED pending external credentials*).
+- [ ] Live Tavily Search integration verification (*BLOCKED pending external credentials*).
 - [x] Adversarial skeptic critique pass cross-referencing vehicle alternator voltage.
 - [x] Counterfactual preventive control simulation workbench with typed parameters.
 - [x] Printable Quality Review Packet with cryptographic SHA-256 evidence digests.
@@ -61,14 +69,24 @@
 - [x] `docs/EVALUATION.md`
 - [x] `docs/SAFETY.md`
 - [x] `docs/DATA_SOURCES.md`
-- [x] `docs/DEMO_SCRIPT.md` (video narration script timed under 2:45)
+- [x] `docs/DEMO_SCRIPT.md` (contains two distinct variants: `FIXTURE_MODE_DRAFT` and `LIVE_VERIFIED_FINAL`)
 - [x] `docs/DEVPOST_SUBMISSION.md`
 - [x] `docs/TOKEN_FACTORY_FEEDBACK.md`
 - [x] `Dockerfile` and `docker-compose.yml`
 
 ---
 
-## 6. User Responsibility Boundaries (NOT Automated)
-- [ ] User records and edits final demo video following `docs/DEMO_SCRIPT.md` and uploads to YouTube.
-- [ ] User pastes submission copy from `docs/DEVPOST_SUBMISSION.md` into the Devpost submission portal.
-- [ ] User enters video URL, thumbnail, and submits before the hackathon deadline.
+## 6. Ten Remaining External Actions (Required for Full External Completion)
+
+The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until these ten non-automated external actions are performed by the project owner:
+
+1. **Provide Nebius Credential:** Obtain and set an active `NEBIUS_TOKEN_FACTORY_KEY` in environment.
+2. **Provide Tavily Credential:** Obtain and set an active `TAVILY_API_KEY` in environment.
+3. **Execute Live Smoke Verification:** Run `python scripts/live_smoke.py` to obtain live API receipts (`LIVE_VERIFIED`) with real HTTP latency and token counts.
+4. **Provision Public Cloud Deployment:** Deploy the application container via Docker/Docker Compose to a public cloud provider (e.g. Render, Fly.io, AWS ECS, or GCP Cloud Run).
+5. **Configure Domain & TLS:** Expose public domain with HTTPS and configure appropriate CORS/allowed hosts.
+6. **Verify Public Endpoints:** Confirm `/api/health` and `/api/meta` respond with expected `application_environment`, `provider_status`, and `live_execution_verified`.
+7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `LIVE_VERIFIED_FINAL` if keys are configured, or `FIXTURE_MODE_DRAFT` if uncredentialed).
+8. **Upload Demo Video:** Host video on YouTube or Vimeo as Public or Unlisted (duration strictly under 3:00).
+9. **Populate Devpost Submission Form:** Copy submission title, tagline, tracks, and markdown from `docs/DEVPOST_SUBMISSION.md`, along with the public GitHub repo URL and `docs/assets/excursionlens-devpost-thumbnail.png`.
+10. **Submit on Devpost:** Submit final entry on the Devpost hackathon portal before the hackathon deadline.

@@ -77,7 +77,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 ? 'badge-neutral'
                 : providerMode === 'DEMO_FIXTURE_FALLBACK'
                 ? 'badge-unknown'
-                : providerMode === 'DEMO_FIXTURE'
+                : providerMode === 'DEMO_FIXTURE' || (providerMode as string) === 'NOT_CONFIGURED'
                 ? 'badge-neutral'
                 : 'badge-excursion'
             }`}
@@ -89,6 +89,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               ? '● LIVE VERIFICATION PENDING'
               : providerMode === 'DEMO_FIXTURE_FALLBACK'
               ? '● DEMO FIXTURE FALLBACK'
+              : (providerMode as string) === 'NOT_CONFIGURED'
+              ? '● NOT CONFIGURED (FIXTURE)'
               : providerMode === 'DEMO_FIXTURE'
               ? '● DEMO FIXTURE'
               : '● PROVIDER FAILED'}

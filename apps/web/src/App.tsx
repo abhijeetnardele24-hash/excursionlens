@@ -173,7 +173,7 @@ export const App: React.FC = () => {
     );
   }
 
-  const providerMode = run?.provider_mode ?? (meta.provider?.nebius_token_factory_configured ? 'CONFIGURED_PENDING_VERIFICATION' : 'DEMO_FIXTURE');
+  const providerMode = run?.provider_mode ?? (meta.provider_status ?? (meta.provider?.nebius_token_factory_configured ? 'CONFIGURED_PENDING_VERIFICATION' : 'DEMO_FIXTURE'));
   const selectedModel = meta.provider?.selected_deep_model ?? 'nvidia/llama-3.1-nemotron-70b-instruct';
 
   return (

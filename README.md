@@ -3,11 +3,17 @@
 **Evidence-first operational agent for biopharmaceutical cold-chain temperature excursion forensics.**  
 *Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
 
-[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20PASSED%20/%20EXTERNAL%20BLOCKED-275E4B?style=for-the-badge&logo=checkmarx)](docs/verification-results.json)
-[![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20(5%20Viewports)-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
+[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20COMPLETE%20%2F%20ACTION%20REQUIRED-275E4B?style=for-the-badge&logo=checkmarx)](docs/verification-results.json)
+[![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20in%20Tested%20States-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
 [![Benchmark](https://img.shields.io/badge/Frozen%20Benchmark-12%2F12%20Scenarios%20(100%25)-275E4B?style=for-the-badge&logo=speedtest)](benchmark/run_benchmark.py)
-[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-79.15%25-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
+[![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-91.37%25%20Stmt%20%7C%2080.16%25%20Branch-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
 [![License](https://img.shields.io/badge/License-Apache--2.0-365E7D?style=for-the-badge)](LICENSE)
+
+> [!NOTE]
+> **Submission & Verification Status:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
+> All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. Live provider verification and public cloud deployment remain blocked pending external keys and cloud hosting access.  
+> **Evidence Authority:** Committed JSON files are local documentation snapshots. The authoritative verification record for any evaluated commit SHA is generated in GitHub Actions CI as downloadable artifacts (`verification-artifacts-<SHA>`).
+
 
 ---
 
@@ -168,10 +174,13 @@ python scripts/verify.py
 - **Ruff Python Linter:** 0 violations across backend and test files.
 - **Python Static Typing (Mypy):** 0 type errors with `--check-untyped-defs`.
 - **Frontend Build:** Strict TypeScript check and Vite production bundle.
-- **Pytest Suite:** 79.15% statement coverage across 80 test cases with zero warnings.
+- **Pytest Suite:** 113 test cases passing with 91.37% statement coverage and 80.16% branch coverage (88.63% combined coverage under canonical `--cov-branch --cov-fail-under=85` enforcement).
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
-- **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px) with **0 Axe accessibility violations**.
+- **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in the tested states across all 5 viewports.
+
+> **Evidence Authority:** Committed JSON files are local snapshots. The authoritative verification record for any evaluated commit SHA is generated in GitHub Actions CI as downloadable artifacts (`verification-artifacts-<SHA>`).
+
 
 ---
 

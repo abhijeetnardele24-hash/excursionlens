@@ -21,6 +21,14 @@ else:
 class Settings(BaseSettings):
     app_name: str = "ExcursionLens API"
     app_version: str = "1.0.0"
+    application_environment: str = Field(
+        default_factory=lambda: str(
+            os.getenv("APPLICATION_ENVIRONMENT")
+            or os.getenv("APP_ENV")
+            or os.getenv("ENVIRONMENT")
+            or "production"
+        )
+    )
     app_mode: str = Field(default_factory=lambda: str(os.getenv("APP_MODE") or "live"))
 
     host: str = Field(default_factory=lambda: str(os.getenv("HOST") or "127.0.0.1"))

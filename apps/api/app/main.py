@@ -33,6 +33,7 @@ from .domain.models import (
     ShipmentCase,
 )
 from .domain.validator import DeterministicClaimsValidator
+from .providers.status import ProviderStatus, evaluate_runtime_status, is_valid_credential
 from .reports.generator import generate_printable_html_report
 
 # In-memory case repository
@@ -139,28 +140,56 @@ validator = DeterministicClaimsValidator()
 # Health and Metadata Endpoints
 # ==============================================================================
 
+def get_current_runtime_status() -> tuple[ProviderStatus, str, bool]:
+    verified_live = False
+    failed_live = False
+    for r in orchestrator.runs.values():
+        if r.provider_mode == "LIVE_TOKEN_FACTORY":
+            verified_live = True
+        elif r.provider_mode in ("DEMO_FIXTURE_FALLBACK", "FAILED"):
+            failed_live = True
+
+    return evaluate_runtime_status(
+        nebius_key=settings.nebius_key,
+        tavily_key=settings.tavily_key,
+        app_mode=settings.app_mode,
+        verified_live_run=verified_live,
+        failed_live_attempt=failed_live,
+    )
+
+
 @app.get("/api/health")
 def health():
+    p_status, p_mode, live_verified = get_current_runtime_status()
     return {
         "status": "ok",
         "app": settings.app_name,
         "version": settings.app_version,
-        "mode": settings.app_mode,
+        "application_environment": settings.application_environment,
+        "provider_status": p_status,
+        "live_execution_verified": live_verified,
+        "provider_mode": p_mode,
     }
 
 
 @app.get("/api/meta")
 def meta():
+    p_status, p_mode, live_verified = get_current_runtime_status()
     return {
         "app": settings.app_name,
         "version": settings.app_version,
         "commit": get_git_commit_sha(),
-        "mode": settings.app_mode,
+        "application_environment": settings.application_environment,
+        "provider_status": p_status,
+        "live_execution_verified": live_verified,
+        "provider_mode": p_mode,
         "provider": {
-            "nebius_token_factory_configured": bool(settings.nebius_key and not settings.nebius_key.startswith("your_")),
-            "tavily_search_configured": bool(settings.tavily_key and not settings.tavily_key.startswith("your_")),
+            "nebius_token_factory_configured": is_valid_credential(settings.nebius_key),
+            "tavily_search_configured": is_valid_credential(settings.tavily_key),
             "selected_fast_model": settings.nvidia_fast_model_id,
             "selected_deep_model": settings.nvidia_deep_model_id,
+            "status": p_status,
+            "live_verified": live_verified,
         },
         "safety_disclaimer": (
             "Investigation-support output generated from synthetic or user-supplied evidence. "

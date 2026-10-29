@@ -36,6 +36,7 @@ EXPOSE 8000
 ENV PYTHONPATH=.
 ENV HOST=0.0.0.0
 ENV PORT=8000
+ENV APPLICATION_ENVIRONMENT=docker
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

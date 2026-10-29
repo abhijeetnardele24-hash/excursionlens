@@ -111,11 +111,12 @@ def valid_mock_sources() -> list[SourceRecord]:
 
 
 @pytest.mark.asyncio
-async def test_invalid_nebius_key_never_live(minimal_case):
+async def test_invalid_nebius_key_never_live(minimal_case, valid_mock_sources):
     """Scenario 1: When Nebius key is invalid or missing, run must never be LIVE_TOKEN_FACTORY."""
     orch = InvestigationOrchestrator()
     orch.nebius.has_key = False
     orch.tavily.has_key = True
+    orch.tavily.search_guidance_async = AsyncMock(return_value=(valid_mock_sources, {"is_live": True, "status": "LIVE_SUCCESS"}))
 
     rid = orch.start_investigation(minimal_case)
     run = await orch.wait_for_completion(rid)
@@ -126,11 +127,24 @@ async def test_invalid_nebius_key_never_live(minimal_case):
 
 
 @pytest.mark.asyncio
-async def test_missing_tavily_key_never_live(minimal_case):
+async def test_missing_tavily_key_never_live(minimal_case, valid_mock_hypotheses, valid_mock_critiques):
     """Scenario 2: When Tavily key is missing, run must never be LIVE_TOKEN_FACTORY."""
     orch = InvestigationOrchestrator()
     orch.nebius.has_key = True
     orch.tavily.has_key = False
+
+    model_name = "nvidia/llama-3.1-nemotron-70b-instruct"
+    orch.nebius.discover_models_async = AsyncMock(return_value={
+        "status": "LIVE_SUCCESS",
+        "nvidia_models": [model_name],
+        "selected_deep_model": model_name,
+    })
+    orch.nebius.generate_hypotheses_async = AsyncMock(return_value=(valid_mock_hypotheses, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "dig123"
+    }))
+    orch.nebius.run_skeptic_pass_async = AsyncMock(return_value=(valid_mock_critiques, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "dig456"
+    }))
 
     rid = orch.start_investigation(minimal_case)
     run = await orch.wait_for_completion(rid)
@@ -280,11 +294,26 @@ async def test_skeptic_only_failure_prevents_live_mode(minimal_case, valid_mock_
 
 
 @pytest.mark.asyncio
-async def test_partial_provider_success_represented_truthfully(minimal_case):
+async def test_partial_provider_success_represented_truthfully(
+    minimal_case, valid_mock_hypotheses, valid_mock_critiques
+):
     """Scenario 8: Partial provider success is labeled DEMO_FIXTURE_FALLBACK, never silent promotion."""
     orch = InvestigationOrchestrator()
     orch.nebius.has_key = True
     orch.tavily.has_key = False  # Tavily missing
+
+    model_name = "nvidia/llama-3.1-nemotron-70b-instruct"
+    orch.nebius.discover_models_async = AsyncMock(return_value={
+        "status": "LIVE_SUCCESS",
+        "nvidia_models": [model_name],
+        "selected_deep_model": model_name,
+    })
+    orch.nebius.generate_hypotheses_async = AsyncMock(return_value=(valid_mock_hypotheses, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "dig123"
+    }))
+    orch.nebius.run_skeptic_pass_async = AsyncMock(return_value=(valid_mock_critiques, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "dig456"
+    }))
 
     rid = orch.start_investigation(minimal_case)
     run = await orch.wait_for_completion(rid)
