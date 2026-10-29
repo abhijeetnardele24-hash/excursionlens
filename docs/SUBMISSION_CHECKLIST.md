@@ -10,7 +10,7 @@
 > [!NOTE]
 > **Evidence Authority Policy:**  
 > Committed JSON documents (such as `docs/verification-results.json` or `test-results/coverage.json`) are local snapshots for documentation convenience.  
-> The **authoritative verification record** for evaluated commit `6f4fe62` is generated in [GitHub Actions CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359) as downloadable artifact `verification-artifacts-6f4fe62514053f059969582a4a6d2036a0e57ccb` (statement coverage: 92.82%, branch coverage: 81.57% under pytest 9.2.0 on Python 3.11.17).
+> The **authoritative verification record** for evaluated commit `b9b380a` is generated in [GitHub Actions CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) as downloadable artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996` (statement coverage: 92.64%, branch coverage: 81.32% under pytest 9.2.0 on Python 3.11.17; baseline commit `6f4fe62` evaluated in [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359) with artifact `verification-artifacts-6f4fe62514053f059969582a4a6d2036a0e57ccb`).
 
 ---
 
@@ -28,7 +28,7 @@
 - [x] **Gate 1 (Python Lint):** Ruff linter clean across `apps/api`, `scripts`, and `benchmark` (0 violations).
 - [x] **Gate 2 (Python Typing):** Mypy clean with `--check-untyped-defs` (0 type errors).
 - [x] **Gate 3 (Frontend Build):** TypeScript type-check and Vite production build clean (`apps/web/dist`).
-- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 129 test cases, 92.82% statement coverage, and 81.57% branch coverage (90.03% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated on Linux [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359)).
+- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 141 test cases, 92.64% statement coverage, and 81.32% branch coverage (89.84% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated on Linux [CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) and baseline [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359)).
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
 - [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports.
