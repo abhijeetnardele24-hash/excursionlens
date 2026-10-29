@@ -1,7 +1,7 @@
 # ExcursionLens: 60-Second Guided Tour for Hackathon Judges
 
 **Project:** ExcursionLens (Cold-Chain Temperature Excursion Forensics Agent)  
-**Hackathon Tracks:** Nebius x NVIDIA Hackathon — *Best Apps and Agents* (Primary) | *Best Use of Tavily* (Bonus)  
+**Hackathon Track:** Nebius x NVIDIA Hackathon — *Best Apps and Agents* (Primary track; *Best Use of Tavily* bonus track omitted pending live credential receipt)  
 **Quick Start:**
 ```bash
 docker compose up --build

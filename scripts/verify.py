@@ -128,7 +128,7 @@ def main():
     cov_path.parent.mkdir(parents=True, exist_ok=True)
     env = {
         "PYTHONPATH": ".",
-        "GITHUB_SHA": os.environ.get("GITHUB_SHA") or git_info.get("head") or "1837e00facd0f4d27906255472d9be2a339885b4",
+        "GITHUB_SHA": os.environ.get("GITHUB_SHA") or git_info.get("head") or "0000000000000000000000000000000000000000",
     }
     rc, stdout, stderr, elapsed = run_cmd([
         sys.executable, "-m", "pytest", "apps/api/tests",
