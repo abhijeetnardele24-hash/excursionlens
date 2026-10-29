@@ -170,3 +170,210 @@ def test_api_health_with_simulated_live_run():
         assert data["provider_status"] == "LIVE_VERIFIED"
         assert data["provider_mode"] == "LIVE_TOKEN_FACTORY"
         assert data["live_execution_verified"] is True
+
+
+def test_runtime_status_recency_live_then_fallback():
+    from apps.api.app.config import settings
+    from apps.api.app.domain.models import InvestigationRun
+    from apps.api.app.main import get_current_runtime_status, orchestrator
+
+    orchestrator.runs.clear()
+    with patch.object(settings, "nebius_key", "mock_key_nebius_12345"), \
+         patch.object(settings, "tavily_key", "mock_key_tavily_12345"):
+        # Run 1: live verified
+        run1 = InvestigationRun(
+            id="RUN-LIVE-01",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:00:00Z",
+            provider_mode="LIVE_TOKEN_FACTORY",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run1.id] = run1
+
+        status, mode, verified = get_current_runtime_status()
+        assert status == "LIVE_VERIFIED"
+        assert mode == "LIVE_TOKEN_FACTORY"
+        assert verified is True
+
+        # Run 2: subsequent attempt falls back
+        run2 = InvestigationRun(
+            id="RUN-FALLBACK-02",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:05:00Z",
+            provider_mode="DEMO_FIXTURE_FALLBACK",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run2.id] = run2
+
+        status, mode, verified = get_current_runtime_status()
+        assert status == "DEMO_FIXTURE_FALLBACK"
+        assert mode == "DEMO_FIXTURE_FALLBACK"
+        assert verified is False
+
+
+def test_runtime_status_recency_live_then_failure():
+    from apps.api.app.config import settings
+    from apps.api.app.domain.models import InvestigationRun
+    from apps.api.app.main import get_current_runtime_status, orchestrator
+
+    orchestrator.runs.clear()
+    with patch.object(settings, "nebius_key", "mock_key_nebius_12345"), \
+         patch.object(settings, "tavily_key", "mock_key_tavily_12345"):
+        run1 = InvestigationRun(
+            id="RUN-LIVE-01",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:00:00Z",
+            provider_mode="LIVE_TOKEN_FACTORY",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run1.id] = run1
+
+        # Run 2: failed truthfully (claims validation error)
+        run2 = InvestigationRun(
+            id="RUN-FAIL-02",
+            case_id="CASE-01",
+            state="FAILED_TRUTHFULLY",
+            failure_reason="Claims validator failed: Prohibited claim detected",
+            created_at="2026-10-29T10:06:00Z",
+            provider_mode="DEMO_FIXTURE_FALLBACK",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run2.id] = run2
+
+        status, mode, verified = get_current_runtime_status()
+        assert status == "DEMO_FIXTURE_FALLBACK"
+        assert verified is False
+
+
+def test_runtime_status_recency_live_then_timeout():
+    from apps.api.app.config import settings
+    from apps.api.app.domain.models import InvestigationRun
+    from apps.api.app.main import get_current_runtime_status, orchestrator
+
+    orchestrator.runs.clear()
+    with patch.object(settings, "nebius_key", "mock_key_nebius_12345"), \
+         patch.object(settings, "tavily_key", "mock_key_tavily_12345"):
+        run1 = InvestigationRun(
+            id="RUN-LIVE-01",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:00:00Z",
+            provider_mode="LIVE_TOKEN_FACTORY",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run1.id] = run1
+
+        # Run 2: timed out
+        run2 = InvestigationRun(
+            id="RUN-TIMEOUT-02",
+            case_id="CASE-01",
+            state="FAILED_TRUTHFULLY",
+            failure_reason="Investigation exceeded configured timeout limit of 45.0s.",
+            created_at="2026-10-29T10:07:00Z",
+            provider_mode="DEMO_FIXTURE_FALLBACK",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run2.id] = run2
+
+        status, mode, verified = get_current_runtime_status()
+        assert status == "DEMO_FIXTURE_FALLBACK"
+        assert verified is False
+
+
+def test_runtime_status_recency_live_then_cancellation():
+    from apps.api.app.config import settings
+    from apps.api.app.domain.models import InvestigationRun
+    from apps.api.app.main import get_current_runtime_status, orchestrator
+
+    orchestrator.runs.clear()
+    with patch.object(settings, "nebius_key", "mock_key_nebius_12345"), \
+         patch.object(settings, "tavily_key", "mock_key_tavily_12345"):
+        run1 = InvestigationRun(
+            id="RUN-LIVE-01",
+            case_id="CASE-01",
+            state="HUMAN_REVIEW_READY",
+            created_at="2026-10-29T10:00:00Z",
+            provider_mode="LIVE_TOKEN_FACTORY",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run1.id] = run1
+
+        # Run 2: cancelled
+        run2 = InvestigationRun(
+            id="RUN-CANCEL-02",
+            case_id="CASE-01",
+            state="FAILED_TRUTHFULLY",
+            failure_reason="Investigation was cancelled by user.",
+            created_at="2026-10-29T10:08:00Z",
+            provider_mode="DEMO_FIXTURE_FALLBACK",
+            requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            observations=[],
+            sources=[],
+            hypotheses=[],
+            critiques=[],
+            review_posture="QUARANTINE_PENDING_QUALIFIED_REVIEW",
+            tool_events=[],
+        )
+        orchestrator.runs[run2.id] = run2
+
+        status, mode, verified = get_current_runtime_status()
+        assert status == "DEMO_FIXTURE_FALLBACK"
+        assert verified is False
+
+        # Verify /api/health and /api/meta endpoints also reflect this recency
+        client = TestClient(app)
+        h_resp = client.get("/api/health")
+        assert h_resp.status_code == 200
+        assert h_resp.json()["provider_status"] == "DEMO_FIXTURE_FALLBACK"
+        assert h_resp.json()["live_execution_verified"] is False
+
+        m_resp = client.get("/api/meta")
+        assert m_resp.status_code == 200
+        assert m_resp.json()["provider_status"] == "DEMO_FIXTURE_FALLBACK"
+        assert m_resp.json()["live_execution_verified"] is False
+

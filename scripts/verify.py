@@ -136,7 +136,8 @@ def main():
         except Exception:
             pass
 
-    cov_passed = (rc == 0) and (statement_cov_pct >= 85.0) and (branch_cov_pct >= 80.0 or round(branch_cov_pct) >= 80)
+    cov_passed = (rc == 0) and (statement_cov_pct >= 85.0) and (branch_cov_pct >= 80.0)
+
     results["gates"]["pytest"] = {
         "passed": cov_passed,
         "coverage_percent": round(cov_pct, 2),

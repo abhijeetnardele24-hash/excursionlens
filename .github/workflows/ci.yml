@@ -73,6 +73,39 @@ jobs:
         run: |
           python -m pytest apps/api/tests --cov=apps/api/app --cov-branch --cov-report=term-missing --cov-report=json:test-results/coverage.json --cov-fail-under=85
 
+      - name: Enforce Strict Unrounded Coverage Thresholds (>= 85.0% Statement, >= 80.0% Branch)
+        run: |
+          python -c "
+          import json, sys
+          with open('test-results/coverage.json', 'r', encoding='utf-8') as f:
+              cov = json.load(f)
+          totals = cov.get('totals', {})
+          num_stmts = totals.get('num_statements', 0)
+          covered_stmts = totals.get('covered_lines', totals.get('covered_statements', 0))
+          stmt_pct = (covered_stmts / num_stmts * 100.0) if num_stmts else 0.0
+
+          num_branches = totals.get('num_branches', 0)
+          covered_branches = totals.get('covered_branches', 0)
+          branch_pct = (covered_branches / num_branches * 100.0) if num_branches else 0.0
+
+          print(f'Coverage Check: Statements: {covered_stmts}/{num_stmts} ({stmt_pct:.3f}%), Branches: {covered_branches}/{num_branches} ({branch_pct:.3f}%)')
+
+          failed = False
+          if stmt_pct < 85.0:
+              print(f'❌ Statement coverage {stmt_pct:.3f}% is below 85.0% minimum threshold!', file=sys.stderr)
+              failed = True
+          else:
+              print(f'✅ Statement coverage {stmt_pct:.3f}% >= 85.0% (Passed)')
+
+          if branch_pct < 80.0:
+              print(f'❌ Branch coverage {branch_pct:.3f}% is below 80.0% minimum unrounded threshold!', file=sys.stderr)
+              failed = True
+          else:
+              print(f'✅ Branch coverage {branch_pct:.3f}% >= 80.0% (Passed without rounding)')
+
+          if failed:
+              sys.exit(1)
+          "
 
       - name: Claims & Citation Security Tests
         run: |
@@ -114,8 +147,37 @@ jobs:
           docker build --build-arg GIT_COMMIT=${{ github.sha }} -t excursionlens:ci .
           docker run -d --name excursionlens-ci -p 8000:8000 excursionlens:ci
           sleep 5
-          curl -f http://127.0.0.1:8000/api/health
-          curl -f http://127.0.0.1:8000/api/meta
+          python -c "
+          import json, urllib.request, sys
+          expected_sha = '${{ github.sha }}'
+
+          # 1. Parse /api/health
+          with urllib.request.urlopen('http://127.0.0.1:8000/api/health') as resp:
+              assert resp.status == 200, f'Health HTTP status: {resp.status}'
+              health = json.loads(resp.read().decode())
+
+          print('Health response:', json.dumps(health, indent=2))
+          assert health['status'] == 'ok', f'Health status unexpected: {health}'
+          assert health.get('commit') == expected_sha, f'Health commit mismatch: {health.get(\"commit\")} != {expected_sha}'
+          assert health.get('application_environment') == 'docker', f'Health environment mismatch: {health.get(\"application_environment\")}'
+          assert health.get('provider_status') == 'NOT_CONFIGURED', f'Health provider_status mismatch: {health.get(\"provider_status\")}'
+          assert health.get('live_execution_verified') is False, f'Health live_execution_verified expected False: {health}'
+          assert health.get('provider_mode') == 'DEMO_FIXTURE', f'Health provider_mode mismatch: {health.get(\"provider_mode\")}'
+
+          # 2. Parse /api/meta
+          with urllib.request.urlopen('http://127.0.0.1:8000/api/meta') as resp:
+              assert resp.status == 200, f'Meta HTTP status: {resp.status}'
+              meta = json.loads(resp.read().decode())
+
+          print('Meta response:', json.dumps(meta, indent=2))
+          assert meta.get('commit') == expected_sha, f'Meta commit mismatch: {meta.get(\"commit\")} != {expected_sha}'
+          assert meta.get('application_environment') == 'docker', f'Meta environment mismatch: {meta.get(\"application_environment\")}'
+          assert meta.get('provider_status') == 'NOT_CONFIGURED', f'Meta provider_status mismatch: {meta.get(\"provider_status\")}'
+          assert meta.get('live_execution_verified') is False, f'Meta live_execution_verified expected False: {meta}'
+          assert meta.get('provider_mode') == 'DEMO_FIXTURE', f'Meta provider_mode mismatch: {meta.get(\"provider_mode\")}'
+
+          print('✅ All Docker CI assertions passed: exact SHA, docker environment, truthful NOT_CONFIGURED state')
+          "
           docker stop excursionlens-ci
           docker rm excursionlens-ci
 

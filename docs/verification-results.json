@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-29T06:11:35Z",
+  "timestamp": "2026-10-29T06:52:27Z",
   "execution_context": "local (AB)",
   "git": {
-    "head": "1e5a320fa18d9c8dbef847cd71a71e51861c9203",
+    "head": "4bf59c8d403a52a243625694e0837ce34191f740",
     "branch": "main",
     "clean_tree": false
   },
@@ -16,31 +16,31 @@
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.48,
+      "elapsed_sec": 0.5,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.5,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 553ms\u001b[39m\n"
+      "elapsed_sec": 2.67,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 610ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 88.63,
-      "statement_coverage_percent": 91.37,
-      "branch_coverage_percent": 80.16,
-      "elapsed_sec": 15.07
+      "coverage_percent": 90.52,
+      "statement_coverage_percent": 93.27,
+      "branch_coverage_percent": 82.16,
+      "elapsed_sec": 19.88
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.23
+      "elapsed_sec": 0.24
     },
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.33
+      "elapsed_sec": 0.34
     },
     "playwright": {
       "passed": true,
@@ -49,7 +49,7 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 28603.449
+      "duration_ms": 30510.404000000002
     }
   },
   "canonical_case_nmb_204": {

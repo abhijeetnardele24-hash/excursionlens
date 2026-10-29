@@ -433,3 +433,180 @@ def test_nebius_sync_skeptic_pass(sample_obs):
         assert len(critiques) == 1
         assert receipt["is_live"] is True
 
+
+def test_nebius_sync_generate_hypotheses_live_success_and_exception(sample_case, sample_obs):
+    provider = NebiusTokenFactoryProvider(api_key="real-nebius-key-12345", app_mode="live")
+    valid_hypotheses_json = """{
+        "hypotheses": [
+            {
+                "id": "HYP-01",
+                "label": "Ambient intrusion",
+                "summary": "Transfer door opening.",
+                "supporting_evidence_ids": ["OBS-EXCURSION-01"],
+                "contradicting_evidence_ids": [],
+                "unknowns": [],
+                "next_check": "Check logs.",
+                "confidence_band": "HIGH",
+                "status": "LEADING",
+                "what_it_does_not_establish": "No safety claim."
+            }
+        ]
+    }"""
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {"choices": [{"message": {"content": valid_hypotheses_json}}], "usage": {}}
+    with patch.object(httpx.Client, "post", return_value=mock_resp):
+        hypotheses, receipt = provider.generate_hypotheses(sample_case, sample_obs, [])
+        assert len(hypotheses) == 1
+        assert receipt["status"] == "LIVE_SUCCESS"
+        assert receipt["is_live"] is True
+
+    # Exception fallback branch
+    with patch.object(httpx.Client, "post", side_effect=httpx.NetworkError("Connection refused")):
+        hypotheses, receipt = provider.generate_hypotheses(sample_case, sample_obs, [])
+        assert len(hypotheses) > 0
+        assert receipt["status"] == "DEMO_FIXTURE_FALLBACK"
+        assert "Connection refused" in receipt["failure_reason"]
+
+
+def test_nebius_sync_skeptic_pass_fallback_and_exception(sample_obs):
+    from apps.api.app.domain.models import Hypothesis
+    provider = NebiusTokenFactoryProvider(api_key="real-nebius-key-12345", app_mode="live")
+    hypotheses = [
+        Hypothesis(
+            id="HYP-01",
+            label="REFRIGERATION_FAILURE",
+            summary="Compressor power cut.",
+            confidence=0.8,
+            confidence_band="HIGH",
+            next_check="Inspect compressor logs.",
+            what_it_does_not_establish="Does not establish sensor failure.",
+            status="LEADING",
+            supporting_evidence_ids=["OBS-EXCURSION-01"],
+            contradicting_evidence_ids=[],
+            generation_model="nvidia/llama-3.1-nemotron-70b-instruct",
+            provider_receipt={"status": "DEMO_FIXTURE"},
+        )
+    ]
+
+    # HTTP 500 fallback
+    mock_500 = MagicMock()
+    mock_500.status_code = 500
+    mock_500.text = "Internal Server Error"
+    with patch.object(httpx.Client, "post", return_value=mock_500):
+        critiques, receipt = provider.run_skeptic_pass(hypotheses, sample_obs, [])
+        assert len(critiques) > 0
+        assert receipt["status"] == "DEMO_FIXTURE_FALLBACK"
+
+    # Network exception fallback
+    with patch.object(httpx.Client, "post", side_effect=httpx.NetworkError("Socket closed")):
+        critiques, receipt = provider.run_skeptic_pass(hypotheses, sample_obs, [])
+        assert len(critiques) > 0
+        assert receipt["status"] == "DEMO_FIXTURE_FALLBACK"
+
+
+@pytest.mark.asyncio
+async def test_nebius_async_hypotheses_retry_429(sample_case, sample_obs):
+    provider = NebiusTokenFactoryProvider(api_key="real-nebius-key-12345", app_mode="live")
+
+    mock_429 = MagicMock()
+    mock_429.status_code = 429
+    mock_429.text = "Rate limited"
+
+    valid_json = """{
+        "hypotheses": [
+            {
+                "id": "HYP-01",
+                "label": "Ambient intrusion",
+                "summary": "Transfer door opening.",
+                "supporting_evidence_ids": ["OBS-EXCURSION-01"],
+                "contradicting_evidence_ids": [],
+                "unknowns": [],
+                "next_check": "Check logs.",
+                "confidence_band": "HIGH",
+                "status": "LEADING",
+                "what_it_does_not_establish": "No safety claim."
+            }
+        ]
+    }"""
+    mock_200 = MagicMock()
+    mock_200.status_code = 200
+    mock_200.json.return_value = {"choices": [{"message": {"content": valid_json}}], "usage": {}}
+
+    with patch.object(httpx.AsyncClient, "post", new_callable=AsyncMock) as mock_post:
+        mock_post.side_effect = [mock_429, mock_200]
+        hypotheses, receipt = await provider.generate_hypotheses_async(sample_case, sample_obs, [])
+        assert len(hypotheses) == 1
+        assert receipt["status"] == "LIVE_SUCCESS"
+        assert mock_post.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_nebius_async_skeptic_retry_503(sample_case, sample_obs):
+    provider = NebiusTokenFactoryProvider(api_key="real-nebius-key-12345", app_mode="live")
+    hypotheses, _ = provider.generate_hypotheses(sample_case, sample_obs, [])
+
+    mock_503 = MagicMock()
+    mock_503.status_code = 503
+    mock_503.text = "Service Unavailable"
+
+    valid_skeptic = """{
+        "critiques": [
+            {
+                "hypothesis_id": "HYP-01",
+                "attack_summary": "Reefer bus telemetry was stable.",
+                "unsupported_claims": [],
+                "ignored_contradictions": [],
+                "recommended_status": "ALTERNATIVE",
+                "rationale": "Stable voltage."
+            }
+        ]
+    }"""
+    mock_200 = MagicMock()
+    mock_200.status_code = 200
+    mock_200.json.return_value = {"choices": [{"message": {"content": valid_skeptic}}], "usage": {}}
+
+    with patch.object(httpx.AsyncClient, "post", new_callable=AsyncMock) as mock_post:
+        mock_post.side_effect = [mock_503, mock_200]
+        critiques, receipt = await provider.run_skeptic_pass_async(hypotheses, sample_obs, [])
+        assert len(critiques) == 1
+        assert receipt["status"] == "LIVE_SUCCESS"
+        assert mock_post.call_count == 2
+
+
+def test_reports_generator_edge_cases(sample_case):
+    from apps.api.app.domain.models import InvestigationRun
+    from apps.api.app.reports.generator import _esc, _get_git_commit_sha, _safe_url, generate_printable_html_report
+
+    assert _esc(None) == ""
+    assert _esc("safe & clean") == "safe &amp; clean"
+
+    assert _safe_url("javascript:alert(1)") == "#"
+    assert _safe_url("data:text/html,bad") == "#"
+    assert _safe_url("") == "#"
+    assert "https://example.com" in _safe_url("https://example.com/test")
+
+    with patch.dict("os.environ", {"GITHUB_SHA": "abc123sha"}):
+        assert _get_git_commit_sha() == "abc123sha"
+
+    # Test report with REQUEST_ADDITIONAL_EVIDENCE posture
+    run = InvestigationRun(
+        id="RUN-POSTURE-TEST",
+        case_id=sample_case.id,
+        state="HUMAN_REVIEW_READY",
+        created_at="2026-10-21T10:00:00Z",
+        provider_mode="DEMO_FIXTURE",
+        requested_model="nvidia/llama-3.1-nemotron-70b-instruct",
+        observations=[],
+        sources=[],
+        hypotheses=[],
+        critiques=[],
+        review_posture="REQUEST_ADDITIONAL_EVIDENCE",
+        tool_events=[],
+        disclaimer="Test",
+    )
+    html = generate_printable_html_report(run, sample_case)
+    assert "RUN-POSTURE-TEST" in html
+    assert "Synthetic Fixture Investigator" in html
+
+

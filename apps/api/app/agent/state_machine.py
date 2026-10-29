@@ -173,8 +173,11 @@ class InvestigationOrchestrator:
                 if not case.readings or len(case.readings) < 1:
                     run.state = "FAILED_TRUTHFULLY"
                     run.failure_reason = "Case contains 0 sensor readings."
+                    if self.nebius.has_key or self.tavily.has_key:
+                        run.provider_mode = "DEMO_FIXTURE_FALLBACK"
                     emit("FAILED_TRUTHFULLY", run.failure_reason)
                     return
+
 
                 # 2. NORMALIZING
                 emit("NORMALIZING", "Normalizing time-series timestamps and telemetry points")
@@ -297,8 +300,11 @@ class InvestigationOrchestrator:
                 if not is_valid:
                     run.state = "FAILED_TRUTHFULLY"
                     run.failure_reason = "Claims validator failed: " + "; ".join(validation_errors)
+                    if self.nebius.has_key or self.tavily.has_key:
+                        run.provider_mode = "DEMO_FIXTURE_FALLBACK"
                     emit("FAILED_TRUTHFULLY", run.failure_reason)
                     return
+
 
                 emit("CLAIMS_VALIDATED", "Citation IDs and prohibited-claim rules passed deterministic validation.")
                 await asyncio.sleep(0.05)
@@ -338,8 +344,9 @@ class InvestigationOrchestrator:
                     tavily_is_live
                     and tavily_receipt.get("status") == "LIVE_SUCCESS"
                     and len(run.sources) > 0
-                    and all(s.domain.lower() in allowlisted_domains for s in run.sources)
+                    and all(any(s.domain.lower() == ad or s.domain.lower().endswith("." + ad) for ad in allowlisted_domains) for s in run.sources)
                 )
+
                 has_valid_schemas = len(run.hypotheses) > 0 and len(run.critiques) > 0
 
                 can_be_live = (
@@ -381,14 +388,20 @@ class InvestigationOrchestrator:
         except TimeoutError:
             run.state = "FAILED_TRUTHFULLY"
             run.failure_reason = f"Investigation exceeded configured timeout limit of {settings.investigation_timeout_seconds}s."
+            if self.nebius.has_key or self.tavily.has_key:
+                run.provider_mode = "DEMO_FIXTURE_FALLBACK"
             emit("FAILED_TRUTHFULLY", run.failure_reason)
         except asyncio.CancelledError:
             run.state = "FAILED_TRUTHFULLY"
             run.failure_reason = "Investigation was cancelled by user."
+            if self.nebius.has_key or self.tavily.has_key:
+                run.provider_mode = "DEMO_FIXTURE_FALLBACK"
             emit("FAILED_TRUTHFULLY", "Investigation cancelled.")
         except Exception as e:
             run.state = "FAILED_TRUTHFULLY"
             run.failure_reason = f"Investigation exception: {type(e).__name__} - {e}"
+            if self.nebius.has_key or self.tavily.has_key:
+                run.provider_mode = "DEMO_FIXTURE_FALLBACK"
             emit("FAILED_TRUTHFULLY", run.failure_reason)
 
     async def subscribe(self, run_id: str) -> AsyncGenerator[dict[str, Any], None]:
@@ -449,5 +462,8 @@ class InvestigationOrchestrator:
             if run and run.state not in ("HUMAN_REVIEW_READY", "FAILED_TRUTHFULLY"):
                 run.state = "FAILED_TRUTHFULLY"
                 run.failure_reason = "Investigation was cancelled by user."
+                if self.nebius.has_key or self.tavily.has_key:
+                    run.provider_mode = "DEMO_FIXTURE_FALLBACK"
             return True
+
         return False

@@ -355,3 +355,96 @@ async def test_complete_verified_success_is_only_path_to_live_token_factory(
     assert run.served_model == model_name
     assert run.validation_result is not None
     assert run.validation_result["passed"] is True
+
+
+@pytest.mark.asyncio
+async def test_tavily_domain_normalization_accepts_www_subdomain(
+    minimal_case, valid_mock_hypotheses, valid_mock_critiques
+):
+    """Verifies that valid allowlisted subdomains like www.cdc.gov achieve LIVE_TOKEN_FACTORY."""
+    orch = InvestigationOrchestrator()
+    orch.nebius.has_key = True
+    orch.tavily.has_key = True
+
+    model_name = "nvidia/llama-3.1-nemotron-70b-instruct"
+    orch.nebius.discover_models_async = AsyncMock(return_value={
+        "status": "LIVE_SUCCESS",
+        "nvidia_models": [model_name],
+        "selected_deep_model": model_name,
+    })
+
+    www_sources = [
+        SourceRecord(
+            id="SRC-CDC-01",
+            url="https://www.cdc.gov/vaccines/storage/guidelines.html",
+            title="CDC Storage Guidelines",
+            domain="www.cdc.gov",
+            retrieved_at="2026-10-25T10:05:00Z",
+            snippet="Storage guidelines between 2C and 8C.",
+            content_digest="abc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+            query="CDC vaccine storage",
+        )
+    ]
+    orch.tavily.search_guidance_async = AsyncMock(return_value=(www_sources, {
+        "is_live": True, "status": "LIVE_SUCCESS"
+    }))
+    orch.nebius.generate_hypotheses_async = AsyncMock(return_value=(valid_mock_hypotheses, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "inv_sha256_digest_verified"
+    }))
+    orch.nebius.run_skeptic_pass_async = AsyncMock(return_value=(valid_mock_critiques, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "skep_sha256_digest_verified"
+    }))
+
+    rid = orch.start_investigation(minimal_case)
+    run = await orch.wait_for_completion(rid)
+
+    assert run.state == "HUMAN_REVIEW_READY"
+    assert run.provider_mode == "LIVE_TOKEN_FACTORY"
+    assert run.served_model == model_name
+
+
+@pytest.mark.asyncio
+async def test_tavily_domain_normalization_rejects_lookalike(
+    minimal_case, valid_mock_hypotheses, valid_mock_critiques
+):
+    """Verifies that malicious lookalike domains like cdc.gov.example.com are rejected and fall back."""
+    orch = InvestigationOrchestrator()
+    orch.nebius.has_key = True
+    orch.tavily.has_key = True
+
+    model_name = "nvidia/llama-3.1-nemotron-70b-instruct"
+    orch.nebius.discover_models_async = AsyncMock(return_value={
+        "status": "LIVE_SUCCESS",
+        "nvidia_models": [model_name],
+        "selected_deep_model": model_name,
+    })
+
+    lookalike_sources = [
+        SourceRecord(
+            id="SRC-CDC-01",
+            url="https://cdc.gov.example.com/vaccines/fake.html",
+            title="Fake CDC Phishing Domain",
+            domain="cdc.gov.example.com",
+            retrieved_at="2026-10-25T10:05:00Z",
+            snippet="Fake guidance.",
+            content_digest="abc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+            query="CDC vaccine storage",
+        )
+    ]
+    orch.tavily.search_guidance_async = AsyncMock(return_value=(lookalike_sources, {
+        "is_live": True, "status": "LIVE_SUCCESS"
+    }))
+    orch.nebius.generate_hypotheses_async = AsyncMock(return_value=(valid_mock_hypotheses, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "inv_sha256_digest_verified"
+    }))
+    orch.nebius.run_skeptic_pass_async = AsyncMock(return_value=(valid_mock_critiques, {
+        "is_live": True, "status": "LIVE_SUCCESS", "model": model_name, "response_digest": "skep_sha256_digest_verified"
+    }))
+
+    rid = orch.start_investigation(minimal_case)
+    run = await orch.wait_for_completion(rid)
+
+    assert run.state == "HUMAN_REVIEW_READY"
+    assert run.provider_mode == "DEMO_FIXTURE_FALLBACK"
+    assert "fallback" in (run.served_model or "").lower()
+

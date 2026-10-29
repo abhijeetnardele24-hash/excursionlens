@@ -6,8 +6,13 @@ import asyncio
 
 import pytest
 from apps.api.app.agent.state_machine import InvestigationOrchestrator
-from apps.api.app.domain.models import InvestigationRun
-from apps.api.app.main import CASES_STORE
+from apps.api.app.domain.models import InvestigationRun, ShipmentCase
+from apps.api.app.main import CASES_STORE, load_default_fixtures
+
+
+@pytest.fixture(autouse=True)
+def ensure_fixtures():
+    load_default_fixtures()
 
 
 @pytest.fixture
@@ -102,3 +107,99 @@ async def test_subscribe_streaming_replay(orchestrator):
     assert len(events_received) == 3
     assert events_received[0]["stage"] == "VALIDATE_SCHEMA"
     assert events_received[2]["stage"] == "HUMAN_REVIEW_READY"
+
+
+@pytest.mark.asyncio
+async def test_execute_run_zero_readings_fails_truthfully(orchestrator):
+    base_case = CASES_STORE["CASE-NMB-204"]
+    zero_case = ShipmentCase.model_validate(base_case.model_dump())
+    zero_case.readings = []
+
+    rid = orchestrator.start_investigation(zero_case)
+    run = await orchestrator.wait_for_completion(rid)
+
+    assert run.state == "FAILED_TRUTHFULLY"
+    assert "0 sensor readings" in (run.failure_reason or "")
+
+
+@pytest.mark.asyncio
+async def test_execute_run_timeout_exception(orchestrator):
+    case = CASES_STORE["CASE-NMB-204"]
+    from unittest.mock import patch
+
+    with patch.object(orchestrator.detector, "analyze_case", side_effect=TimeoutError("Wall-clock budget exceeded")):
+        rid = orchestrator.start_investigation(case)
+        run = await orchestrator.wait_for_completion(rid)
+
+        assert run.state == "FAILED_TRUTHFULLY"
+        assert "timeout limit" in (run.failure_reason or "")
+
+
+@pytest.mark.asyncio
+async def test_execute_run_unhandled_exception(orchestrator):
+    case = CASES_STORE["CASE-NMB-204"]
+    from unittest.mock import patch
+
+    with patch.object(orchestrator.detector, "analyze_case", side_effect=RuntimeError("Corrupted time series")):
+        rid = orchestrator.start_investigation(case)
+        run = await orchestrator.wait_for_completion(rid)
+
+        assert run.state == "FAILED_TRUTHFULLY"
+        assert "Corrupted time series" in (run.failure_reason or "")
+
+
+@pytest.mark.asyncio
+async def test_execute_run_critique_validation_failure(orchestrator):
+    case = CASES_STORE["CASE-NMB-204"]
+    from unittest.mock import AsyncMock
+
+    from apps.api.app.domain.models import SkepticCritique
+
+    invalid_critique = SkepticCritique(
+        hypothesis_id="HYP-NONEXISTENT-999",
+        attack_summary="Invalid hypothesis reference.",
+        unsupported_claims=[],
+        ignored_contradictions=[],
+        recommended_status="DOWNGRADED",
+        rationale="Unknown hypothesis ID.",
+    )
+    orchestrator.nebius.run_skeptic_pass_async = AsyncMock(
+        return_value=([invalid_critique], {"status": "DEMO_FIXTURE", "is_live": False})
+    )
+
+    rid = orchestrator.start_investigation(case)
+    run = await orchestrator.wait_for_completion(rid)
+
+    assert run.state == "FAILED_TRUTHFULLY"
+    assert "Claims validator failed" in (run.failure_reason or "")
+
+
+@pytest.mark.asyncio
+async def test_execute_run_prohibited_claim_failure(orchestrator):
+    case = CASES_STORE["CASE-NMB-204"]
+    from unittest.mock import AsyncMock
+
+    from apps.api.app.domain.models import Hypothesis
+
+    prohibited_hyp = Hypothesis(
+        id="HYP-01",
+        label="REFRIGERATION_FAILURE",
+        summary="This batch is compliant with FDA regulations and approved for immediate release.",
+        supporting_evidence_ids=["OBS-EXCURSION-01"],
+        contradicting_evidence_ids=[],
+        unknowns=[],
+        next_check="Check door seals.",
+        confidence_band="HIGH",
+        status="LEADING",
+        what_it_does_not_establish="Does not establish core thermal equilibrium.",
+    )
+    orchestrator.nebius.generate_hypotheses_async = AsyncMock(
+        return_value=([prohibited_hyp], {"status": "DEMO_FIXTURE", "is_live": False})
+    )
+
+    rid = orchestrator.start_investigation(case)
+    run = await orchestrator.wait_for_completion(rid)
+
+    assert run.state == "FAILED_TRUTHFULLY"
+    assert "Claims validator failed" in (run.failure_reason or "")
+

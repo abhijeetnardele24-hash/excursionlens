@@ -62,12 +62,18 @@ def get_git_commit_sha() -> str:
 
 
 def load_default_fixtures():
-    nmb_path = os.path.join("packages", "fixtures", "nmb_204.json")
-    if os.path.exists(nmb_path):
-        with open(nmb_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            case = ShipmentCase.model_validate(data)
-            CASES_STORE[case.id] = case
+    candidate_paths = [
+        os.path.join("packages", "fixtures", "nmb_204.json"),
+        os.path.join("..", "..", "packages", "fixtures", "nmb_204.json"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "packages", "fixtures", "nmb_204.json"),
+    ]
+    for nmb_path in candidate_paths:
+        if os.path.exists(nmb_path):
+            with open(nmb_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                case = ShipmentCase.model_validate(data)
+                CASES_STORE[case.id] = case
+            break
 
 
 @asynccontextmanager
@@ -141,21 +147,30 @@ validator = DeterministicClaimsValidator()
 # ==============================================================================
 
 def get_current_runtime_status() -> tuple[ProviderStatus, str, bool]:
-    verified_live = False
-    failed_live = False
-    for r in orchestrator.runs.values():
-        if r.provider_mode == "LIVE_TOKEN_FACTORY":
-            verified_live = True
-        elif r.provider_mode in ("DEMO_FIXTURE_FALLBACK", "FAILED"):
-            failed_live = True
+    latest_run = None
+    if orchestrator.runs:
+        latest_run = max(orchestrator.runs.values(), key=lambda r: (r.created_at or "", r.id))
+
+    latest_verified_live = False
+    latest_failed_live = False
+
+    if latest_run is not None:
+        if latest_run.provider_mode == "LIVE_TOKEN_FACTORY" and latest_run.state == "HUMAN_REVIEW_READY":
+            latest_verified_live = True
+        elif (
+            latest_run.state == "FAILED_TRUTHFULLY"
+            or latest_run.provider_mode in ("DEMO_FIXTURE_FALLBACK", "FAILED")
+        ):
+            latest_failed_live = True
 
     return evaluate_runtime_status(
         nebius_key=settings.nebius_key,
         tavily_key=settings.tavily_key,
         app_mode=settings.app_mode,
-        verified_live_run=verified_live,
-        failed_live_attempt=failed_live,
+        verified_live_run=latest_verified_live,
+        failed_live_attempt=latest_failed_live,
     )
+
 
 
 @app.get("/api/health")
@@ -165,6 +180,7 @@ def health():
         "status": "ok",
         "app": settings.app_name,
         "version": settings.app_version,
+        "commit": get_git_commit_sha(),
         "application_environment": settings.application_environment,
         "provider_status": p_status,
         "live_execution_verified": live_verified,

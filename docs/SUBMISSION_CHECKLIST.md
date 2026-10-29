@@ -87,6 +87,6 @@ The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until
 5. **Configure Domain & TLS:** Expose public domain with HTTPS and configure appropriate CORS/allowed hosts.
 6. **Verify Public Endpoints:** Confirm `/api/health` and `/api/meta` respond with expected `application_environment`, `provider_status`, and `live_execution_verified`.
 7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `LIVE_VERIFIED_FINAL` if keys are configured, or `FIXTURE_MODE_DRAFT` if uncredentialed).
-8. **Upload Demo Video:** Host video on YouTube or Vimeo as Public or Unlisted (duration strictly under 3:00).
+8. **Upload Demo Video:** Host video on Public YouTube (duration strictly under 3:00; use Public visibility unless official hackathon rules explicitly permit Unlisted).
 9. **Populate Devpost Submission Form:** Copy submission title, tagline, tracks, and markdown from `docs/DEVPOST_SUBMISSION.md`, along with the public GitHub repo URL and `docs/assets/excursionlens-devpost-thumbnail.png`.
 10. **Submit on Devpost:** Submit final entry on the Devpost hackathon portal before the hackathon deadline.

@@ -16,6 +16,7 @@
 > It states honestly to the viewer that external keys are absent in the public checkout, showcasing the full deterministic safety boundaries, counterfactual engine, and UI workflow without pretending live inference has occurred.
 
 **Target Duration:** 2 minutes 30 seconds (Hard Cap: 2:45, Official Limit: 3:00)  
+**Video Hosting:** Public YouTube (strictly under 3:00; use Public visibility unless official hackathon rules explicitly permit Unlisted).  
 **Tone:** Forensic, transparent, methodical, engineering-rigorous.  
 **Operating Mode:** Fixture Mode (`DEMO_FIXTURE`), `http://localhost:8000`
 
@@ -58,7 +59,7 @@
 - **Visual:** Counterfactual Workbench and Review Packet Modal.
 - **Onscreen Action:** In the Counterfactual Workbench, select "Expedite Door Closing (5 min limit vs 24 min observed)" and click "Replay Counterfactual". The delta highlights simulated excursion duration reduced from 40.0 min to 0.0 min. Then click "Review Packet" to display the full printable quality packet.
 - **Spoken Narration:**
-  > "To assist quality engineers with corrective actions, our Counterfactual Workbench simulates operational interventions. Enforcing a 5-minute door closure threshold eliminates the excursion completely in simulation. Finally, ExcursionLens generates a signed Quality Review Packet containing observation digests, model receipts, and strict quarantine boundaries. The product remains quarantined until qualified human QA signs off."
+  > "To assist quality engineers with corrective actions, our Counterfactual Workbench simulates operational interventions. Enforcing a 5-minute door closure threshold eliminates the excursion completely in simulation. Finally, ExcursionLens generates an auditable Quality Review Packet containing observation digests, model receipts, and strict quarantine boundaries. The product remains quarantined until qualified human QA signs off."
 
 #### Scene 6: Conclusion (2:20 - 2:30)
 - **Visual:** Return to main header showing clean state and audit footer.
@@ -90,7 +91,7 @@
 | **03** | `0:55 - 1:20` | Stage Tracker & Tavily Live Proof Panel | Click "Investigate Excursion", expand Tavily panel, show live queries & URLs | Live Tavily API search; strict domain allowlist (`cdc.gov`, `who.int`) |
 | **04** | `1:20 - 1:50` | Hypothesis Board & Skeptic Panel | Show 3 live hypotheses; hover skeptic critique of reefer voltage | NVIDIA Nemotron-70B on Nebius live inference; adversarial falsification |
 | **05** | `1:50 - 2:20` | Counterfactual Workbench & Modal | Select 5-min door limit, click replay (40min → 0min); open Review Packet | Sensitivity replay controls; printable review packet with SHA-256 digests |
-| **06** | `2:20 - 2:30` | Summary Header & Live Receipts | Show live token usage, round-trip latency (ms), model signature | Closing: IoT reality + Tavily retrieval + Nemotron reasoning on Nebius |
+| **06** | `2:20 - 2:30` | Summary Header & Live Receipts | Show live token usage, round-trip latency (ms), model response integrity digest | Closing: IoT reality + Tavily retrieval + Nemotron reasoning on Nebius |
 
 #### Scene 1: The Problem & Live Verified Integration (0:00 - 0:30)
 - **Visual:** Browser showing `http://localhost:8000`. Fullscreen at 1920x1080.
@@ -118,7 +119,7 @@
 
 #### Scene 5: Counterfactual Workbench & Quality Review Packet (1:50 - 2:20)
 - **Visual:** Counterfactual Workbench and Review Packet Modal.
-- **Onscreen Action:** In the Counterfactual Workbench, select "Expedite Door Closing (5 min limit vs 24 min observed)" and click "Replay Counterfactual". The delta shows simulated excursion duration reduced from 40.0 min to 0.0 min. Then click "Review Packet" to display the full printable quality packet with cryptographic hashes and model signatures.
+- **Onscreen Action:** In the Counterfactual Workbench, select "Expedite Door Closing (5 min limit vs 24 min observed)" and click "Replay Counterfactual". The delta shows simulated excursion duration reduced from 40.0 min to 0.0 min. Then click "Review Packet" to display the full printable quality packet with cryptographic SHA-256 integrity digests.
 - **Spoken Narration:**
   > "To evaluate preventive sensitivity controls, our Counterfactual Workbench allows QA engineers to replay interventions. Here, enforcing a 5-minute door closing rule prevents the thermal breach entirely in simulation. Finally, we generate a formal Quality Review Packet, complete with evidence hashes, live Nebius model receipts, and an unbending quarantine boundary. Physical stock remains safely segregated until human QA signs off."
 
