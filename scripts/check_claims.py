@@ -39,8 +39,8 @@ PROHIBITED_PATTERNS = [
         "Misleading label: Fixture summaries must not be presented as quoted authoritative excerpts.",
     ),
     (
-        r"\b141\s+test\b",
-        "Stale test count: ExcursionLens test suite now contains 161 test cases, not 141.",
+        r"\b(?:141|161)\s+test\b",
+        "Stale test count: ExcursionLens test suite now contains 165 test cases.",
     ),
     (
         r"\b0896105\b",

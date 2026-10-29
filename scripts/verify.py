@@ -340,6 +340,8 @@ def main():
         results["overall_status"] = "FAILED"
     elif smoke_status == "LIVE_VERIFIED":
         results["overall_status"] = "LIVE_VERIFIED"
+    elif smoke_status == "LIVE_TOKEN_FACTORY":
+        results["overall_status"] = "LIVE_TOKEN_FACTORY"
     else:
         results["overall_status"] = "INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED"
 

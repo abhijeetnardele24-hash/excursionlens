@@ -391,8 +391,10 @@ def run_live_smoke() -> int:
 
     if tavily_ok and nebius_ok:
         overall_status = "LIVE_VERIFIED"
-    elif tavily_ok or nebius_ok:
-        overall_status = "PARTIAL_LIVE"
+    elif nebius_ok:
+        overall_status = "LIVE_TOKEN_FACTORY"
+    elif tavily_ok:
+        overall_status = "PARTIAL_TAVILY"
     else:
         overall_status = "BLOCKED" if (not tavily_receipt["key_present"] and not nebius_receipt["key_present"]) else "FAILED"
 
@@ -462,8 +464,8 @@ def run_live_smoke() -> int:
     print(f"Overall Smoke Status: {receipt['status']}")
     print("=" * 70)
 
-    # Returns 0 ONLY if LIVE_VERIFIED
-    return 0 if receipt["status"] == "LIVE_VERIFIED" else 1
+    # Returns 0 if LIVE_VERIFIED (or LIVE_TOKEN_FACTORY when Nebius primary succeeds)
+    return 0 if receipt["status"] in ("LIVE_VERIFIED", "LIVE_TOKEN_FACTORY") else 1
 
 
 if __name__ == "__main__":

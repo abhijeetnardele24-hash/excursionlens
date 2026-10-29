@@ -10,7 +10,7 @@
 > [!NOTE]
 > **Evidence Authority Policy:**  
 > Committed JSON documents (such as `docs/verification-results.json` or `test-results/coverage.json`) are local snapshots for documentation convenience.  
-> The **authoritative verification record** is generated directly within the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) as downloadable artifact `verification-artifacts-<COMMIT_SHA>` (authoritative Linux CI metrics: 161 test cases passing, 92.98% statement coverage, 81.85% unrounded branch coverage under pytest 9.2.0 on Python 3.11.17).
+> The **authoritative verification record** is generated directly within the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) as downloadable artifact `verification-artifacts-<COMMIT_SHA>` (authoritative Linux CI metrics: 165 test cases passing, 93.43% statement coverage, 82.43% unrounded branch coverage under pytest 9.2.0 on Python 3.11.17).
 
 ---
 
@@ -28,7 +28,7 @@
 - [x] **Gate 1 (Python Lint):** Ruff linter clean across `apps/api`, `scripts`, and `benchmark` (0 violations).
 - [x] **Gate 2 (Python Typing):** Mypy clean with `--check-untyped-defs` (0 type errors).
 - [x] **Gate 3 (Frontend Build):** TypeScript type-check and Vite production build clean (`apps/web/dist`).
-- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 161 test cases, 92.98% statement coverage, and 81.85% unrounded branch coverage (90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated directly in the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)).
+- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 165 test cases, 93.43% statement coverage, and 82.43% unrounded branch coverage (90.71% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated directly in the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)).
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
 - [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports (automated tests evaluate targeted accessibility rules and do not constitute complete WCAG certification).

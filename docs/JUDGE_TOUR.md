@@ -62,9 +62,9 @@ Follow this 5-stop walkthrough to evaluate the complete core journey in under 60
 ## Technical Verification Summary
 
 ExcursionLens is independently verified through GitHub Actions CI on Ubuntu Linux:
-- **161 of 161 Pytest test cases passing.**
-- **92.98% Statement Coverage** (1,471 / 1,582 statements).
-- **81.85% Unrounded Branch Coverage** (424 / 518 branches).
+- **165 of 165 Pytest test cases passing.**
+- **93.43% Statement Coverage** (1,478 / 1,582 statements).
+- **82.43% Unrounded Branch Coverage** (427 / 518 branches).
 - **12 of 12 Synthetic Benchmark Scenarios passing** with 100% precision.
 - **25 of 25 Playwright E2E and Axe accessibility viewport executions passing** (0 violations in tested states).
 - **Hardened non-root runtime container** executing as UID 10001 (`appuser`).
