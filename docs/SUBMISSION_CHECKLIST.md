@@ -2,7 +2,7 @@
 
 **Project:** ExcursionLens (Cold-Chain Temperature Excursion Investigation Agent)  
 **Hackathon:** Nebius x NVIDIA Hackathon (Devpost)  
-**Tracks:** *Best Apps and Agents* | *Best Use of Tavily*  
+**Tracks:** *Best Apps and Agents* (Primary track; *Best Use of Tavily* bonus track omitted pending live credential receipt)  
 **Repository:** `https://github.com/abhijeetnardele24-hash/excursionlens`  
 **Current Posture:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
 *Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
@@ -10,7 +10,7 @@
 > [!NOTE]
 > **Evidence Authority Policy:**  
 > Committed JSON documents (such as `docs/verification-results.json` or `test-results/coverage.json`) are local snapshots for documentation convenience.  
-> The **authoritative verification record** is generated directly within the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) as downloadable artifact `verification-artifacts-<COMMIT_SHA>` (authoritative Linux CI metrics: 165 test cases passing, 93.43% statement coverage, 82.43% unrounded branch coverage under pytest 9.2.0 on Python 3.11.17).
+> The **authoritative verification record** is generated directly within the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) as downloadable artifact `verification-artifacts-<COMMIT_SHA>` (authoritative Linux CI metrics: 165 test cases passing, 92.98% statement coverage, 81.85% unrounded branch coverage under pytest 9.2.0 on Python 3.11.17).
 
 ---
 
@@ -28,7 +28,7 @@
 - [x] **Gate 1 (Python Lint):** Ruff linter clean across `apps/api`, `scripts`, and `benchmark` (0 violations).
 - [x] **Gate 2 (Python Typing):** Mypy clean with `--check-untyped-defs` (0 type errors).
 - [x] **Gate 3 (Frontend Build):** TypeScript type-check and Vite production build clean (`apps/web/dist`).
-- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 165 test cases, 93.43% statement coverage, and 82.43% unrounded branch coverage (90.71% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated directly in the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)).
+- [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 165 test cases, 92.98% statement coverage, and 81.85% unrounded branch coverage (90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated directly in the [GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)).
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
 - [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports (automated tests evaluate targeted accessibility rules and do not constitute complete WCAG certification).
@@ -83,7 +83,7 @@ The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until
 1. **Provide Nebius Credential:** Obtain and set an active `NEBIUS_TOKEN_FACTORY_KEY` in environment.
 2. **Provide Tavily Credential:** Obtain and set an active `TAVILY_API_KEY` in environment.
 3. **Execute Live Smoke Verification:** Run `python scripts/live_smoke.py` to obtain live API receipts (`LIVE_VERIFIED`) with real HTTP latency and token counts.
-4. **Provision Public Cloud Deployment:** Deploy the application container via Docker/Docker Compose to a public cloud provider (e.g. Render, Fly.io, AWS ECS, or GCP Cloud Run).
+4. **Provision Public Cloud Deployment (REQUIRED):** Official hackathon rules require a working demo, hosted application, or test-build URL. Deploy the application container via Docker/Docker Compose to a public cloud provider (e.g. Render, Fly.io, AWS ECS, or GCP Cloud Run).
 5. **Configure Domain & TLS:** Expose public domain with HTTPS and configure appropriate CORS/allowed hosts.
 6. **Verify Public Endpoints:** Confirm `/api/health` and `/api/meta` respond with expected `application_environment`, `provider_status`, and `live_execution_verified`.
 7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `LIVE_VERIFIED_FINAL` if keys are configured, or `FIXTURE_MODE_DRAFT` if uncredentialed).

@@ -3,10 +3,10 @@
 **Project Name:** ExcursionLens  
 **Tagline:** Evidence-first cold-chain temperature excursion investigation agent using NVIDIA Nemotron on Nebius Token Factory.  
 **Track:** Best Apps and Agents  
-**Bonus Track:** Best Use of Tavily  
+**Bonus Track:** None (Primary track only: Best Apps and Agents; Best Use of Tavily bonus track omitted pending live TAVILY_API_KEY receipt)  
 **Repository:** https://github.com/abhijeetnardele24-hash/excursionlens  
 **Public Video URL:** [PUBLIC_YOUTUBE_URL_PLACEHOLDER]  
-**Deployment & Reproducibility:** Containerized non-root production deployment verified via `docker compose up --build` (Public cloud hosting is `BLOCKED` pending hosting credentials).  
+**Deployment & Reproducibility:** Public deployment is REQUIRED by hackathon rules. Public cloud hosting is currently recorded as `BLOCKED` pending hosting credentials; 100% reproducible containerized non-root production execution is verified locally via `docker compose up --build`.  
 **Current Posture:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` (All internal logic, deterministic physics, and quality gates 100% verified; live sponsor execution dispatchable via workflow upon configuring repository secrets).  
 
 ---
@@ -44,7 +44,7 @@ ExcursionLens is an operational investigation copilot for pharmaceutical cold-ch
 - **Authoritative Research:** Integrated Tavily Search API with automated tests verifying strict domain allowlisting (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`), snippet truncation, and content digest verification. In offline/demo mode, uses pre-vetted verified fixture summaries.
 - **Backend Domain Engine:** Built with **Python 3.11+**, **FastAPI**, and **Pydantic v2**, executing 100% deterministic excursion window detection, area-under-the-curve (AUC) calculations, and claims validation.
 - **Frontend Operational Canvas:** Developed with **React 18**, **TypeScript**, and **Vite**, adhering to a forensic operations aesthetic (minimalist palette: Canvas `#F3F0E8`, Ink `#17201E`, Excursion `#B5482D`, Supported `#275E4B`).
-- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, canonical Pytest suite with 165 test cases (93.43% statement and 82.43% unrounded branch coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-fail-under=85`), and Playwright E2E + Axe accessibility scans (0 violations in tested states across 5 viewports). Evidence authority is bound to downloadable GitHub Actions CI artifacts (`verification-artifacts-<COMMIT_SHA>`) produced directly by the [ExcursionLens CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml).
+- **Comprehensive Quality Gates:** 12 frozen synthetic benchmark scenarios with 100% mathematical pass rate, canonical Pytest suite with 165 test cases (92.98% statement and 81.85% unrounded branch coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-fail-under=85`), and Playwright E2E + Axe accessibility scans (0 violations in tested states across 5 viewports). Evidence authority is bound to downloadable GitHub Actions CI artifacts (`verification-artifacts-<COMMIT_SHA>`) produced directly by the [ExcursionLens CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml).
 
 ---
 

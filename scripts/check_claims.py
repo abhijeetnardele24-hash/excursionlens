@@ -8,12 +8,14 @@ Scans all project documentation and claims for:
 4. Fixture evidence described as live
 5. Fixture paraphrases described as verbatim quotations or quoted excerpts
 6. Stale authoritative commit / run identifiers
+7. Stale or mismatched test counts and coverage metrics vs test-results/coverage.json
 """
 
 import json
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -58,15 +60,36 @@ PROHIBITED_PATTERNS = [
         r"\bb9b380a\b",
         "Obsolete commit SHA: Obsolete commit b9b380a referenced in documentation.",
     ),
+    (
+        r"(?i)\b93\.43%",
+        "Stale statement coverage metric: Documented 93.43% must match authoritative Linux CI metric (92.98%).",
+    ),
+    (
+        r"(?i)\b82\.43%",
+        "Stale branch coverage metric: Documented 82.43% must match authoritative Linux CI metric (81.85%).",
+    ),
+    (
+        r"(?i)\b90\.71%",
+        "Stale combined coverage metric: Documented 90.71% must match authoritative Linux CI metric (90.24%).",
+    ),
+    (
+        r"\b1,?478\s*(?:/|\b)",
+        "Stale covered statement count: Documented 1,478 statements must match authoritative Linux CI count (1,471).",
+    ),
+    (
+        r"\b427\s*/\s*518\b",
+        "Stale covered branch count: Documented 427/518 branches must match authoritative Linux CI count (424/518).",
+    ),
 ]
 
 
-def check_markdown_claims() -> list[str]:
+def check_markdown_claims(doc_files: list[Path] | None = None) -> list[str]:
     violations = []
-    doc_files = list(ROOT.glob("*.md")) + list((ROOT / "docs").glob("*.md"))
+    if doc_files is None:
+        doc_files = list(ROOT.glob("*.md")) + list((ROOT / "docs").glob("*.md"))
 
     for file_path in doc_files:
-        rel_path = file_path.relative_to(ROOT)
+        rel_path = file_path.relative_to(ROOT) if file_path.is_relative_to(ROOT) else file_path.name
         content = file_path.read_text(encoding="utf-8")
         for line_no, line in enumerate(content.splitlines(), start=1):
             # Skip lines that explicitly forbid or warn against the phrase (e.g. not "WCAG compliant")
@@ -81,9 +104,10 @@ def check_markdown_claims() -> list[str]:
     return violations
 
 
-def check_authoritative_identifiers() -> list[str]:
+def check_authoritative_identifiers(verification_path: Path | None = None) -> list[str]:
     violations = []
-    verification_path = ROOT / "docs" / "verification-results.json"
+    if verification_path is None:
+        verification_path = ROOT / "docs" / "verification-results.json"
     if not verification_path.exists():
         return violations
 
@@ -107,6 +131,148 @@ def check_authoritative_identifiers() -> list[str]:
     return violations
 
 
+def parse_coverage_totals(cov_data: dict[str, Any]) -> dict[str, Any]:
+    totals = cov_data.get("totals", {})
+    num_stmts = totals.get("num_statements", 0)
+    covered_stmts = totals.get("covered_lines", totals.get("covered_statements", 0))
+    stmt_pct = round((covered_stmts / num_stmts * 100.0), 2) if num_stmts else 0.0
+
+    num_branches = totals.get("num_branches", 0)
+    covered_branches = totals.get("covered_branches", 0)
+    branch_pct = round((covered_branches / num_branches * 100.0), 2) if num_branches else 0.0
+
+    num_total = num_stmts + num_branches
+    covered_total = covered_stmts + covered_branches
+    combined_pct = round((covered_total / num_total * 100.0), 2) if num_total else 0.0
+
+    return {
+        "num_statements": num_stmts,
+        "covered_statements": covered_stmts,
+        "statement_pct": stmt_pct,
+        "num_branches": num_branches,
+        "covered_branches": covered_branches,
+        "branch_pct": branch_pct,
+        "num_total": num_total,
+        "covered_total": covered_total,
+        "combined_pct": combined_pct,
+    }
+
+
+def check_coverage_claims(
+    cov_path: Path | None = None,
+    doc_files: list[Path] | None = None,
+    verification_path: Path | None = None,
+) -> list[str]:
+    violations = []
+    if cov_path is None:
+        cov_path = ROOT / "test-results" / "coverage.json"
+
+    if not cov_path.exists():
+        violations.append(
+            f"Coverage report {cov_path} not found. Pytest coverage JSON must be generated before auditing claims."
+        )
+        return violations
+
+    try:
+        with open(cov_path, "r", encoding="utf-8") as f:
+            cov_raw = json.load(f)
+    except Exception as e:
+        violations.append(f"Failed to parse coverage JSON at {cov_path}: {e}")
+        return violations
+
+    cov = parse_coverage_totals(cov_raw)
+    stmt_pct = cov["statement_pct"]
+    branch_pct = cov["branch_pct"]
+    combined_pct = cov["combined_pct"]
+    covered_stmts = cov["covered_statements"]
+    num_stmts = cov["num_statements"]
+    covered_branches = cov["covered_branches"]
+    num_branches = cov["num_branches"]
+
+    if doc_files is None:
+        doc_files = list(ROOT.glob("*.md")) + list((ROOT / "docs").glob("*.md"))
+
+    for file_path in doc_files:
+        rel_path = file_path.relative_to(ROOT) if file_path.is_relative_to(ROOT) else file_path.name
+        content = file_path.read_text(encoding="utf-8")
+
+        for line_no, line in enumerate(content.splitlines(), start=1):
+            lower_line = line.lower()
+            # Skip lines defining threshold rules/criteria (e.g. >= 85% or minimum threshold)
+            if any(k in lower_line for k in [">=", "<=", "threshold", "minimum threshold", "--cov-fail-under"]):
+                continue
+
+            # 1. Statement coverage % claims: e.g. "92.98% statement coverage" or "92.98% Stmt"
+            for m in re.finditer(r"(\d+\.\d+)%\s*(?:statement|Stmt)", line, re.IGNORECASE):
+                val = float(m.group(1))
+                if abs(val - stmt_pct) > 0.01:
+                    violations.append(
+                        f"{rel_path}:{line_no} — Documented statement coverage claim '{val}%' does not match coverage.json metric '{stmt_pct}%' ({covered_stmts}/{num_stmts})"
+                    )
+
+            # 2. Branch coverage % claims: e.g. "81.85% unrounded branch coverage" or "81.85% Branch"
+            for m in re.finditer(r"(\d+\.\d+)%\s*(?:unrounded\s+)?(?:branch|Branch)", line, re.IGNORECASE):
+                val = float(m.group(1))
+                if abs(val - branch_pct) > 0.01:
+                    violations.append(
+                        f"{rel_path}:{line_no} — Documented branch coverage claim '{val}%' does not match coverage.json metric '{branch_pct}%' ({covered_branches}/{num_branches})"
+                    )
+
+            # 3. Combined coverage % claims: e.g. "90.24% combined coverage"
+            for m in re.finditer(r"(\d+\.\d+)%\s+combined\s+coverage", line, re.IGNORECASE):
+                val = float(m.group(1))
+                if abs(val - combined_pct) > 0.01:
+                    violations.append(
+                        f"{rel_path}:{line_no} — Documented combined coverage claim '{val}%' does not match coverage.json metric '{combined_pct}%' ({cov['covered_total']}/{cov['num_total']})"
+                    )
+
+            # 4. Covered statements fraction: e.g. "1,471/1,582 statements"
+            for m in re.finditer(r"(\d[\d,]*)\s*/\s*(\d[\d,]*)\s+statements", line, re.IGNORECASE):
+                c_val = int(m.group(1).replace(",", ""))
+                t_val = int(m.group(2).replace(",", ""))
+                if c_val != covered_stmts or t_val != num_stmts:
+                    violations.append(
+                        f"{rel_path}:{line_no} — Documented statement fraction '{c_val}/{t_val}' does not match coverage.json '{covered_stmts}/{num_stmts}'"
+                    )
+
+            # 5. Covered branches fraction: e.g. "424/518 branches"
+            for m in re.finditer(r"(\d[\d,]*)\s*/\s*(\d[\d,]*)\s+branches", line, re.IGNORECASE):
+                c_val = int(m.group(1).replace(",", ""))
+                t_val = int(m.group(2).replace(",", ""))
+                if c_val != covered_branches or t_val != num_branches:
+                    violations.append(
+                        f"{rel_path}:{line_no} — Documented branch fraction '{c_val}/{t_val}' does not match coverage.json '{covered_branches}/{num_branches}'"
+                    )
+
+    # Reconcile docs/verification-results.json
+    if verification_path is None:
+        verification_path = ROOT / "docs" / "verification-results.json"
+    if verification_path.exists():
+        try:
+            with open(verification_path, "r", encoding="utf-8") as f:
+                vr = json.load(f)
+            vr_pytest = vr.get("gates", {}).get("pytest", {})
+            vr_stmt = vr_pytest.get("statement_coverage_percent")
+            vr_branch = vr_pytest.get("branch_coverage_percent")
+            vr_comb = vr_pytest.get("coverage_percent")
+            if vr_stmt is not None and abs(vr_stmt - stmt_pct) > 0.01:
+                violations.append(
+                    f"verification-results.json: statement_coverage_percent '{vr_stmt}' does not match coverage.json '{stmt_pct}'"
+                )
+            if vr_branch is not None and abs(vr_branch - branch_pct) > 0.01:
+                violations.append(
+                    f"verification-results.json: branch_coverage_percent '{vr_branch}' does not match coverage.json '{branch_pct}'"
+                )
+            if vr_comb is not None and abs(vr_comb - combined_pct) > 0.01:
+                violations.append(
+                    f"verification-results.json: coverage_percent '{vr_comb}' does not match coverage.json '{combined_pct}'"
+                )
+        except Exception as e:
+            violations.append(f"Failed to check coverage in {verification_path}: {e}")
+
+    return violations
+
+
 def main() -> int:
     print("=" * 60)
     print("  EXCURSIONLENS DOCUMENTATION & CLAIMS AUDIT")
@@ -114,8 +280,9 @@ def main() -> int:
 
     claims_violations = check_markdown_claims()
     id_violations = check_authoritative_identifiers()
+    cov_violations = check_coverage_claims()
 
-    all_violations = claims_violations + id_violations
+    all_violations = claims_violations + id_violations + cov_violations
 
     if all_violations:
         print(f"❌ Claims audit failed with {len(all_violations)} violation(s):")
@@ -123,7 +290,7 @@ def main() -> int:
             print(f"   • {v}")
         return 1
 
-    print("✅ Documentation & Claims Audit Passed! Zero overclaims or invalid identifiers found.")
+    print("✅ Documentation & Claims Audit Passed! Zero overclaims, stale metrics, or invalid identifiers found.")
     return 0
 
 

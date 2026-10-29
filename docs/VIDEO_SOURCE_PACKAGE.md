@@ -1,5 +1,10 @@
 # ExcursionLens: Official Video Demonstration Source Package
 
+> [!CAUTION]
+> **Video Recorder Truthfulness Directive:**  
+> When recording while provider status is DEMO_FIXTURE or NOT_CONFIGURED, the presenter MUST NOT claim, imply, or suggest that live Nebius Token Factory inference or live Tavily retrieval is executing.  
+> The presenter must explicitly state that the system operates in verified deterministic fixture mode, showcase the header badge displaying NOT_CONFIGURED or DEMO_FIXTURE, and explain that live execution remains fail-closed until external API credentials are provided. Never fabricate live provider execution during video capture.
+
 **Target Duration:** 2 minutes 40 seconds (Strict target: 2:35–2:50 | Hard maximum: 3:00)  
 **Publishing Requirement:** Public YouTube video (URL to replace `[PUBLIC_YOUTUBE_URL_PLACEHOLDER]` in `docs/DEVPOST_SUBMISSION.md`)  
 **Target Application URL:** `http://localhost:8000` (run via `docker compose up --build`) or public HTTPS deployment URL  
@@ -93,7 +98,7 @@
   2. Hover over the **Skeptic Critique** on Hypothesis 2: point to the vehicle alternator telemetry badge showing steady **12.8V to 13.1V**.
   3. Point out how the Skeptic directly falsifies auxiliary power loss.
 - **Spoken Narration (Voiceover):**
-  > "Stages 5 and 6 execute our dual-pass causal engine, powered by NVIDIA Nemotron-70B on Nebius. First, generator synthesis produces three competing hypotheses. Next, an adversarial skeptic pass tests each hypothesis against telemetry facts.
+  > "Stages 5 and 6 execute our dual-pass causal engine, structured for NVIDIA Nemotron-70B on Nebius (operating here in verified fixture mode). First, generator synthesis produces three competing hypotheses. Next, an adversarial skeptic pass tests each hypothesis against telemetry facts.
   >
   > While a naive LLM might blame refrigeration failure, the skeptic analyzes the truck alternator telemetry: voltage remained rock-steady at 12.8 to 13.1 volts, directly refuting compressor power loss and isolating dock infiltration as the primary root cause. Strict regex validators trap any hallucinated release claims."
 

@@ -111,8 +111,9 @@ jobs:
         run: |
           python -m pytest apps/api/tests/test_claims_validator.py
 
-      - name: Documentation Claims Audit
+      - name: Documentation Claims Audit & Regression Suite
         run: |
+          python scripts/test_check_claims.py
           python scripts/check_claims.py
 
       - name: Live Provider Verification Gate (Fail-Closed)

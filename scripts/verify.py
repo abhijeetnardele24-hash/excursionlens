@@ -126,7 +126,10 @@ def main():
     print("\n[Gate 4/7] Running Pytest & Coverage (Statement >= 85%, Branch >= 80%)...")
     cov_path = ROOT / "test-results" / "coverage.json"
     cov_path.parent.mkdir(parents=True, exist_ok=True)
-    env = {"PYTHONPATH": "."}
+    env = {
+        "PYTHONPATH": ".",
+        "GITHUB_SHA": os.environ.get("GITHUB_SHA") or git_info.get("head") or "1837e00facd0f4d27906255472d9be2a339885b4",
+    }
     rc, stdout, stderr, elapsed = run_cmd([
         sys.executable, "-m", "pytest", "apps/api/tests",
         "--cov=apps/api/app",
@@ -269,16 +272,18 @@ def main():
 
     # 8. Documentation & Claims Check
     print("\n[Gate 8/8] Running Documentation & Claims Audit...")
+    rc_test, out_test, err_test, _ = run_cmd([sys.executable, "scripts/test_check_claims.py"])
     rc, stdout, stderr, elapsed = run_cmd([sys.executable, "scripts/check_claims.py"])
+    all_passed = (rc == 0 and rc_test == 0)
     results["gates"]["claims_check"] = {
-        "passed": rc == 0,
+        "passed": all_passed,
         "elapsed_sec": round(elapsed, 2),
-        "output": stdout if rc == 0 else f"{stdout}\n{stderr}",
+        "output": f"{out_test}\n{stdout}" if all_passed else f"{out_test}\n{err_test}\n{stdout}\n{stderr}",
     }
-    if rc == 0:
-        print("  ✓ Documentation claims audit passed (0 violations)")
+    if all_passed:
+        print("  ✓ Documentation claims audit & regression suite passed (0 violations)")
     else:
-        print(f"  ✗ Documentation claims audit failed:\n{stdout}\n{stderr}")
+        print(f"  ✗ Documentation claims audit failed:\n{out_test}\n{err_test}\n{stdout}\n{stderr}")
 
     # Canonical Case Ground Truth
     results["canonical_case_nmb_204"] = {

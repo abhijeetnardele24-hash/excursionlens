@@ -11,6 +11,7 @@ export default defineConfig({
   timeout: 30000,
   fullyParallel: false,
   workers: 1,
+  outputDir: 'test-results/artifacts',
   reporter: [
     ['list'],
     ['json', { outputFile: 'test-results/playwright-results.json' }],

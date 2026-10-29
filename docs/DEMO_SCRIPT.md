@@ -4,6 +4,11 @@
 > ExcursionLens is implemented to use NVIDIA Nemotron (`nvidia/llama-3.1-nemotron-70b-instruct`) through Nebius Token Factory and authoritative live search via Tavily.  
 > **Current committed repository evidence is fixture mode (`DEMO_FIXTURE`); live provider verification remains blocked pending real external credentials.**  
 >
+> [!CAUTION]
+> **Video Recorder Truthfulness Directive:**  
+> When recording while provider status is DEMO_FIXTURE or NOT_CONFIGURED, the presenter MUST NOT claim, imply, or suggest that live Nebius Token Factory inference or live Tavily retrieval is executing.  
+> The presenter must explicitly state that the system operates in verified deterministic fixture mode, showcase the header badge displaying NOT_CONFIGURED or DEMO_FIXTURE, and explain that live execution remains fail-closed until external API credentials are provided. Never fabricate live provider execution during video capture.
+>
 > Below are two complete, distinct script variants depending on whether external API credentials have been supplied.
 
 ---
