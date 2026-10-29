@@ -5,6 +5,7 @@ from .models import (
     CounterfactualRequest,
     CounterfactualResult,
     CustodyEvent,
+    ExcerptKind,
     Hypothesis,
     InvestigationRun,
     Observation,
@@ -12,6 +13,7 @@ from .models import (
     SensorReading,
     ShipmentCase,
     SkepticCritique,
+    SourceMode,
     SourceRecord,
     ToolEvent,
 )
@@ -22,6 +24,7 @@ __all__ = [
     "CounterfactualResult",
     "CustodyEvent",
     "DeterministicExcursionEngine",
+    "ExcerptKind",
     "Hypothesis",
     "InvestigationRun",
     "Observation",
@@ -29,6 +32,7 @@ __all__ = [
     "SensorReading",
     "ShipmentCase",
     "SkepticCritique",
+    "SourceMode",
     "SourceRecord",
     "ToolEvent",
 ]

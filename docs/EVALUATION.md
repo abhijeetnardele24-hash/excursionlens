@@ -45,4 +45,4 @@ python benchmark/run_benchmark.py
 The Claims Validator (`apps/api/app/domain/validator.py`) was tested against synthetic adversarial perturbations:
 - **Hallucinated Evidence IDs:** Synthetic hypotheses attempting to cite non-existent observation IDs (e.g., `OBS-HALLUCINATED-99`) are automatically rejected.
 - **Prohibited Disposition Language:** Any hypothesis containing release assertions ("Product is completely safe for immediate release") is stripped of authority and flagged as a safety violation.
-- **Strict Allowlist Compliance:** 100% of external web sources retrieved via Tavily adhere to the domain allowlist (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`).
+- **Strict Allowlist Enforcement:** Automated test suites verify that 100% of guidance sources adhere strictly to the domain allowlist (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`) and reject spoofed URLs, lookalikes, ports, and credentials. In offline benchmark execution, verified pre-vetted fixture summaries are used.

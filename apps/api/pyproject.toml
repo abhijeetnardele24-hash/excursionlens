@@ -34,6 +34,7 @@ minversion = "8.0"
 testpaths = ["tests"]
 pythonpath = ["app", "."]
 asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
 line-length = 120

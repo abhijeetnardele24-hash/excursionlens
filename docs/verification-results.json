@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-29T07:24:27Z",
+  "timestamp": "2026-10-29T18:36:58Z",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "git": {
-    "head": "6f4fe62514053f059969582a4a6d2036a0e57ccb",
+    "head": "f68e00791110fe944b3c197573ecf95a276f90f7",
     "branch": "main",
     "clean_tree": false
   },
@@ -12,36 +12,36 @@
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.08,
+      "elapsed_sec": 0.12,
       "output": "All checks passed!\n"
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.47,
+      "elapsed_sec": 0.66,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.96,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DwM1TPR6.js   \u001b[39m\u001b[1m\u001b[2m190.97 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.47 kB\u001b[22m\u001b[2m \u2502 map: 472.10 kB\u001b[22m\n\u001b[32m\u2713 built in 612ms\u001b[39m\n"
+      "elapsed_sec": 2.39,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 513ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
-      "coverage_percent": 90.32,
-      "statement_coverage_percent": 93.09,
-      "branch_coverage_percent": 81.91,
-      "elapsed_sec": 33.48
+      "coverage_percent": 90.71,
+      "statement_coverage_percent": 93.43,
+      "branch_coverage_percent": 82.43,
+      "elapsed_sec": 23.79
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.28
+      "elapsed_sec": 0.21
     },
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.42
+      "elapsed_sec": 0.4
     },
     "playwright": {
       "passed": true,
@@ -50,7 +50,12 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 29547.490999999998
+      "duration_ms": 35808.222
+    },
+    "claims_check": {
+      "passed": true,
+      "elapsed_sec": 0.08,
+      "output": "============================================================\n  EXCURSIONLENS DOCUMENTATION & CLAIMS AUDIT\n============================================================\n\u2705 Documentation & Claims Audit Passed! Zero overclaims or invalid identifiers found.\n"
     }
   },
   "canonical_case_nmb_204": {
@@ -63,8 +68,8 @@
   },
   "external_gates": {
     "live_providers": {
-      "status": "BLOCKED/STALE_EVIDENCE",
-      "reason": "STALE_EVIDENCE",
+      "status": "BLOCKED",
+      "reason": null,
       "nebius_token_factory": "MISSING_KEY",
       "served_nvidia_model": "nvidia/llama-3.1-nemotron-70b-instruct",
       "tavily_search": "MISSING_KEY",

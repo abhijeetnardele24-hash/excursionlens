@@ -24,7 +24,7 @@
 
 | Scene | Timecode | Visual / URL | Onscreen Action | Audio / Spoken Focus |
 |:---:|:---:|:---|:---|:---|
-| **01** | `0:00 - 0:30` | `http://localhost:8000` Header & Case Card | Show `NOT_CONFIGURED` badge, NMB-204 case card, red quarantine badge | The $35B cold-chain blindspot; fail-closed safety boundary; fixture baseline |
+| **01** | `0:00 - 0:30` | `http://localhost:8000` Header & Case Card | Show `NOT_CONFIGURED` badge, NMB-204 case card, red quarantine badge | The cold-chain integrity challenge; fail-closed safety boundary; fixture baseline |
 | **02** | `0:30 - 0:55` | Temperature Chart & Event Rail | Toggle accessible table, highlight 40-min breach, 10.5°C peak, 10:18 UTC door event | Deterministic Python engine; IoT logger correlation with dock door |
 | **03** | `0:55 - 1:20` | Stage Tracker & Provider Panel | Click "Investigate Excursion", expand Provider panel, show cached CDC/WHO guidance | Bounded state machine; pre-vetted regulatory guidance fallback |
 | **04** | `1:20 - 1:50` | Hypothesis Board & Skeptic Panel | Show 3 competing hypotheses; hover skeptic critique of reefer voltage | Nemotron-70B causal architecture; adversarial contradiction pass |

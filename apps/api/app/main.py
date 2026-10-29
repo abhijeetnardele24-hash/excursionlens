@@ -104,8 +104,15 @@ app.add_middleware(
 async def security_and_rate_limit_middleware(request: Request, call_next):
     # 1. Payload size check
     content_length = request.headers.get("content-length")
-    if content_length and int(content_length) > settings.max_request_size_bytes:
-        return Response(content="Request payload exceeds maximum allowed size.", status_code=413)
+    if content_length is not None:
+        try:
+            cl_val = int(content_length)
+            if cl_val < 0:
+                return Response(content="Malformed Content-Length header.", status_code=400)
+            if cl_val > settings.max_request_size_bytes:
+                return Response(content="Request payload exceeds maximum allowed size.", status_code=413)
+        except ValueError:
+            return Response(content="Invalid Content-Length header.", status_code=400)
 
     # 2. Sliding window rate limiting (applied only to API endpoints)
     if request.url.path.startswith("/api") and not request.url.path.endswith("/events"):

@@ -142,6 +142,15 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
 
         {src && (
           <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span className={`badge ${src.source_mode === 'LIVE_RETRIEVAL' ? 'badge-accent' : 'badge-neutral'}`}>
+                {src.source_mode === 'LIVE_RETRIEVAL' ? 'LIVE RETRIEVAL' : 'VERIFIED FIXTURE'}
+              </span>
+              <span className="badge badge-neutral" style={{ fontSize: '10px' }}>
+                {src.excerpt_kind === 'VERBATIM' ? 'VERBATIM EXCERPT' : 'PARAPHRASE'}
+              </span>
+            </div>
+
             <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
               {src.title}
             </h3>
@@ -153,14 +162,29 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
 
             <div style={{ backgroundColor: 'var(--canvas)', padding: '12px', borderRadius: 'var(--radius-sm)', marginBottom: '12px' }}>
               <div style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>
-                Authoritative Guidance Excerpt (Domain: {src.domain})
+                {src.source_mode === 'LIVE_RETRIEVAL' && src.excerpt_kind === 'VERBATIM'
+                  ? 'Live retrieved excerpt'
+                  : 'Verified fixture summary — not a live quotation'}{' '}
+                (Domain: {src.domain})
               </div>
-              <p style={{ fontSize: '13px', color: 'var(--ink-secondary)', fontStyle: 'italic' }}>
-                "{src.snippet}"
+              <p style={{ fontSize: '13px', color: 'var(--ink-secondary)', fontStyle: src.excerpt_kind === 'VERBATIM' ? 'italic' : 'normal', margin: '6px 0' }}>
+                {src.excerpt_kind === 'VERBATIM' ? `"${src.snippet}"` : src.snippet}
               </p>
+              {src.verification_note && (
+                <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
+                  <strong>Verification Note:</strong> {src.verification_note}
+                </div>
+              )}
             </div>
 
             <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
+              <div><strong>Source Mode:</strong> <code>{src.source_mode}</code></div>
+              {src.verified_at && (
+                <div><strong>Verified At:</strong> <span className="tabular-nums">{src.verified_at}</span></div>
+              )}
+              {src.published_or_updated_at && (
+                <div><strong>Published / Updated:</strong> <span className="tabular-nums">{src.published_or_updated_at}</span></div>
+              )}
               <div><strong>Retrieved:</strong> {src.retrieved_at}</div>
               <div><strong>Content Digest:</strong> <code style={{ fontSize: '10px' }}>{src.content_digest.slice(0, 24)}…</code></div>
             </div>

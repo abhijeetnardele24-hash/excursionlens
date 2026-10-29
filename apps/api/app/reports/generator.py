@@ -13,7 +13,7 @@ import os
 import subprocess
 import urllib.parse
 
-from ..domain.models import InvestigationRun, ShipmentCase
+from ..domain.models import InvestigationRun, ShipmentCase, SourceRecord
 
 
 def _get_git_commit_sha() -> str:
@@ -98,16 +98,29 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
         for h in run.hypotheses
     )
 
-    source_rows = "".join(
-        f"""<tr>
+    def _format_source_row(s: SourceRecord) -> str:
+        mode_badge = (
+            '<span class="badge" style="background: #D4EDDA; color: #155724; font-size: 10px;">LIVE RETRIEVAL</span>'
+            if s.source_mode == "LIVE_RETRIEVAL"
+            else '<span class="badge" style="background: #E2E3E5; color: #383D41; font-size: 10px;">VERIFIED FIXTURE</span>'
+        )
+        kind_label = "Verbatim Excerpt" if s.excerpt_kind == "VERBATIM" else "Verified Paraphrase"
+        note_html = (
+            f"<div style='font-size: 11px; color: var(--muted); margin-top: 4px;'><em>{_esc(s.verification_note)}</em></div>"
+            if s.verification_note
+            else ""
+        )
+        date_str = f" &bull; Verified: {_esc(s.verified_at)}" if s.verified_at else ""
+        return f"""<tr>
             <td><code>{_esc(s.id)}</code></td>
             <td><a href="{_safe_url(s.url)}" target="_blank" rel="noopener noreferrer">{_esc(s.title)}</a></td>
             <td><code>{_esc(s.domain)}</code></td>
+            <td>{mode_badge}<br><span style="font-size: 11px; color: var(--muted);">{kind_label}{date_str}</span></td>
             <td><code title="SHA-256 Digest">{_esc(s.content_digest[:16])}…</code></td>
-            <td>{_esc(s.snippet)}</td>
+            <td>{_esc(s.snippet)}{note_html}</td>
         </tr>"""
-        for s in run.sources
-    )
+
+    source_rows = "".join(_format_source_row(s) for s in run.sources)
 
     cf_section = ""
     if run.counterfactual:
@@ -429,7 +442,7 @@ def generate_printable_html_report(run: InvestigationRun, case: ShipmentCase) ->
         <h2>{source_heading}</h2>
         <table>
             <thead>
-                <tr><th style="width: 120px;">Source ID</th><th>Title &amp; Canonical Reference</th><th>Domain</th><th style="width: 160px;">Source Digest</th><th>Relevant Excerpt</th></tr>
+                <tr><th style="width: 100px;">Source ID</th><th>Title &amp; Canonical Reference</th><th>Domain</th><th style="width: 140px;">Provenance Mode</th><th style="width: 150px;">Source Digest</th><th>Guidance Content &amp; Provenance</th></tr>
             </thead>
             <tbody>
                 {source_rows}

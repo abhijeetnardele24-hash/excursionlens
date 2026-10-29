@@ -78,11 +78,15 @@ export interface SourceRecord {
   url: string;
   title: string;
   domain: string;
-  published_or_updated_at?: string;
+  published_or_updated_at?: string | null;
   retrieved_at: string;
   snippet: string;
   content_digest: string;
   query: string;
+  source_mode: 'LIVE_RETRIEVAL' | 'VERIFIED_FIXTURE';
+  excerpt_kind: 'VERBATIM' | 'PARAPHRASE';
+  verified_at?: string | null;
+  verification_note?: string | null;
 }
 
 export interface Hypothesis {

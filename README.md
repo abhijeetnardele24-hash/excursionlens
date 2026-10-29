@@ -3,7 +3,7 @@
 **Evidence-first operational agent for biopharmaceutical cold-chain temperature excursion forensics.**  
 *Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
 
-[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20COMPLETE%20%2F%20ACTION%20REQUIRED-275E4B?style=for-the-badge&logo=checkmarx)](docs/verification-results.json)
+[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20COMPLETE%20%2F%20ACTION%20REQUIRED-275E4B?style=for-the-badge&logo=checkmarx)](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)
 [![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20in%20Tested%20States-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
 [![Benchmark](https://img.shields.io/badge/Frozen%20Benchmark-12%2F12%20Scenarios%20(100%25)-275E4B?style=for-the-badge&logo=speedtest)](benchmark/run_benchmark.py)
 [![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-92.64%25%20Stmt%20%7C%2081.32%25%20Branch-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
@@ -30,9 +30,9 @@
 
 ---
 
-## The Problem: The $35 Billion Cold-Chain Blindspot
+## The Problem: Cold-Chain Vulnerabilities in Biopharmaceutical Distribution
 
-Every year, over **$35 billion in critical biopharmaceuticals, vaccines, and biologics** are discarded or compromised due to cold-chain temperature excursions during multimodal distribution. 
+Temperature-sensitive vaccines, biologics, and biopharmaceuticals depend on continuous thermal integrity (standard 2°C to 8°C controls) across multimodal transit. According to the World Health Organization (WHO), up to 50% of vaccines are wasted globally each year in part due to cold-chain failures, temperature excursions, and logistical bottlenecks (*WHO Immunization Supply Chain Guidelines*).
 
 In life sciences operations:
 1. **The Investigation Bottleneck:** When an Internet-of-Things (IoT) temperature logger alarms at receiving dock, operations teams must manually reconcile disjointed sensor logs, delivery manifests, and vehicle telemetry to understand if the breach penetrated the liquid core of the vial or merely warmed surface air during pallet handoff.
@@ -41,7 +41,7 @@ In life sciences operations:
 ### The ExcursionLens Solution
 ExcursionLens combines a **100% deterministic domain foundation** with **bounded agentic causal reasoning**:
 - **Deterministic Core:** Zero AI tokens in temperature calculations. Window detection, 40.0-min duration, 10.5°C peak breach, rate-of-change, and 50.5°C·min Area Under the Curve (AUC) are pure mathematical calculations.
-- **Authoritative Grounding:** Real-time search through Tavily restricted to trusted public health domains (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`).
+- **Authoritative Grounding:** Integrated search through Tavily restricted to trusted public health domains (`cdc.gov`, `fda.gov`, `who.int`, `gs1.org`). Automated tests strictly enforce domain allowlisting and reject URL spoofing; in offline/demo mode, the system falls back safely to pre-vetted verified fixture summaries.
 - **NVIDIA Nemotron via Nebius Token Factory:** Deep causal hypothesis generation across competing operational explanations.
 - **Adversarial Skeptic Pass:** An adversarial critique systematically audits hypotheses against physical telemetry (e.g., verifying vehicle bus voltage directly disproves reefer auxiliary power failure).
 - **Quality Posture Boundary:** The system is architecturally barred from making final release dispositions. All investigations conclude in `QUARANTINE_PENDING_QUALIFIED_REVIEW` with an auditable human-review packet.
@@ -128,7 +128,7 @@ Investigations stream in real-time over Server-Sent Events (SSE) across eight di
 [1. VALIDATE_SCHEMA]    --> Enforces strict Pydantic schemas on custody & sensor logs.
 [2. NORMALIZE_SERIES]   --> Detects reading intervals, gaps, and computes rate of temperature rise.
 [3. DETECT_EXCURSION]   --> Deterministically calculates breach windows, AUC, and peak breach values.
-[4. TAVILY_GUIDANCE]    --> Queries live CDC/FDA/WHO guidelines on strict domain allowlist.
+[4. TAVILY_GUIDANCE]    --> Queries CDC/FDA/WHO guidelines on strict domain allowlist (falls back safely to verified fixture summaries).
 [5. NEMOTRON_HYPOTHESIS]--> Generates 3 competing causal hypotheses via Nebius Token Factory.
 [6. ADVERSARIAL_SKEPTIC]--> Refutes invalid hypotheses using physical evidence (bus voltage).
 [7. VALIDATE_CITATIONS] --> Verifies all factual claims against observation IDs (OBS-* / SRC-*).
@@ -177,7 +177,7 @@ python scripts/verify.py
 - **Pytest Suite:** 141 test cases passing with 92.64% statement coverage and 81.32% branch coverage (89.84% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement).
 - **Deterministic Benchmark:** 12 of 12 scenarios passing with 100% precision.
 - **Security Scanner:** 0 secrets, tokens, or private credentials committed.
-- **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in the tested states across all 5 viewports.
+- **Playwright E2E & Axe Accessibility:** 5 logical journeys (25 viewport executions) passing across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in the tested states across all 5 viewports. (Automated scans verify targeted accessibility criteria and do not constitute complete WCAG certification).
 
 > **Evidence Authority:** The authoritative verification record for evaluated commit `b9b380a` is generated in [GitHub Actions CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) with downloadable artifact `verification-artifacts-b9b380a0c0ccce097d581c57ed186f8a9140c996` (with baseline commit `6f4fe62` verified in [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359) with artifact `verification-artifacts-6f4fe62514053f059969582a4a6d2036a0e57ccb`). Statement coverage: 92.64%, Branch coverage: 81.32% (exceeding the strict unrounded 80.0% gate under pytest 9.2.0).
 

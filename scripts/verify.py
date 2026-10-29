@@ -14,6 +14,11 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.provenance import get_execution_provenance  # noqa: E402
+
 
 def run_cmd(args, env=None, capture=True):
     start = time.time()
@@ -61,21 +66,7 @@ def main():
     print("=" * 60)
 
     git_info = get_git_info()
-    github_server = os.environ.get("GITHUB_SERVER_URL")
-    github_repo = os.environ.get("GITHUB_REPOSITORY")
-    github_run_id = os.environ.get("GITHUB_RUN_ID")
-    is_ci = os.environ.get("GITHUB_ACTIONS") == "true" and bool(github_server and github_repo and github_run_id)
-
-    execution_context = (
-        f"{github_server}/{github_repo}/actions/runs/{github_run_id}"
-        if is_ci
-        else "LOCAL_DOCUMENTATION_SNAPSHOT"
-    )
-    evidence_authority = (
-        "AUTHORITATIVE_CI_ARTIFACT"
-        if is_ci
-        else "LOCAL_DOCUMENTATION_SNAPSHOT"
-    )
+    evidence_authority, execution_context = get_execution_provenance()
 
     results = {
         "schema_version": "1.0",
@@ -275,6 +266,19 @@ def main():
         print(f"  ✓ Playwright & Axe passed: {logical_tests_count} logical journeys ({viewport_executions_count} viewport executions) across 5 viewports")
     else:
         print(f"  ✗ Playwright status: {results['gates'].get('playwright')}")
+
+    # 8. Documentation & Claims Check
+    print("\n[Gate 8/8] Running Documentation & Claims Audit...")
+    rc, stdout, stderr, elapsed = run_cmd([sys.executable, "scripts/check_claims.py"])
+    results["gates"]["claims_check"] = {
+        "passed": rc == 0,
+        "elapsed_sec": round(elapsed, 2),
+        "output": stdout if rc == 0 else f"{stdout}\n{stderr}",
+    }
+    if rc == 0:
+        print("  ✓ Documentation claims audit passed (0 violations)")
+    else:
+        print(f"  ✗ Documentation claims audit failed:\n{stdout}\n{stderr}")
 
     # Canonical Case Ground Truth
     results["canonical_case_nmb_204"] = {

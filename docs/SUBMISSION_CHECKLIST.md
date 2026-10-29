@@ -31,7 +31,7 @@
 - [x] **Gate 4 (Backend Unit & Coverage):** Canonical Pytest suite passing with 141 test cases, 92.64% statement coverage, and 81.32% branch coverage (89.84% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 with `--cov-branch --cov-fail-under=85` enforcement; evaluated on Linux [CI Run 40835420059](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40835420059) and baseline [CI Run 40832497359](https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/40832497359)).
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
-- [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports.
+- [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports (automated tests evaluate targeted accessibility rules and do not constitute complete WCAG certification).
 - [x] Machine verification receipt generated at `docs/verification-results.json` (`INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`).
 
 ---

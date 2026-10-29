@@ -27,6 +27,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from apps.api.app.config import settings  # noqa: E402
+from scripts.provenance import get_execution_provenance  # noqa: E402
 
 AUTHORITATIVE_DOMAINS = [
     "cdc.gov",
@@ -405,9 +406,12 @@ def run_live_smoke() -> int:
             pass
         return "unknown"
 
+    evidence_authority, execution_context = get_execution_provenance()
+
     receipt = {
         "schema_version": "1.0",
-        "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+        "evidence_authority": evidence_authority,
+        "execution_context": execution_context,
         "commit_sha": _get_git_sha(),
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "status": overall_status,
@@ -426,7 +430,8 @@ def run_live_smoke() -> int:
     with open(prov_receipts_path, "w", encoding="utf-8") as f:
         json.dump({
             "schema_version": "1.0",
-            "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "evidence_authority": evidence_authority,
+            "execution_context": execution_context,
             "commit_sha": receipt["commit_sha"],
             "timestamp": receipt["timestamp"],
             "nebius": {

@@ -16,13 +16,40 @@ async function main() {
   fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
 
   console.log('🚀 Starting ExcursionLens backend for asset capture...');
-  const server = spawn('.\\.venv\\Scripts\\python.exe', ['-m', 'uvicorn', 'apps.api.app.main:app', '--port', '8000', '--host', '127.0.0.1'], {
-    stdio: 'ignore',
-    shell: true,
+  const pythonCmd = process.env.PYTHON || 'python';
+
+  const server = spawn(pythonCmd, ['-m', 'uvicorn', 'apps.api.app.main:app', '--port', '8000', '--host', '127.0.0.1'], {
+    cwd: path.resolve(__dirname, '..'),
+    env: { ...process.env, PYTHONPATH: path.resolve(__dirname, '..') },
+    stdio: 'pipe',
   });
 
-  // Wait for server to boot
-  await new Promise((resolve) => setTimeout(resolve, 2500));
+  server.stdout.on('data', (d) => {
+    // console.log(`[server] ${d}`);
+  });
+  server.stderr.on('data', (d) => {
+    console.error(`[server err] ${d}`);
+  });
+
+  // Poll for server health
+  let serverReady = false;
+  for (let i = 0; i < 30; i++) {
+    try {
+      const resp = await fetch('http://127.0.0.1:8000/api/health');
+      if (resp.ok) {
+        serverReady = true;
+        console.log('✅ Backend server is ready.');
+        break;
+      }
+    } catch {
+      // wait and retry
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+
+  if (!serverReady) {
+    throw new Error('Backend server failed to start within 15 seconds.');
+  }
 
   const browser = await chromium.launch({ headless: true });
 
@@ -111,8 +138,9 @@ async function main() {
     await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '01_case_overview.png') });
 
     // Screenshot 2: 02_timeline_evidence.png
-    console.log('Capturing 02_timeline_evidence.png...');
-    const timelineElem = page.locator('.card').first();
+    console.log('Capturing 02_timeline_evidence.png (operational timeline chart & aligned event rail)...');
+    const timelineElem = page.locator('.operational-grid');
+    await timelineElem.scrollIntoViewIfNeeded();
     await timelineElem.screenshot({ path: path.join(SCREENSHOTS_DIR, '02_timeline_evidence.png') });
 
     // Trigger Investigation
@@ -132,8 +160,10 @@ async function main() {
     await page.waitForSelector('text=Simulation Completed', { timeout: 5000 });
 
     // Screenshot 4: 04_counterfactual.png
-    console.log('Capturing 04_counterfactual.png...');
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '04_counterfactual.png') });
+    console.log('Capturing 04_counterfactual.png (deliberate workbench composition)...');
+    const cfElem = page.locator('.card', { hasText: 'Counterfactual Preventive Control Workbench' });
+    await cfElem.scrollIntoViewIfNeeded();
+    await cfElem.screenshot({ path: path.join(SCREENSHOTS_DIR, '04_counterfactual.png') });
 
     // Open Review Packet Modal
     console.log('Opening Review Packet for 05_review_packet.png...');
@@ -143,7 +173,8 @@ async function main() {
 
     // Screenshot 5: 05_review_packet.png
     console.log('Capturing 05_review_packet.png...');
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, '05_review_packet.png') });
+    const modalElem = page.locator('.modal-content');
+    await modalElem.screenshot({ path: path.join(SCREENSHOTS_DIR, '05_review_packet.png') });
 
     console.log('🎉 All 5 product screenshots and graphic assets captured successfully!');
   } finally {

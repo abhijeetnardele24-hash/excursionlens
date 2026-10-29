@@ -32,17 +32,17 @@ Multimodal events aligned along the common UTC timeline:
 
 ## 3. Authoritative Health Guidelines (Tavily Allowlist)
 
-Real-time guidance retrieval restricted to trusted public health repositories:
+Authoritative guidance retrieval restricted to trusted public health repositories. Automated test suites verify strict domain allowlisting and URL sanitization. In live operation with API keys configured, queries are dispatched to Tavily; in offline/demo mode, the system falls back safely to pre-vetted verified fixture summaries:
 - **CDC (Centers for Disease Control and Prevention):**
-  - *Vaccine Storage and Handling Toolkit (June 2024)*
+  - *Vaccine Storage and Handling Toolkit*
   - Temperature monitoring best practices, purpose-built storage units, and emergency response procedures.
   - Domain: `cdc.gov`
 - **WHO (World Health Organization):**
-  - *Good Distribution Practices for Pharmaceutical Products (Technical Report Series)*
+  - *Controlled Temperature Chain (CTC) Guidelines / Good Distribution Practices*
   - Temperature excursion management protocols in cross-dock transit.
   - Domain: `who.int`
 - **FDA (Food and Drug Administration):**
-  - *21 CFR Part 211 & Part 11 Electronic Records Compliance*
+  - *Q1A(R2) Stability Testing of New Drug Substances and Products / 21 CFR Part 211*
   - Stability testing guidelines and quarantine segregation mandates.
   - Domain: `fda.gov`
 - **GS1 Healthcare:**
@@ -55,4 +55,4 @@ Real-time guidance retrieval restricted to trusted public health repositories:
 ## 4. Provenance Hashing & Retention
 
 - Every ingested file and query snippet receives a SHA-256 digest upon intake.
-- These digests are recorded in the structured review packet and JSON audit export to guarantee non-repudiation in pharmaceutical compliance reviews.
+- These digests are recorded in the structured review packet and JSON audit export. SHA-256 supports integrity verification when compared with a trusted digest; it does not provide identity, authorship, approval, or non-repudiation by itself. Qualified human pharmacist sign-off remains mandatory for product disposition.

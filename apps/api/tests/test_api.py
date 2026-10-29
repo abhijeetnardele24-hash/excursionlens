@@ -122,11 +122,38 @@ def test_security_headers_and_payload_limits():
     assert res.headers["x-frame-options"] == "DENY"
     assert "default-src 'self'" in res.headers["content-security-policy"]
 
-    # Test payload size limit
+    # 1. Non-integer Content-Length header returns 400
+    res_non_int = client.post(
+        "/api/cases/validate",
+        content="{}",
+        headers={"content-type": "application/json", "content-length": "invalid-non-int"},
+    )
+    assert res_non_int.status_code == 400
+    assert "Invalid Content-Length header." in res_non_int.text
+
+    # 2. Negative Content-Length header returns 400
+    res_neg = client.post(
+        "/api/cases/validate",
+        content="{}",
+        headers={"content-type": "application/json", "content-length": "-42"},
+    )
+    assert res_neg.status_code == 400
+    assert "Malformed Content-Length header." in res_neg.text
+
+    # 3. Payload above configured maximum returns 413
     oversized = "a" * (2 * 1024 * 1024 + 100)
     big_res = client.post(
         "/api/cases/validate",
-        data=oversized,
-        headers={"content-type": "application/json", "content-length": str(len(oversized))}
+        content=oversized,
+        headers={"content-type": "application/json", "content-length": str(len(oversized))},
     )
     assert big_res.status_code == 413
+    assert "Request payload exceeds maximum allowed size." in big_res.text
+
+    # 4. Valid payload at or below limit proceeds safely
+    valid_res = client.post(
+        "/api/cases/validate",
+        content="{}",
+        headers={"content-type": "application/json", "content-length": "2"},
+    )
+    assert valid_res.status_code in (200, 422)  # Either accepted or schema validation error, not 400/413/500

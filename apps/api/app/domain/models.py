@@ -126,8 +126,12 @@ class CaseAnalysisResult(BaseModel):
 
 
 # ==============================================================================
-# 3. Authoritative Source Records (Tavily Grounding)
+# 3. Authoritative Source Records (Tavily Grounding & Provenance)
 # ==============================================================================
+
+SourceMode = Literal["LIVE_RETRIEVAL", "VERIFIED_FIXTURE"]
+ExcerptKind = Literal["VERBATIM", "PARAPHRASE"]
+
 
 class SourceRecord(BaseModel):
     id: str = Field(..., description="Unique source ID, e.g. SRC-CDC-01")
@@ -136,9 +140,13 @@ class SourceRecord(BaseModel):
     domain: str = Field(..., description="Allowlisted domain, e.g. cdc.gov")
     published_or_updated_at: str | None = Field(None, description="Publication or update date")
     retrieved_at: str = Field(..., description="ISO 8601 retrieval timestamp")
-    snippet: str = Field(..., description="Relevant text excerpt")
+    snippet: str = Field(..., description="Relevant text excerpt or summary")
     content_digest: str = Field(..., description="SHA-256 digest of excerpt")
     query: str = Field(..., description="Originating search query")
+    source_mode: SourceMode = Field("VERIFIED_FIXTURE", description="LIVE_RETRIEVAL or VERIFIED_FIXTURE")
+    excerpt_kind: ExcerptKind = Field("PARAPHRASE", description="VERBATIM or PARAPHRASE")
+    verified_at: str | None = Field(None, description="ISO date or timestamp when source content was verified")
+    verification_note: str | None = Field(None, description="Concise explanation of how fixture content was checked")
 
 
 # ==============================================================================

@@ -1,8 +1,9 @@
 {
   "schema_version": "1.0",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
-  "commit_sha": "1e5a320fa18d9c8dbef847cd71a71e51861c9203",
-  "timestamp": "2026-10-29T06:11:34Z",
+  "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "commit_sha": "f68e00791110fe944b3c197573ecf95a276f90f7",
+  "timestamp": "2026-10-29T18:36:34Z",
   "status": "BLOCKED",
   "nebius_smoke": {
     "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",

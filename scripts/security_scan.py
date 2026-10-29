@@ -115,7 +115,7 @@ def scan_git_history() -> list[str]:
 
 
 def main() -> int:
-    print("🔒 [LastRack / ExcursionLens Security Scan] Scanning working tree and Git history...")
+    print("🔒 [ExcursionLens Security Scan] Scanning working tree and Git history...")
     tree_violations = scan_working_tree()
     history_violations = scan_git_history()
 

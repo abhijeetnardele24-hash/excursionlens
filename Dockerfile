@@ -30,6 +30,12 @@ COPY benchmark ./benchmark
 # Copy prebuilt frontend static assets from builder stage
 COPY --from=frontend-builder /web/dist ./apps/web/dist
 
+# Create dedicated non-root application user and set ownership
+RUN groupadd -r appuser && useradd -r -g appuser -u 10001 -d /app -s /sbin/nologin appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
 # Expose standard port
 EXPOSE 8000
 

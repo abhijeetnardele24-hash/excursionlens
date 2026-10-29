@@ -53,47 +53,70 @@ def is_valid_guidance_url(raw_url: str, allowed_domains: list[str] = AUTHORITATI
 
 
 # Canonical pre-vetted public reference guidance for offline benchmark evaluation
-CACHED_AUTHORITATIVE_GUIDANCE = [
+CACHED_AUTHORITATIVE_GUIDANCE: list[dict[str, Any]] = [
     {
         "id": "SRC-CDC-01",
-        "url": "https://www.cdc.gov/vaccines/hcp/storage-handling/toolkit/index.html",
-        "title": "CDC Vaccine Storage and Handling Toolkit — Temperature Excursion Response",
+        "url": "https://www.cdc.gov/vaccines/hcp/storage-handling/",
+        "title": "CDC Vaccine Storage and Handling Clinical Guidance",
         "domain": "cdc.gov",
-        "published_or_updated_at": "2024-03-01",
+        "published_or_updated_at": None,
         "snippet": (
-            "In the event of a temperature excursion: 1. Immediately isolate affected vaccines "
-            "in an operational unit at 2°C–8°C. 2. Mark 'DO NOT USE - DO NOT DISCARD'. 3. Record "
-            "minimum and maximum temperatures, duration of excursion, and inventory affected. "
-            "4. Contact the immunization program or vaccine manufacturer for disposition guidance."
+            "Clinical guidance for vaccine storage and handling: in the event of a temperature excursion, "
+            "immediately separate and store affected vaccines at recommended temperatures (2°C to 8°C), clearly "
+            "label them 'DO NOT USE', and contact the manufacturer or immunization program for disposition "
+            "guidance prior to administration."
         ),
-        "query": "CDC vaccine storage handling temperature excursion 2 to 8 C"
+        "query": "CDC vaccine storage handling temperature excursion 2 to 8 C",
+        "source_mode": "VERIFIED_FIXTURE",
+        "excerpt_kind": "PARAPHRASE",
+        "verified_at": "2026-10-29",
+        "verification_note": (
+            "Verified via official HTTPS GET (HTTP 200). Summary paraphrases official CDC clinical "
+            "storage recommendations; not a verbatim quotation."
+        ),
     },
     {
         "id": "SRC-FDA-01",
-        "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/ich-q1a-r2-stability-testing-new-drug-substances-and-products",
-        "title": "FDA / ICH Q1A(R2) Stability Testing Guidance for Biologics & Pharmaceuticals",
+        "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1ar2-stability-testing-new-drug-substances-and-products",
+        "title": "Q1A(R2) Stability Testing of New Drug Substances and Products | FDA",
         "domain": "fda.gov",
-        "published_or_updated_at": "2023-11-15",
+        "published_or_updated_at": "2003-11",
         "snippet": (
-            "Excursions outside standard 2°C–8°C labeled storage must be evaluated against accelerated "
-            "thermal stability data. Short-term deviations during distribution do not automatically cause "
-            "degradation, but require documented manufacturer stability profile assessment before disposition."
+            "FDA/ICH Q1A(R2) stability testing guidance establishes that formal stability profiles under "
+            "accelerated conditions evaluate short-term deviations outside declared labeled storage conditions "
+            "(e.g., 2°C to 8°C). Any excursion during distribution requires documented assessment against "
+            "manufacturer stability data prior to lot disposition."
         ),
-        "query": "FDA ICH stability testing temperature excursion refrigerated biologics"
+        "query": "FDA ICH stability testing temperature excursion refrigerated biologics",
+        "source_mode": "VERIFIED_FIXTURE",
+        "excerpt_kind": "PARAPHRASE",
+        "verified_at": "2026-10-29",
+        "verification_note": (
+            "Verified via official HTTPS GET (HTTP 200). Summary paraphrases core ICH/FDA stability "
+            "principles; not a verbatim quotation."
+        ),
     },
     {
         "id": "SRC-WHO-01",
         "url": "https://www.who.int/teams/immunization-vaccines-and-biologicals/essential-programme-on-immunization/supply-chain/controlled-temperature-chain-(ctc)",
-        "title": "WHO Guidelines on the International Packaging and Transportation of Vaccines",
+        "title": "WHO Controlled Temperature Chain (CTC) Guidance | Essential Programme on Immunization",
         "domain": "who.int",
-        "published_or_updated_at": "2023-08-20",
+        "published_or_updated_at": None,
         "snippet": (
-            "Cold chain breaches occurring during transport transfers require physical verification "
-            "of secondary internal thermal monitoring before batch release. Temperature readings at the outer "
-            "packaging surface often exceed internal core temperature due to insulating mass."
+            "WHO Controlled Temperature Chain supply chain guidance: temperature monitoring during transit "
+            "transfers requires secondary verification of internal product temperature before releasing "
+            "quarantined batches. Surface thermal readings during unmonitored transfer windows can diverge "
+            "from core product temperature depending on container insulation and packout."
         ),
-        "query": "WHO controlled temperature chain transport transfer guidelines"
-    }
+        "query": "WHO controlled temperature chain transport transfer guidelines",
+        "source_mode": "VERIFIED_FIXTURE",
+        "excerpt_kind": "PARAPHRASE",
+        "verified_at": "2026-10-29",
+        "verification_note": (
+            "Verified via official HTTPS GET (HTTP 200). Summary paraphrases WHO CTC operational transfer "
+            "guidance; not a verbatim quotation."
+        ),
+    },
 ]
 
 
@@ -210,7 +233,11 @@ class TavilySearchProvider:
                                 retrieved_at=retrieval_iso,
                                 snippet=clean_content,
                                 content_digest=sha256_digest(clean_content),
-                                query=query
+                                query=query,
+                                source_mode="LIVE_RETRIEVAL",
+                                excerpt_kind="VERBATIM",
+                                verified_at=None,
+                                verification_note="Live retrieval from allowlisted domain via Tavily Search API.",
                             )
                             source_records.append(rec)
 
@@ -245,7 +272,11 @@ class TavilySearchProvider:
                 retrieved_at=retrieval_iso,
                 snippet=item["snippet"],
                 content_digest=sha256_digest(item["snippet"]),
-                query=query
+                query=query,
+                source_mode=item["source_mode"],
+                excerpt_kind=item["excerpt_kind"],
+                verified_at=item["verified_at"],
+                verification_note=item["verification_note"],
             )
             source_records.append(rec)
 
@@ -312,7 +343,11 @@ class TavilySearchProvider:
                                     retrieved_at=retrieval_iso,
                                     snippet=clean_content,
                                     content_digest=sha256_digest(clean_content),
-                                    query=query
+                                    query=query,
+                                    source_mode="LIVE_RETRIEVAL",
+                                    excerpt_kind="VERBATIM",
+                                    verified_at=None,
+                                    verification_note="Live retrieval from allowlisted domain via Tavily Search API.",
                                 )
                                 source_records.append(rec)
 
@@ -355,7 +390,11 @@ class TavilySearchProvider:
                 retrieved_at=retrieval_iso,
                 snippet=item["snippet"],
                 content_digest=sha256_digest(item["snippet"]),
-                query=query
+                query=query,
+                source_mode=item["source_mode"],
+                excerpt_kind=item["excerpt_kind"],
+                verified_at=item["verified_at"],
+                verification_note=item["verification_note"],
             )
             source_records.append(rec)
 
