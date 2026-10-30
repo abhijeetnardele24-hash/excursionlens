@@ -80,6 +80,22 @@ PROHIBITED_PATTERNS = [
         r"\b427\s*/\s*518\b",
         "Stale covered branch count: Documented 427/518 branches must match authoritative Linux CI count (424/518).",
     ),
+    (
+        r"(?i)\baxe\s+complian(?:t|ce)\b",
+        "Overclaim: Never say 'Axe compliant' or 'Axe compliance'. Say: 'Automated Axe scans detected zero violations in the tested application states.'",
+    ),
+    (
+        r"exercise-streams-manhattan-submitting\.trycloudflare\.com",
+        "Stale endpoint: Old tunnel URL exercise-streams-manhattan-submitting must not appear in active docs.",
+    ),
+    (
+        r"(?i)\bpermanent(?:ly)?\s+deployed\b",
+        "Overclaim: The Cloudflare tunnel is a temporary live demonstration endpoint, not permanently deployed.",
+    ),
+    (
+        r"(?i)\bdurable\s+public\s+endpoint\b",
+        "Overclaim: The Cloudflare tunnel is a temporary live demonstration endpoint, not a durable public endpoint.",
+    ),
 ]
 
 
@@ -141,12 +157,15 @@ def check_receipt_provenance(docs_dir: Path | None = None) -> list[str]:
         try:
             with open(deploy_path, "r", encoding="utf-8") as f:
                 d = json.load(f)
-            for req_key in ("evaluated_source_sha", "receipt_commit_sha", "evidence_authority", "execution_context", "status"):
+            for req_key in ("evaluated_source_sha", "evidence_authority", "execution_context", "status"):
                 if req_key not in d:
                     violations.append(f"deployment-receipt.json missing required provenance field '{req_key}'")
             eval_sha = d.get("evaluated_source_sha", "")
             if eval_sha and len(eval_sha) != 40:
                 violations.append(f"deployment-receipt.json: evaluated_source_sha must be 40-char SHA, got '{eval_sha}'")
+            rec_sha = d.get("receipt_commit_sha")
+            if rec_sha and len(rec_sha) != 40:
+                violations.append(f"deployment-receipt.json: receipt_commit_sha must be 40-char SHA, got '{rec_sha}'")
             if d.get("status") == "LIVE_DEPLOYED":
                 endpoint_commit = d.get("endpoint_commit")
                 if endpoint_commit and endpoint_commit != eval_sha:
@@ -161,12 +180,15 @@ def check_receipt_provenance(docs_dir: Path | None = None) -> list[str]:
         try:
             with open(smoke_path, "r", encoding="utf-8") as f:
                 s = json.load(f)
-            for req_key in ("evaluated_source_sha", "receipt_commit_sha", "evidence_authority", "execution_context", "status"):
+            for req_key in ("evaluated_source_sha", "evidence_authority", "execution_context", "status"):
                 if req_key not in s:
                     violations.append(f"live-smoke-receipt.json missing required provenance field '{req_key}'")
             eval_sha = s.get("evaluated_source_sha", "")
             if eval_sha and len(eval_sha) != 40:
                 violations.append(f"live-smoke-receipt.json: evaluated_source_sha must be 40-char SHA, got '{eval_sha}'")
+            rec_sha = s.get("receipt_commit_sha")
+            if rec_sha and len(rec_sha) != 40:
+                violations.append(f"live-smoke-receipt.json: receipt_commit_sha must be 40-char SHA, got '{rec_sha}'")
             status = s.get("status")
             nebius_smoke = s.get("nebius_smoke", {})
             if status == "BLOCKED":
@@ -200,6 +222,24 @@ def check_receipt_provenance(docs_dir: Path | None = None) -> list[str]:
                 )
         except Exception as e:
             violations.append(f"Failed to validate verification-results.json provenance: {e}")
+
+    index_path = docs_dir / "evidence-index.json"
+    if index_path.exists():
+        try:
+            with open(index_path, "r", encoding="utf-8") as f:
+                idx = json.load(f)
+            if not isinstance(idx.get("receipts"), list):
+                violations.append("evidence-index.json must contain a 'receipts' list")
+            else:
+                for entry in idx["receipts"]:
+                    for req in ("receipt_path", "receipt_sha256", "evaluated_source_sha"):
+                        if req not in entry:
+                            violations.append(f"evidence-index.json entry missing required key '{req}'")
+                    sha = entry.get("evaluated_source_sha", "")
+                    if sha and len(sha) != 40:
+                        violations.append(f"evidence-index.json: evaluated_source_sha must be 40-char SHA, got '{sha}'")
+        except Exception as e:
+            violations.append(f"Failed to validate evidence-index.json: {e}")
 
     return violations
 

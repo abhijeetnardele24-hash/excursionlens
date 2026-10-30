@@ -234,6 +234,52 @@ def test_invalid_evaluated_source_sha_fails():
         assert any("must be 40-char SHA" in v for v in violations)
 
 
+def test_axe_compliance_overclaim_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        bad_md = tmp_dir / "ACCESSIBILITY.md"
+        bad_md.write_text("The user interface is fully Axe compliant across all pages.", encoding="utf-8")
+        violations = check_markdown_claims(doc_files=[bad_md])
+        assert any("Never say 'Axe compliant'" in v for v in violations)
+
+
+def test_stale_endpoint_url_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        bad_md = tmp_dir / "DEPLOY.md"
+        bad_md.write_text("Live endpoint at https://exercise-streams-manhattan-submitting.trycloudflare.com", encoding="utf-8")
+        violations = check_markdown_claims(doc_files=[bad_md])
+        assert any("Old tunnel URL exercise-streams-manhattan-submitting" in v for v in violations)
+
+
+def test_durable_endpoint_overclaim_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        bad_md = tmp_dir / "DEPLOY.md"
+        bad_md.write_text("The application is permanently deployed on Cloudflare quick tunnels.", encoding="utf-8")
+        violations = check_markdown_claims(doc_files=[bad_md])
+        assert any("temporary live demonstration endpoint" in v for v in violations)
+
+
+def test_evidence_index_malformed_sha_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        idx_path = tmp_dir / "evidence-index.json"
+        data = {
+            "receipts": [
+                {
+                    "receipt_path": "docs/deployment-receipt.json",
+                    "receipt_sha256": "bad-hash",
+                    "evaluated_source_sha": "not-40-chars",
+                }
+            ]
+        }
+        with open(idx_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        violations = check_receipt_provenance(docs_dir=tmp_dir)
+        assert any("evaluated_source_sha must be 40-char SHA" in v for v in violations)
+
+
 def main() -> int:
     print("Running check_claims regression tests...")
     tests = [
@@ -249,6 +295,10 @@ def main() -> int:
         test_contradictory_endpoint_commit_fails,
         test_blocked_smoke_receipt_with_fake_model_fails,
         test_invalid_evaluated_source_sha_fails,
+        test_axe_compliance_overclaim_fails,
+        test_stale_endpoint_url_fails,
+        test_durable_endpoint_overclaim_fails,
+        test_evidence_index_malformed_sha_fails,
     ]
 
     for t in tests:

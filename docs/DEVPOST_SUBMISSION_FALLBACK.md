@@ -9,7 +9,7 @@
 ---
 
 **Project Name:** ExcursionLens  
-**Tagline:** An evidence-first cold-chain investigation agent architected for NVIDIA Nemotron through Nebius Token Factory, currently demonstrated in transparent deterministic fixture mode.  
+**Tagline:** ExcursionLens is architected for NVIDIA Nemotron through Nebius Token Factory and is currently demonstrated in transparent deterministic fixture mode. Live sponsor runtime execution remains unverified.  
 **Track:** Best Apps and Agents (Primary track; Best Use of Tavily bonus track omitted)  
 **Repository:** https://github.com/abhijeetnardele24-hash/excursionlens  
 **Public Video URL:** [PUBLIC_YOUTUBE_URL_PLACEHOLDER]  

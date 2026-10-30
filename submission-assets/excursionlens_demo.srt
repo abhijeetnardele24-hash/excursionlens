@@ -1,0 +1,87 @@
+1
+00:00:00,000 --> 00:00:06,000
+Every year, cold-chain excursions compromise critical biopharmaceuticals during transit.
+
+2
+00:00:06,000 --> 00:00:13,000
+In regulated life sciences, an unconstrained AI that hallucinates approval risks patient safety.
+
+3
+00:00:13,000 --> 00:00:20,500
+This is ExcursionLens: an evidence-driven forensic system architected for NVIDIA Nemotron.
+
+4
+00:00:20,500 --> 00:00:28,000
+Notice our header: this public demonstration uses transparent deterministic fixture replay.
+
+5
+00:00:28,000 --> 00:00:36,400
+Live Nebius Token Factory execution is not being claimed in this recording. The system operates fail-closed.
+
+6
+00:00:36,400 --> 00:00:43,000
+Our foundation is 100% deterministic code. Zero generative tokens are used for physics.
+
+7
+00:00:43,000 --> 00:00:50,500
+For shipment NMB-204, Python analyzes raw IoT telemetry, detecting a 40-minute breach above 8°C.
+
+8
+00:00:50,500 --> 00:00:57,500
+Peak temperature reaches 10.5°C with an Area Under the Curve of 50.5 degree-minutes.
+
+9
+00:00:57,500 --> 00:01:04,500
+Aligned with custody logs, the breach correlates with open bay doors at Newburgh Hub at 10:18 UTC.
+
+10
+00:01:04,500 --> 00:01:12,000
+Clicking 'Investigate Excursion' triggers our bounded state-machine pipeline.
+
+11
+00:01:12,000 --> 00:01:19,500
+The system steps through schema validation, normalization, and regulatory guidance matching.
+
+12
+00:01:19,500 --> 00:01:27,500
+In this fixture demonstration, pre-vetted CDC and WHO summaries establish allowable thresholds.
+
+13
+00:01:27,500 --> 00:01:34,500
+Next, the pipeline executes our dual-pass causal engine, structured for NVIDIA Nemotron-70B.
+
+14
+00:01:34,500 --> 00:01:42,000
+Generator synthesis produces three competing hypotheses, followed by an adversarial skeptic pass.
+
+15
+00:01:42,000 --> 00:01:50,000
+While a naive model might blame refrigeration failure, the skeptic sees vehicle alternator bus at 12.8V.
+
+16
+00:01:50,000 --> 00:01:58,000
+This directly falsifies compressor power loss. Prohibited overclaims are trapped by validators.
+
+17
+00:01:58,000 --> 00:02:05,000
+To assist quality engineers with corrective actions, our Counterfactual Workbench simulates interventions.
+
+18
+00:02:05,000 --> 00:02:12,000
+Enforcing a 5-minute door closure threshold eliminates the excursion completely in simulation.
+
+19
+00:02:12,000 --> 00:02:18,000
+Simulated breach duration is reduced from 40.0 minutes to zero, proving corrective SLA efficacy.
+
+20
+00:02:18,000 --> 00:02:26,000
+Finally, ExcursionLens generates an auditable Quality Review Packet with observation digests and model receipts.
+
+21
+00:02:26,000 --> 00:02:33,000
+The product remains strictly quarantined until an authorized quality professional signs off.
+
+22
+00:02:33,000 --> 00:02:39,600
+ExcursionLens bridges physical telemetry, regulatory guidance, and adversarial reasoning into an auditable science.
