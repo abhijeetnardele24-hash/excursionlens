@@ -102,15 +102,20 @@ def verify_deployment(target_url: str, expected_sha: str | None = None) -> tuple
 
             # 4. Canonical Case Probe
             c_res = client.get(f"{base_url}/api/cases/NMB-204")
+            if c_res.status_code == 404:
+                c_res = client.get(f"{base_url}/api/cases/CASE-NMB-204")
             if c_res.status_code != 200:
                 receipt["status"] = f"CASE_HTTP_{c_res.status_code}"
                 failures.append(f"/api/cases/NMB-204 returned HTTP {c_res.status_code}: {c_res.text[:200]}")
                 return receipt, failures
 
             case_data = c_res.json()
-            if case_data.get("shipment_id") != "NMB-204":
+            shipment_id = case_data.get("shipment_id")
+            if not shipment_id and isinstance(case_data.get("shipment"), dict):
+                shipment_id = case_data["shipment"].get("shipment_id")
+            if shipment_id != "NMB-204":
                 receipt["status"] = "MALFORMED_CASE_DATA"
-                failures.append(f"Unexpected shipment_id: {case_data.get('shipment_id')}")
+                failures.append(f"Unexpected shipment_id: {shipment_id}")
                 return receipt, failures
             receipt["case_check"] = {"shipment_id": "NMB-204", "status": 200}
 

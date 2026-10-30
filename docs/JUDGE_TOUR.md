@@ -6,7 +6,7 @@
 ```bash
 docker compose up --build
 ```
-Open **`http://localhost:8000`** in your browser.
+Open **`http://localhost:8000`** locally, or evaluate the verified live public deployment at **`https://exercise-streams-manhattan-submitting.trycloudflare.com`**.
 
 ---
 

@@ -2,17 +2,52 @@
   "schema_version": "1.0",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
-  "commit_sha": "b5959d2eb63df5904d214c9320f462d5f512e4ab",
-  "timestamp": "2026-10-29T19:09:12Z",
-  "status": "BLOCKED",
-  "reason": "Hosting deployment credentials/target not configured in environment.",
-  "reproducible_deployment_command": "docker compose up --build -d",
-  "container_security": {
-    "runtime_user": "appuser",
-    "uid": 10001,
-    "is_non_root": true
+  "commit_sha": "2a701ae1dff3123313541b00d7ad34ed82a30fb1",
+  "timestamp": "2026-10-30T07:26:18Z",
+  "status": "LIVE_DEPLOYED",
+  "deployment_probe": {
+    "target_url": "https://exercise-streams-manhattan-submitting.trycloudflare.com",
+    "status": "LIVE_DEPLOYED",
+    "latency_ms": 3032,
+    "health_check": {
+      "status": "ok",
+      "app": "ExcursionLens API",
+      "version": "1.0.0",
+      "commit": "2a701ae1dff3123313541b00d7ad34ed82a30fb1",
+      "application_environment": "production",
+      "provider_status": "NOT_CONFIGURED",
+      "live_execution_verified": false,
+      "provider_mode": "DEMO_FIXTURE"
+    },
+    "meta_check": {
+      "app": "ExcursionLens API",
+      "version": "1.0.0",
+      "commit": "2a701ae1dff3123313541b00d7ad34ed82a30fb1",
+      "application_environment": "production",
+      "provider_status": "NOT_CONFIGURED",
+      "live_execution_verified": false,
+      "provider_mode": "DEMO_FIXTURE",
+      "provider": {
+        "nebius_token_factory_configured": false,
+        "tavily_search_configured": false,
+        "selected_fast_model": "nvidia/nemotron-mini-4b-instruct",
+        "selected_deep_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+        "status": "NOT_CONFIGURED",
+        "live_verified": false
+      },
+      "safety_disclaimer": "Investigation-support output generated from synthetic or user-supplied evidence. It does not determine product safety, potency, regulatory compliance or disposition. Follow organizational SOPs and obtain review from an authorized quality professional."
+    },
+    "frontend_check": {
+      "status": 200,
+      "has_html": true
+    },
+    "case_check": {
+      "shipment_id": "NMB-204",
+      "status": 200
+    },
+    "deployed_commit": "2a701ae1dff3123313541b00d7ad34ed82a30fb1",
+    "commit_match": true,
+    "non_root_verified": null
   },
-  "failure_reasons": [
-    "DEPLOY_URL or public cloud hosting credentials not supplied."
-  ]
+  "failure_reasons": []
 }
