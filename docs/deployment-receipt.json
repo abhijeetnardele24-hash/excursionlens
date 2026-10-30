@@ -2,18 +2,18 @@
   "schema_version": "1.0",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
-  "commit_sha": "4844d805fe964774093c80d18be7bd0cdec6008c",
-  "timestamp": "2026-10-30T08:20:15Z",
+  "commit_sha": "ad0315e00d3b4221275d83534be2c56c12e9afdc",
+  "timestamp": "2026-10-30T09:04:27Z",
   "status": "LIVE_DEPLOYED",
   "deployment_probe": {
     "target_url": "https://exercise-streams-manhattan-submitting.trycloudflare.com",
     "status": "LIVE_DEPLOYED",
-    "latency_ms": 2263,
+    "latency_ms": 2914,
     "health_check": {
       "status": "ok",
       "app": "ExcursionLens API",
       "version": "1.0.0",
-      "commit": "4844d805fe964774093c80d18be7bd0cdec6008c",
+      "commit": "ad0315e00d3b4221275d83534be2c56c12e9afdc",
       "application_environment": "production",
       "provider_status": "NOT_CONFIGURED",
       "live_execution_verified": false,
@@ -22,7 +22,7 @@
     "meta_check": {
       "app": "ExcursionLens API",
       "version": "1.0.0",
-      "commit": "4844d805fe964774093c80d18be7bd0cdec6008c",
+      "commit": "ad0315e00d3b4221275d83534be2c56c12e9afdc",
       "application_environment": "production",
       "provider_status": "NOT_CONFIGURED",
       "live_execution_verified": false,
@@ -45,7 +45,7 @@
       "shipment_id": "NMB-204",
       "status": 200
     },
-    "deployed_commit": "4844d805fe964774093c80d18be7bd0cdec6008c",
+    "deployed_commit": "ad0315e00d3b4221275d83534be2c56c12e9afdc",
     "commit_match": true,
     "non_root_verified": null
   },

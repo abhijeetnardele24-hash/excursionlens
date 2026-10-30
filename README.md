@@ -11,7 +11,7 @@
 
 > [!NOTE]
 > **Submission & Verification Status:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
-> All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. Public deployment is active and verified (`LIVE_DEPLOYED`), while live provider inference remains in deterministic fixture replay mode pending external keys.  
+> All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. A temporary live demonstration tunnel is active and verified (`LIVE_DEPLOYED`), while live provider inference remains in deterministic fixture replay mode (`DEMO_FIXTURE`) pending external keys.  
 > **Authoritative CI Verification:** Evaluated and verified in the [ExcursionLens GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) (see [All Workflow Runs](https://github.com/abhijeetnardele24-hash/excursionlens/actions)). Each authoritative CI run evaluates the exact Git commit and publishes a machine-readable downloadable artifact named `verification-artifacts-<COMMIT_SHA>`. Authoritative Linux CI totals: **92.98% statement coverage** (1,471/1,582 statements) and **81.85% unrounded branch coverage** (424/518 branches, $\ge 80.0\%$, 90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 across **165 passed test cases**).
 
 
@@ -194,7 +194,7 @@ docker compose up --build
 Access the application at `http://localhost:8000`.
 
 - **Security Hardening:** The runtime container executes as non-root user `appuser` (UID 10001) with dropped capabilities.
-- **Deployment Status:** Public deployment is REQUIRED by hackathon rules. Verified live public deployment URL: https://exercise-streams-manhattan-submitting.trycloudflare.com (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED`). 100% reproducible local and containerized production execution is verified via Docker (`docker compose up --build`).
+- **Deployment Status:** Public demo is REQUIRED by hackathon rules. A temporary live public demonstration tunnel is active at https://exercise-streams-manhattan-submitting.trycloudflare.com (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode). 100% reproducible local and containerized production execution is verified via Docker (`docker compose up --build`).
 
 ---
 

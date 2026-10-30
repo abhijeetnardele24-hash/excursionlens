@@ -83,7 +83,7 @@ The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until
 1. **Provide Nebius Credential:** Obtain and set an active `NEBIUS_TOKEN_FACTORY_KEY` in environment.
 2. **Provide Tavily Credential:** Obtain and set an active `TAVILY_API_KEY` in environment.
 3. **Execute Live Smoke Verification:** Run `python scripts/live_smoke.py` to obtain live API receipts (`LIVE_VERIFIED`) with real HTTP latency and token counts.
-4. **Provision Public Cloud Deployment (REQUIRED):** Verified live public deployment URL active at `https://exercise-streams-manhattan-submitting.trycloudflare.com` (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED`).
+4. **Public Demo Endpoint (REQUIRED):** Verified temporary live public demonstration tunnel active at `https://exercise-streams-manhattan-submitting.trycloudflare.com` (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode).
 5. **Configure Domain & TLS:** Verified active with valid TLS.
 6. **Verify Public Endpoints:** Confirmed `/api/health`, `/api/meta`, frontend `/`, and canonical case `/api/cases/CASE-NMB-204` respond with expected `application_environment`, `provider_status`, and `live_execution_verified`.
 7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `LIVE_VERIFIED_FINAL` if keys are configured, or `FIXTURE_MODE_DRAFT` if uncredentialed).

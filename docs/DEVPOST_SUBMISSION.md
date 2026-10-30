@@ -6,7 +6,7 @@
 **Bonus Track:** None (Primary track only: Best Apps and Agents; Best Use of Tavily bonus track omitted pending live TAVILY_API_KEY receipt)  
 **Repository:** https://github.com/abhijeetnardele24-hash/excursionlens  
 **Public Video URL:** [PUBLIC_YOUTUBE_URL_PLACEHOLDER]  
-**Deployment & Reproducibility:** Public deployment is REQUIRED by hackathon rules. Verified live public deployment URL: https://exercise-streams-manhattan-submitting.trycloudflare.com (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED`). Additionally, 100% reproducible containerized non-root production execution is verified locally via `docker compose up --build`.  
+**Deployment & Reproducibility:** Public demo is REQUIRED by hackathon rules. A temporary live public demonstration tunnel is active at https://exercise-streams-manhattan-submitting.trycloudflare.com (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode). Additionally, 100% reproducible containerized non-root production execution is verified locally via `docker compose up --build`.  
 **Current Posture:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` (All internal logic, deterministic physics, and quality gates 100% verified; live sponsor execution dispatchable via workflow upon configuring repository secrets).  
 
 ---
