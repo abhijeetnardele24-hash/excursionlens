@@ -10,6 +10,9 @@ Validates that:
 6. Mismatched verification-results.json metrics fail the audit.
 7. Prohibited stale patterns (93.43%, 82.43%, 90.71%, 1,478, 427/518) fail the audit.
 8. Missing coverage files fail the audit safely.
+9. Contradictory deployment endpoint commit fails provenance audit.
+10. Blocked smoke receipt claiming served models fails provenance audit.
+11. Malformed evaluated_source_sha fails provenance audit.
 """
 
 import json
@@ -26,6 +29,7 @@ from scripts.check_claims import (  # noqa: E402
     check_authoritative_identifiers,
     check_coverage_claims,
     check_markdown_claims,
+    check_receipt_provenance,
 )
 
 
@@ -54,6 +58,9 @@ def test_real_repo_claims_and_coverage():
 
     cov_violations = check_coverage_claims()
     assert len(cov_violations) == 0, f"Unexpected coverage claims violations: {cov_violations}"
+
+    prov_violations = check_receipt_provenance()
+    assert len(prov_violations) == 0, f"Unexpected provenance claims violations: {prov_violations}"
 
 
 def test_mismatched_statement_coverage_fails():
@@ -170,6 +177,63 @@ def test_missing_coverage_file_fails():
     assert any("not found" in v for v in violations), f"Expected missing file violation, got: {violations}"
 
 
+def test_contradictory_endpoint_commit_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        receipt_path = tmp_dir / "deployment-receipt.json"
+        data = {
+            "evaluated_source_sha": "a" * 40,
+            "receipt_commit_sha": "b" * 40,
+            "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "status": "LIVE_DEPLOYED",
+            "endpoint_commit": "c" * 40,  # Contradicts evaluated_source_sha
+        }
+        with open(receipt_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        violations = check_receipt_provenance(docs_dir=tmp_dir)
+        assert any("endpoint_commit" in v and "does not match" in v for v in violations)
+
+
+def test_blocked_smoke_receipt_with_fake_model_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        receipt_path = tmp_dir / "live-smoke-receipt.json"
+        data = {
+            "evaluated_source_sha": "a" * 40,
+            "receipt_commit_sha": "b" * 40,
+            "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "status": "BLOCKED",
+            "provider_mode": "DEMO_FIXTURE",
+            "nebius_smoke": {
+                "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",  # Prohibited when BLOCKED
+                "total_tokens": None,
+            },
+        }
+        with open(receipt_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        violations = check_receipt_provenance(docs_dir=tmp_dir)
+        assert any("status is BLOCKED but tested_model is" in v for v in violations)
+
+
+def test_invalid_evaluated_source_sha_fails():
+    with tempfile.TemporaryDirectory() as tmp_str:
+        tmp_dir = Path(tmp_str)
+        receipt_path = tmp_dir / "deployment-receipt.json"
+        data = {
+            "evaluated_source_sha": "short-sha",
+            "receipt_commit_sha": "b" * 40,
+            "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
+            "status": "BLOCKED",
+        }
+        with open(receipt_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        violations = check_receipt_provenance(docs_dir=tmp_dir)
+        assert any("must be 40-char SHA" in v for v in violations)
+
+
 def main() -> int:
     print("Running check_claims regression tests...")
     tests = [
@@ -182,6 +246,9 @@ def main() -> int:
         test_mismatched_verification_results_fails,
         test_prohibited_stale_patterns_fail,
         test_missing_coverage_file_fails,
+        test_contradictory_endpoint_commit_fails,
+        test_blocked_smoke_receipt_with_fake_model_fails,
+        test_invalid_evaluated_source_sha_fails,
     ]
 
     for t in tests:

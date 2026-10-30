@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
-  "commit_sha": "46d7c8a5541bead65e5f44687e6b3fbf3fbcb8d7",
-  "timestamp": "2026-10-30T10:20:32Z",
+  "commit_sha": "1f049ee88aae55e2f00ddf16ca697446ce7f3de4",
+  "timestamp": "2026-10-30T11:30:40Z",
   "nebius": {
     "base_url": "https://api.tokenfactory.nebius.com/v1/",
     "key_present": false,

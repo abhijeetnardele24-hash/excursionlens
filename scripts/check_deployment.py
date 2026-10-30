@@ -20,7 +20,7 @@ from typing import Any
 
 import httpx
 
-DEFAULT_ENDPOINT = "https://exercise-streams-manhattan-submitting.trycloudflare.com"
+DEFAULT_ENDPOINT = "https://newest-surname-observer-cow.trycloudflare.com"
 
 
 def get_local_git_sha() -> str:

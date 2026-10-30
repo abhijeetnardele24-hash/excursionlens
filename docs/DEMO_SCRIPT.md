@@ -12,7 +12,7 @@
 
 **Target Duration:** 2 minutes 30 seconds (Hard limit: under 3:00)  
 **Tone:** Forensic, methodical, engineering-rigorous, completely transparent.  
-**Endpoint:** `https://exercise-streams-manhattan-submitting.trycloudflare.com` or local `http://localhost:8000`  
+**Endpoint:** `https://newest-surname-observer-cow.trycloudflare.com` or local `http://localhost:8000`  
 **Audio:** Clear spoken voiceover; zero copyrighted background music.
 
 ### Scene Storyboard

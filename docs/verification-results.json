@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-30T10:20:19Z",
+  "timestamp": "2026-10-30T11:30:24Z",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "git": {
-    "head": "46d7c8a5541bead65e5f44687e6b3fbf3fbcb8d7",
+    "head": "1f049ee88aae55e2f00ddf16ca697446ce7f3de4",
     "branch": "main",
     "clean_tree": false
   },
@@ -12,36 +12,36 @@
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.07,
+      "elapsed_sec": 0.06,
       "output": "All checks passed!\n"
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.4,
+      "elapsed_sec": 3.41,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 2.57,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 505ms\u001b[39m\n"
+      "elapsed_sec": 2.54,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 495ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
       "coverage_percent": 90.24,
       "statement_coverage_percent": 92.98,
       "branch_coverage_percent": 81.85,
-      "elapsed_sec": 38.21
+      "elapsed_sec": 35.21
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.23
+      "elapsed_sec": 0.22
     },
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.4
+      "elapsed_sec": 0.46
     },
     "playwright": {
       "passed": true,
@@ -50,12 +50,12 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 29849.858
+      "duration_ms": 27784.866
     },
     "claims_check": {
       "passed": true,
       "elapsed_sec": 0.11,
-      "output": "Running check_claims regression tests...\n  \u2713 test_real_repo_claims_and_coverage passed\n  \u2713 test_mismatched_statement_coverage_fails passed\n  \u2713 test_mismatched_branch_coverage_fails passed\n  \u2713 test_mismatched_combined_coverage_fails passed\n  \u2713 test_mismatched_statement_count_fails passed\n  \u2713 test_mismatched_branch_count_fails passed\n  \u2713 test_mismatched_verification_results_fails passed\n  \u2713 test_prohibited_stale_patterns_fail passed\n  \u2713 test_missing_coverage_file_fails passed\n\n\u2705 All 9 regression tests passed successfully!\n\n============================================================\n  EXCURSIONLENS DOCUMENTATION & CLAIMS AUDIT\n============================================================\n\u2705 Documentation & Claims Audit Passed! Zero overclaims, stale metrics, or invalid identifiers found.\n"
+      "output": "Running check_claims regression tests...\n  \u2713 test_real_repo_claims_and_coverage passed\n  \u2713 test_mismatched_statement_coverage_fails passed\n  \u2713 test_mismatched_branch_coverage_fails passed\n  \u2713 test_mismatched_combined_coverage_fails passed\n  \u2713 test_mismatched_statement_count_fails passed\n  \u2713 test_mismatched_branch_count_fails passed\n  \u2713 test_mismatched_verification_results_fails passed\n  \u2713 test_prohibited_stale_patterns_fail passed\n  \u2713 test_missing_coverage_file_fails passed\n  \u2713 test_contradictory_endpoint_commit_fails passed\n  \u2713 test_blocked_smoke_receipt_with_fake_model_fails passed\n  \u2713 test_invalid_evaluated_source_sha_fails passed\n\n\u2705 All 12 regression tests passed successfully!\n\n============================================================\n  EXCURSIONLENS DOCUMENTATION & CLAIMS AUDIT\n============================================================\n\u2705 Documentation & Claims Audit Passed! Zero overclaims, stale metrics, or invalid identifiers found.\n"
     }
   },
   "canonical_case_nmb_204": {

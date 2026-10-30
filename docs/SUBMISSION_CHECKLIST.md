@@ -84,7 +84,7 @@ The system remains in posture `INTERNAL_COMPLETE_SPONSOR_RUNTIME_UNVERIFIED` unt
   `gh secret set NEBIUS_TOKEN_FACTORY_KEY -R abhijeetnardele24-hash/excursionlens`
 - [x] 2. **Tavily Credential:** Bonus track omitted; Tavily search is optional and zero-blocking for primary *Best Apps and Agents* track.
 - [ ] 3. **Execute Live Smoke Verification (If Key Configured):** Dispatch `.github/workflows/live-smoke.yml` to obtain live API receipts (`LIVE_TOKEN_FACTORY` or `LIVE_VERIFIED`) with real HTTP latency and token counts.
-- [x] 4. **Public Demo Endpoint (REQUIRED):** Verified temporary live public demonstration tunnel active at `https://exercise-streams-manhattan-submitting.trycloudflare.com` (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode).
+- [x] 4. **Public Demo Endpoint (REQUIRED):** Verified temporary live public demonstration tunnel active at `https://newest-surname-observer-cow.trycloudflare.com` (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode).
 - [x] 5. **Configure Domain & TLS:** Verified active with valid Cloudflare TLS.
 - [x] 6. **Verify Public Endpoints:** Confirmed `/api/health`, `/api/meta`, frontend `/`, and canonical case `/api/cases/CASE-NMB-204` respond with expected `application_environment: production`, `provider_status: NOT_CONFIGURED`, and `live_execution_verified: false`.
 - [ ] 7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `FIXTURE_MODE_DRAFT` for honest fixture review, or `LIVE_VERIFIED_FINAL` if keys are configured).

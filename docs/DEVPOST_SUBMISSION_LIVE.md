@@ -17,7 +17,7 @@
 **Track:** Best Apps and Agents (Primary track; Best Use of Tavily bonus track omitted)  
 **Repository:** https://github.com/abhijeetnardele24-hash/excursionlens  
 **Public Video URL:** [PUBLIC_YOUTUBE_URL_PLACEHOLDER]  
-**Deployment & Reproducibility:** A temporary live public demonstration endpoint is active at https://exercise-streams-manhattan-submitting.trycloudflare.com (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED`). Additionally, 100% reproducible containerized non-root execution is verified locally via `docker compose up --build`.  
+**Deployment & Reproducibility:** A temporary live public demonstration endpoint is active at https://newest-surname-observer-cow.trycloudflare.com (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED`). Additionally, 100% reproducible containerized non-root execution is verified locally via `docker compose up --build`.  
 **Current Posture:** `LIVE_TOKEN_FACTORY` (Live runtime inference verified on Nebius Token Factory using NVIDIA Nemotron).  
 
 ---
