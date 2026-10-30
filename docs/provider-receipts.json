@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "evidence_authority": "AUTHORITATIVE_CI_ARTIFACT",
-  "execution_context": "https://github.com/abhijeetnardele24-hash/excursionlens/actions/runs/41030526265",
-  "commit_sha": "ad0315e00d3b4221275d83534be2c56c12e9afdc",
-  "timestamp": "2026-10-30T09:02:43Z",
+  "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "commit_sha": "08dccc0e3a5a6f093e88021cad86dce4f1bce945",
+  "timestamp": "2026-10-30T09:43:40Z",
   "nebius": {
     "base_url": "https://api.tokenfactory.nebius.com/v1/",
     "key_present": false,

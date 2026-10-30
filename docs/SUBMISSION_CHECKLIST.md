@@ -76,17 +76,18 @@
 
 ---
 
-## 6. Ten Remaining External Actions (Required for Full External Completion)
+## 6. External Actions & Human Handoff Posture
 
-The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until these ten non-automated external actions are performed by the project owner:
+The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until external live provider keys are supplied:
 
-1. **Provide Nebius Credential:** Obtain and set an active `NEBIUS_TOKEN_FACTORY_KEY` in environment.
-2. **Provide Tavily Credential:** Obtain and set an active `TAVILY_API_KEY` in environment.
-3. **Execute Live Smoke Verification:** Run `python scripts/live_smoke.py` to obtain live API receipts (`LIVE_VERIFIED`) with real HTTP latency and token counts.
-4. **Public Demo Endpoint (REQUIRED):** Verified temporary live public demonstration tunnel active at `https://exercise-streams-manhattan-submitting.trycloudflare.com` (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode).
-5. **Configure Domain & TLS:** Verified active with valid TLS.
-6. **Verify Public Endpoints:** Confirmed `/api/health`, `/api/meta`, frontend `/`, and canonical case `/api/cases/CASE-NMB-204` respond with expected `application_environment`, `provider_status`, and `live_execution_verified`.
-7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `LIVE_VERIFIED_FINAL` if keys are configured, or `FIXTURE_MODE_DRAFT` if uncredentialed).
-8. **Upload Demo Video:** Host video on Public YouTube (duration strictly under 3:00; use Public visibility unless official hackathon rules explicitly permit Unlisted).
-9. **Populate Devpost Submission Form:** Copy submission title, tagline, tracks, and markdown from `docs/DEVPOST_SUBMISSION.md`, along with the public GitHub repo URL and `docs/assets/excursionlens-devpost-thumbnail.png`.
-10. **Submit on Devpost:** Submit final entry on the Devpost hackathon portal before the hackathon deadline.
+- [ ] 1. **Provide Nebius Credential (Optional for Fixture Mode, Required for Live Verified):** Complete Nebius $0 verification card authorization on `tokenfactory.nebius.com` (or await Builder Program manual review) to obtain `NEBIUS_TOKEN_FACTORY_KEY`, then set it via:
+  `gh secret set NEBIUS_TOKEN_FACTORY_KEY -R abhijeetnardele24-hash/excursionlens`
+- [x] 2. **Tavily Credential:** Bonus track omitted; Tavily search is optional and zero-blocking for primary *Best Apps and Agents* track.
+- [ ] 3. **Execute Live Smoke Verification (If Key Configured):** Dispatch `.github/workflows/live-smoke.yml` to obtain live API receipts (`LIVE_TOKEN_FACTORY` or `LIVE_VERIFIED`) with real HTTP latency and token counts.
+- [x] 4. **Public Demo Endpoint (REQUIRED):** Verified temporary live public demonstration tunnel active at `https://exercise-streams-manhattan-submitting.trycloudflare.com` (verified via `scripts/deploy_smoke.py`, recorded in `docs/deployment-receipt.json` as `LIVE_DEPLOYED` in `DEMO_FIXTURE` mode).
+- [x] 5. **Configure Domain & TLS:** Verified active with valid Cloudflare TLS.
+- [x] 6. **Verify Public Endpoints:** Confirmed `/api/health`, `/api/meta`, frontend `/`, and canonical case `/api/cases/CASE-NMB-204` respond with expected `application_environment: production`, `provider_status: NOT_CONFIGURED`, and `live_execution_verified: false`.
+- [ ] 7. **Record Demo Video:** Record the ~2:30 video demonstration according to `docs/DEMO_SCRIPT.md` (using `FIXTURE_MODE_DRAFT` for honest fixture review, or `LIVE_VERIFIED_FINAL` if keys are configured).
+- [ ] 8. **Upload Demo Video:** Host video on Public YouTube (duration strictly under 3:00).
+- [ ] 9. **Populate Devpost Submission Form:** Copy submission title, tagline, tracks, and markdown from `docs/DEVPOST_SUBMISSION.md`, along with the public GitHub repo URL and `docs/assets/excursionlens-devpost-thumbnail.png`.
+- [ ] 10. **Submit on Devpost:** Submit final entry on the Devpost hackathon portal before the hackathon deadline.

@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "timestamp": "2026-10-30T09:07:57Z",
+  "timestamp": "2026-10-30T09:43:50Z",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "git": {
-    "head": "ad0315e00d3b4221275d83534be2c56c12e9afdc",
+    "head": "08dccc0e3a5a6f093e88021cad86dce4f1bce945",
     "branch": "main",
     "clean_tree": false
   },
@@ -12,36 +12,36 @@
   "gates": {
     "ruff": {
       "passed": true,
-      "elapsed_sec": 0.15,
+      "elapsed_sec": 0.14,
       "output": "All checks passed!\n"
     },
     "mypy": {
       "passed": true,
-      "elapsed_sec": 0.81,
+      "elapsed_sec": 0.82,
       "output": "Success: no issues found in 13 source files\n"
     },
     "frontend_build": {
       "passed": true,
-      "elapsed_sec": 3.45,
-      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 787ms\u001b[39m\n"
+      "elapsed_sec": 3.46,
+      "output": "2m\u001b[2m \u2502 gzip:  0.50 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-pO7-2HhF.css  \u001b[39m\u001b[1m\u001b[2m  4.84 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip:  1.71 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dy31n5aP.js   \u001b[39m\u001b[1m\u001b[2m192.22 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m \u2502 gzip: 57.73 kB\u001b[22m\u001b[2m \u2502 map: 474.72 kB\u001b[22m\n\u001b[32m\u2713 built in 697ms\u001b[39m\n"
     },
     "pytest": {
       "passed": true,
       "coverage_percent": 90.24,
       "statement_coverage_percent": 92.98,
       "branch_coverage_percent": 81.85,
-      "elapsed_sec": 38.58
+      "elapsed_sec": 54.16
     },
     "benchmark": {
       "passed": true,
       "total_scenarios": 12,
       "passed_scenarios": 12,
-      "elapsed_sec": 0.32
+      "elapsed_sec": 0.33
     },
     "security_scan": {
       "passed": true,
       "exposed_secrets": 0,
-      "elapsed_sec": 0.48
+      "elapsed_sec": 0.63
     },
     "playwright": {
       "passed": true,
@@ -50,11 +50,11 @@
       "expected": 25,
       "unexpected": 0,
       "flaky": 0,
-      "duration_ms": 33310.159
+      "duration_ms": 44708.193
     },
     "claims_check": {
       "passed": true,
-      "elapsed_sec": 0.13,
+      "elapsed_sec": 0.14,
       "output": "Running check_claims regression tests...\n  \u2713 test_real_repo_claims_and_coverage passed\n  \u2713 test_mismatched_statement_coverage_fails passed\n  \u2713 test_mismatched_branch_coverage_fails passed\n  \u2713 test_mismatched_combined_coverage_fails passed\n  \u2713 test_mismatched_statement_count_fails passed\n  \u2713 test_mismatched_branch_count_fails passed\n  \u2713 test_mismatched_verification_results_fails passed\n  \u2713 test_prohibited_stale_patterns_fail passed\n  \u2713 test_missing_coverage_file_fails passed\n\n\u2705 All 9 regression tests passed successfully!\n\n============================================================\n  EXCURSIONLENS DOCUMENTATION & CLAIMS AUDIT\n============================================================\n\u2705 Documentation & Claims Audit Passed! Zero overclaims, stale metrics, or invalid identifiers found.\n"
     }
   },
