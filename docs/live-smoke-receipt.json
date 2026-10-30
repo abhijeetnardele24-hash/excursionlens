@@ -1,12 +1,17 @@
 {
   "schema_version": "1.0",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
+  "workflow_run_url": null,
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
-  "commit_sha": "08dccc0e3a5a6f093e88021cad86dce4f1bce945",
-  "timestamp": "2026-10-30T09:43:40Z",
+  "evaluated_source_sha": "46d7c8a5541bead65e5f44687e6b3fbf3fbcb8d7",
+  "receipt_commit_sha": "46d7c8a5541bead65e5f44687e6b3fbf3fbcb8d7",
+  "commit_sha": "46d7c8a5541bead65e5f44687e6b3fbf3fbcb8d7",
+  "endpoint_commit": null,
+  "provider_mode": "DEMO_FIXTURE",
+  "timestamp": "2026-10-30T10:20:32Z",
   "status": "BLOCKED",
   "nebius_smoke": {
-    "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "tested_model": null,
     "selected_catalog_model": null,
     "status": "MISSING_KEY",
     "latency_ms": null,
@@ -21,7 +26,7 @@
   "tavily_smoke": {
     "query": "CDC vaccine storage handling temperature excursion 2 to 8 C",
     "query_digest": "5f89c71f5b5756579c358508a71711b188f0eb4b20f6ca00d841636e7c1372d0",
-    "status": "MISSING_KEY",
+    "status": "OMITTED",
     "latency_ms": null,
     "results_count": 0,
     "source_domains": [],
@@ -30,7 +35,6 @@
     "key_preview": "<none>"
   },
   "failure_reasons": [
-    "TAVILY_API_KEY is not configured or contains placeholder.",
     "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
   ]
 }

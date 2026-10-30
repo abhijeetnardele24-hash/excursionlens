@@ -4,8 +4,8 @@
 **Hackathon:** Nebius x NVIDIA Hackathon (Devpost)  
 **Tracks:** *Best Apps and Agents* (Primary track; *Best Use of Tavily* bonus track omitted pending live credential receipt)  
 **Repository:** `https://github.com/abhijeetnardele24-hash/excursionlens`  
-**Current Posture:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
-*Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
+**Current Posture:** `INTERNAL_COMPLETE_SPONSOR_RUNTIME_UNVERIFIED`  
+*An evidence-first cold-chain investigation agent architected for NVIDIA Nemotron through Nebius Token Factory, currently demonstrated in transparent deterministic fixture mode.*
 
 > [!NOTE]
 > **Evidence Authority Policy:**  
@@ -32,7 +32,7 @@
 - [x] **Gate 5 (Deterministic Benchmark):** 12 of 12 frozen synthetic scenarios passed with 100% mathematical precision (`benchmark/run_benchmark.py`).
 - [x] **Gate 6 (Security Scan):** 0 secrets detected.
 - [x] **Gate 7 (Playwright E2E & Axe):** 5 logical journeys (25 viewport executions) passed across 5 viewports (320px, 390px, 768px, 1280px, 1920px). Automated Axe scans detected zero violations in tested states across all five configured viewports (automated tests evaluate targeted accessibility rules and do not constitute complete WCAG certification).
-- [x] Machine verification receipt generated at `docs/verification-results.json` (`INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`).
+- [x] Machine verification receipt generated at `docs/verification-results.json` (`INTERNAL_COMPLETE_SPONSOR_RUNTIME_UNVERIFIED`).
 
 ---
 
@@ -78,9 +78,9 @@
 
 ## 6. External Actions & Human Handoff Posture
 
-The system remains in posture `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED` until external live provider keys are supplied:
+The system remains in posture `INTERNAL_COMPLETE_SPONSOR_RUNTIME_UNVERIFIED` until external live provider keys are supplied:
 
-- [ ] 1. **Provide Nebius Credential (Optional for Fixture Mode, Required for Live Verified):** Complete Nebius $0 verification card authorization on `tokenfactory.nebius.com` (or await Builder Program manual review) to obtain `NEBIUS_TOKEN_FACTORY_KEY`, then set it via:
+- [ ] 1. **Provide Nebius Credential (Required for Live Verified):** Token Factory accounts support card top-ups; official promo codes can be applied without card/billing info; Builder Program registration was submitted but manual review remains pending. If a key is obtained, set it via:
   `gh secret set NEBIUS_TOKEN_FACTORY_KEY -R abhijeetnardele24-hash/excursionlens`
 - [x] 2. **Tavily Credential:** Bonus track omitted; Tavily search is optional and zero-blocking for primary *Best Apps and Agents* track.
 - [ ] 3. **Execute Live Smoke Verification (If Key Configured):** Dispatch `.github/workflows/live-smoke.yml` to obtain live API receipts (`LIVE_TOKEN_FACTORY` or `LIVE_VERIFIED`) with real HTTP latency and token counts.

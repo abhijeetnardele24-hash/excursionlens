@@ -1,17 +1,17 @@
 # ExcursionLens
 
 **Evidence-first operational agent for biopharmaceutical cold-chain temperature excursion forensics.**  
-*Designed to use NVIDIA Nemotron through Nebius Token Factory. Current committed execution evidence is fixture mode; live verification remains blocked pending credentials.*
+*An evidence-first cold-chain investigation agent architected for NVIDIA Nemotron through Nebius Token Factory, currently demonstrated in transparent deterministic fixture mode.*
 
-[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20COMPLETE%20%2F%20ACTION%20REQUIRED-275E4B?style=for-the-badge&logo=checkmarx)](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)
+[![Master Verification](https://img.shields.io/badge/Verification%20Suite-INTERNAL%20COMPLETE%20%2F%20SPONSOR%20UNVERIFIED-275E4B?style=for-the-badge&logo=checkmarx)](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml)
 [![Accessibility](https://img.shields.io/badge/Axe%20Accessibility-0%20Violations%20in%20Tested%20States-275E4B?style=for-the-badge&logo=w3c)](tests/e2e/journey.spec.ts)
 [![Benchmark](https://img.shields.io/badge/Frozen%20Benchmark-12%2F12%20Scenarios%20(100%25)-275E4B?style=for-the-badge&logo=speedtest)](benchmark/run_benchmark.py)
 [![Pytest Coverage](https://img.shields.io/badge/Pytest%20Coverage-92.98%25%20Stmt%20%7C%2081.85%25%20Branch-275E4B?style=for-the-badge&logo=pytest)](apps/api/tests)
 [![License](https://img.shields.io/badge/License-Apache--2.0-365E7D?style=for-the-badge)](LICENSE)
 
 > [!NOTE]
-> **Submission & Verification Status:** `INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED`  
-> All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. A temporary live demonstration tunnel is active and verified (`LIVE_DEPLOYED`), while live provider inference remains in deterministic fixture replay mode (`DEMO_FIXTURE`) pending external keys.  
+> **Submission & Verification Status:** `INTERNAL_COMPLETE_SPONSOR_RUNTIME_UNVERIFIED`  
+> All internal code, deterministic algorithms, type checking, security scanning, Playwright E2E suites, Axe accessibility scans, and unit tests are complete and verified. A temporary live demonstration endpoint is active at `https://exercise-streams-manhattan-submitting.trycloudflare.com` (`LIVE_DEPLOYED`), while live provider inference operates in deterministic fixture replay mode (`DEMO_FIXTURE`). Live runtime execution against Nebius Token Factory remains unverified due to lack of an active sponsor API key.  
 > **Authoritative CI Verification:** Evaluated and verified in the [ExcursionLens GitHub Actions CI Workflow](https://github.com/abhijeetnardele24-hash/excursionlens/actions/workflows/ci.yml) (see [All Workflow Runs](https://github.com/abhijeetnardele24-hash/excursionlens/actions)). Each authoritative CI run evaluates the exact Git commit and publishes a machine-readable downloadable artifact named `verification-artifacts-<COMMIT_SHA>`. Authoritative Linux CI totals: **92.98% statement coverage** (1,471/1,582 statements) and **81.85% unrounded branch coverage** (424/518 branches, $\ge 80.0\%$, 90.24% combined coverage under canonical pytest 9.2.0 on Python 3.11.17 across **165 passed test cases**).
 
 

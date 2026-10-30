@@ -2,21 +2,21 @@
   "schema_version": "1.0",
   "evidence_authority": "LOCAL_DOCUMENTATION_SNAPSHOT",
   "execution_context": "LOCAL_DOCUMENTATION_SNAPSHOT",
-  "commit_sha": "08dccc0e3a5a6f093e88021cad86dce4f1bce945",
-  "timestamp": "2026-10-30T09:43:40Z",
+  "commit_sha": "46d7c8a5541bead65e5f44687e6b3fbf3fbcb8d7",
+  "timestamp": "2026-10-30T10:20:32Z",
   "nebius": {
     "base_url": "https://api.tokenfactory.nebius.com/v1/",
     "key_present": false,
     "key_preview": "<none>",
     "status": "MISSING_KEY",
-    "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "tested_model": null,
     "latency_ms": null,
     "probe_success": false
   },
   "tavily": {
     "key_present": false,
     "key_preview": "<none>",
-    "status": "MISSING_KEY",
+    "status": "OMITTED",
     "latency_ms": null,
     "probe_success": false,
     "domains_found": []
@@ -24,7 +24,6 @@
   "overall_ready": false,
   "overall_status": "BLOCKED",
   "failure_reasons": [
-    "TAVILY_API_KEY is not configured or contains placeholder.",
     "NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder."
   ]
 }

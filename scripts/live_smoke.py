@@ -210,6 +210,7 @@ def verify_nebius(
 
     if not receipt["key_present"]:
         receipt["status"] = "MISSING_KEY"
+        receipt["tested_model"] = None
         failures.append("NEBIUS_TOKEN_FACTORY_KEY is not configured or contains placeholder.")
         return receipt, failures
 
@@ -368,14 +369,29 @@ def run_live_smoke() -> int:
     print("🧪 ExcursionLens Live Provider Smoke Test (Fail-Closed)")
     print("=" * 70)
 
-    # 1. Check Tavily
-    print("\n[1/2] Executing live Tavily Search query...")
-    tavily_receipt, tavily_failures = verify_tavily(tavily_key)
-    if tavily_receipt["status"] == "LIVE_SUCCESS":
-        print(f"   ✅ Tavily Live Success! Returned {tavily_receipt['results_count']} results in {tavily_receipt['latency_ms']}ms.")
-        print(f"      Domains: {tavily_receipt['source_domains']}")
+    # 1. Check Tavily (Optional bonus track, omitted by default)
+    if not tavily_key or tavily_key.startswith("your_"):
+        print("\n[1/2] Tavily search is omitted (optional bonus track not claimed).")
+        tavily_receipt = {
+            "query": "CDC vaccine storage handling temperature excursion 2 to 8 C",
+            "query_digest": "5f89c71f5b5756579c358508a71711b188f0eb4b20f6ca00d841636e7c1372d0",
+            "status": "OMITTED",
+            "latency_ms": None,
+            "results_count": 0,
+            "source_domains": [],
+            "source_digests": [],
+            "key_present": False,
+            "key_preview": "<none>"
+        }
+        tavily_failures = []
     else:
-        print(f"   ❌ Tavily failed ({tavily_receipt['status']}): {tavily_failures}")
+        print("\n[1/2] Executing live Tavily Search query...")
+        tavily_receipt, tavily_failures = verify_tavily(tavily_key)
+        if tavily_receipt["status"] == "LIVE_SUCCESS":
+            print(f"   ✅ Tavily Live Success! Returned {tavily_receipt['results_count']} results in {tavily_receipt['latency_ms']}ms.")
+            print(f"      Domains: {tavily_receipt['source_domains']}")
+        else:
+            print(f"   ❌ Tavily failed ({tavily_receipt['status']}): {tavily_failures}")
 
     # 2. Check Nebius Token Factory
     print("\n[2/2] Executing live Nebius Token Factory inference with NVIDIA model...")
@@ -385,7 +401,7 @@ def run_live_smoke() -> int:
     else:
         print(f"   ❌ Nebius failed ({nebius_receipt['status']}): {nebius_failures}")
 
-    all_failures = tavily_failures + nebius_failures
+    all_failures = nebius_failures + (tavily_failures if tavily_receipt["key_present"] else [])
     tavily_ok = tavily_receipt["status"] == "LIVE_SUCCESS"
     nebius_ok = nebius_receipt["status"] == "LIVE_SUCCESS"
 
@@ -396,7 +412,7 @@ def run_live_smoke() -> int:
     elif tavily_ok:
         overall_status = "PARTIAL_TAVILY"
     else:
-        overall_status = "BLOCKED" if (not tavily_receipt["key_present"] and not nebius_receipt["key_present"]) else "FAILED"
+        overall_status = "BLOCKED" if not nebius_receipt["key_present"] else "FAILED"
 
     def _get_git_sha() -> str:
         try:
@@ -409,12 +425,18 @@ def run_live_smoke() -> int:
         return "unknown"
 
     evidence_authority, execution_context = get_execution_provenance()
+    git_sha = _get_git_sha()
 
     receipt = {
         "schema_version": "1.0",
         "evidence_authority": evidence_authority,
+        "workflow_run_url": execution_context if evidence_authority == "AUTHORITATIVE_CI_ARTIFACT" else None,
         "execution_context": execution_context,
-        "commit_sha": _get_git_sha(),
+        "evaluated_source_sha": git_sha,
+        "receipt_commit_sha": git_sha,
+        "commit_sha": git_sha,
+        "endpoint_commit": None,
+        "provider_mode": "LIVE" if overall_status in ("LIVE_VERIFIED", "LIVE_TOKEN_FACTORY") else "DEMO_FIXTURE",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "status": overall_status,
         "nebius_smoke": nebius_receipt,

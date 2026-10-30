@@ -153,8 +153,13 @@ def main() -> int:
         receipt = {
             "schema_version": "1.0",
             "evidence_authority": evidence_authority,
+            "workflow_run_url": execution_context if evidence_authority == "AUTHORITATIVE_CI_ARTIFACT" else None,
             "execution_context": execution_context,
+            "evaluated_source_sha": expected_sha,
+            "receipt_commit_sha": get_git_sha(),
             "commit_sha": expected_sha,
+            "endpoint_commit": None,
+            "provider_mode": "DEMO_FIXTURE",
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "status": "BLOCKED",
             "reason": "Hosting deployment credentials/target not configured in environment.",
@@ -182,11 +187,23 @@ def main() -> int:
     print(f"Expected SHA: {expected_sha}")
     receipt_data, failures = verify_deployment(target_url, expected_sha)
 
+    endpoint_commit = receipt_data.get("deployed_commit")
+    provider_mode = (
+        receipt_data.get("health_check", {}).get("provider_mode", "DEMO_FIXTURE")
+        if isinstance(receipt_data.get("health_check"), dict)
+        else "DEMO_FIXTURE"
+    )
+
     final_receipt = {
         "schema_version": "1.0",
         "evidence_authority": evidence_authority,
+        "workflow_run_url": execution_context if evidence_authority == "AUTHORITATIVE_CI_ARTIFACT" else None,
         "execution_context": execution_context,
+        "evaluated_source_sha": expected_sha,
+        "receipt_commit_sha": get_git_sha(),
         "commit_sha": expected_sha,
+        "endpoint_commit": endpoint_commit,
+        "provider_mode": provider_mode,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "status": receipt_data["status"],
         "deployment_probe": receipt_data,

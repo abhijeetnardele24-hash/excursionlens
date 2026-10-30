@@ -326,7 +326,12 @@ def main():
             "status": smoke_status,
             "reason": smoke_reason,
             "nebius_token_factory": smoke_data.get("nebius_smoke", {}).get("status", "NOT_CONFIGURED"),
-            "served_nvidia_model": smoke_data.get("nebius_smoke", {}).get("tested_model", "nvidia/llama-3.1-nemotron-70b-instruct"),
+            "served_nvidia_model": (
+                smoke_data.get("nebius_smoke", {}).get("selected_catalog_model")
+                or smoke_data.get("nebius_smoke", {}).get("tested_model")
+                if smoke_status in ("LIVE_VERIFIED", "LIVE_TOKEN_FACTORY")
+                else None
+            ),
             "tavily_search": smoke_data.get("tavily_smoke", {}).get("status", "NOT_CONFIGURED"),
             "notice": "Fail-closed check. Real inference and retrieval verified when keys provided.",
         },
@@ -348,7 +353,7 @@ def main():
     elif smoke_status == "LIVE_TOKEN_FACTORY":
         results["overall_status"] = "LIVE_TOKEN_FACTORY"
     else:
-        results["overall_status"] = "INTERNAL_COMPLETE_EXTERNAL_ACTION_REQUIRED"
+        results["overall_status"] = "INTERNAL_COMPLETE_SPONSOR_RUNTIME_UNVERIFIED"
 
 
     # Write out verification-results.json

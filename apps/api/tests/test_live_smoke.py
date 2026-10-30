@@ -270,3 +270,66 @@ def test_exact_commit_live_receipt_verifies_head():
     assert status == "LIVE_VERIFIED"
     assert reason is None
 
+
+def test_nebius_only_success_without_tavily(monkeypatch):
+    from scripts.live_smoke import run_live_smoke
+
+    # Mock settings and env with Nebius key but empty Tavily key
+    monkeypatch.setattr("scripts.live_smoke.settings.nebius_key", "neb-live-test-valid-key-123456")
+    monkeypatch.setattr("scripts.live_smoke.settings.tavily_key", "")
+    monkeypatch.setenv("NEBIUS_TOKEN_FACTORY_KEY", "neb-live-test-valid-key-123456")
+    monkeypatch.setenv("TAVILY_API_KEY", "")
+
+    # Mock verify_nebius to return success
+    def mock_verify_nebius(key, base_url, deep_model, client=None):
+        return {
+            "tested_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+            "selected_catalog_model": "nvidia/llama-3.1-nemotron-70b-instruct",
+            "status": "LIVE_SUCCESS",
+            "latency_ms": 350,
+            "prompt_tokens": 120,
+            "completion_tokens": 80,
+            "total_tokens": 200,
+            "response_digest": "abcdef123456",
+            "structured_output_valid": True,
+            "key_present": True,
+            "key_preview": "neb-...3456",
+        }, []
+
+    monkeypatch.setattr("scripts.live_smoke.verify_nebius", mock_verify_nebius)
+
+    rc = run_live_smoke()
+    assert rc == 0
+
+    receipt_file = ROOT / "docs" / "live-smoke-receipt.json"
+    with open(receipt_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    assert data["status"] == "LIVE_TOKEN_FACTORY"
+    assert data["nebius_smoke"]["status"] == "LIVE_SUCCESS"
+    assert data["tavily_smoke"]["status"] == "OMITTED"
+    assert data["provider_mode"] == "LIVE"
+
+
+def test_missing_key_fail_closed_behavior(monkeypatch):
+    from scripts.live_smoke import run_live_smoke
+
+    monkeypatch.setattr("scripts.live_smoke.settings.nebius_key", "")
+    monkeypatch.setattr("scripts.live_smoke.settings.tavily_key", "")
+    monkeypatch.setenv("NEBIUS_TOKEN_FACTORY_KEY", "")
+    monkeypatch.setenv("TAVILY_API_KEY", "")
+
+    rc = run_live_smoke()
+    assert rc == 1
+
+    receipt_file = ROOT / "docs" / "live-smoke-receipt.json"
+    with open(receipt_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    assert data["status"] == "BLOCKED"
+    assert data["nebius_smoke"]["status"] == "MISSING_KEY"
+    assert data["nebius_smoke"]["tested_model"] is None
+    assert data["nebius_smoke"]["total_tokens"] is None
+    assert data["provider_mode"] == "DEMO_FIXTURE"
+    assert "evaluated_source_sha" in data
+    assert "receipt_commit_sha" in data
+
+
